@@ -1,0 +1,1 @@
+export { ManagerView } from "./ManagerView";
