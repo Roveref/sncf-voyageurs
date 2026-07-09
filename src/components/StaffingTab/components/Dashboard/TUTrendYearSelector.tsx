@@ -4,7 +4,7 @@ import Chip from "@mui/material/Chip";
 import { alpha } from "@mui/material/styles";
 import { chartPalette, brand } from "../../../../config/brandConfig";
 
-// Year palette (BearingPoint brand tones, newest year gets strongest color)
+// Year palette (GAIF brand tones, newest year gets strongest color)
 export const YEAR_COLORS = [...chartPalette];
 
 /** Hook to manage year selection — share between TUOverview header and chart */

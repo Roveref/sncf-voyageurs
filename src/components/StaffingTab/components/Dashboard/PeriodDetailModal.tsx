@@ -46,7 +46,7 @@ interface PeriodDetailModalProps {
 const NoDataMessage = memo(() => (
   <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", py: 4 }}>
     <Typography sx={{ fontSize: "0.875rem", color: "text.disabled", fontStyle: "italic" }}>
-      No data available for this period
+      Aucune donnée pour cette période
     </Typography>
   </Box>
 ));
@@ -114,8 +114,8 @@ const PeriodDetailModal = memo(({ data, onClose }: PeriodDetailModalProps) => {
         {data.notYetArrived ? (
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", py: 4 }}>
             <Typography sx={{ fontSize: "0.875rem", color: "#94a3b8", fontStyle: "italic" }}>
-              Not yet in workforce (arrival on{" "}
-              {new Date(data.notYetArrived + "T00:00:00").toLocaleDateString("en-GB", {
+              Pas encore dans l'équipe (arrivée le{" "}
+              {new Date(data.notYetArrived + "T00:00:00").toLocaleDateString("fr-FR", {
                 day: "numeric",
                 month: "long",
                 year: "numeric",
@@ -126,8 +126,8 @@ const PeriodDetailModal = memo(({ data, onClose }: PeriodDetailModalProps) => {
         ) : data.alreadyDeparted ? (
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", py: 4 }}>
             <Typography sx={{ fontSize: "0.875rem", color: "#94a3b8", fontStyle: "italic" }}>
-              Left workforce on{" "}
-              {new Date(data.alreadyDeparted + "T00:00:00").toLocaleDateString("en-GB", {
+              A quitté l'équipe le{" "}
+              {new Date(data.alreadyDeparted + "T00:00:00").toLocaleDateString("fr-FR", {
                 day: "numeric",
                 month: "long",
                 year: "numeric",

@@ -32,7 +32,7 @@ import {
 import { StatusChartTooltip } from "./ChartTooltips";
 import { formatCompactCurrency } from "../../../utils/formatters";
 
-// BearingPoint brand colors for Allocated and Others
+// GAIF brand colors for Allocated and Others
 const COLORS = {
   earlyOthers: "#FFBDC0",
   midOthers: "#FFA3A8",
@@ -79,7 +79,7 @@ const BarTotalLabels = ({ data, textColor }: { data: any[]; textColor: string })
               textAnchor="start"
               dominantBaseline="middle"
             >
-              {count} opp{count !== 1 ? "s" : ""}
+              {count} actif{count !== 1 ? "s" : ""}
             </text>
             <text
               x={xPos + 10}
@@ -187,7 +187,7 @@ const AccountChart = React.memo(
                   onClick={onClearAllDrillDown ?? onBackClick}
                   sx={{ cursor: "pointer", fontSize: "inherit", lineHeight: "inherit" }}
                 >
-                  Segments
+                  Patrimoines
                 </Link>
                 {drillDownSubSegment ? (
                   <Link
@@ -217,7 +217,7 @@ const AccountChart = React.memo(
                   onClick={onBackClick}
                   sx={{ cursor: "pointer", fontSize: "inherit", lineHeight: "inherit" }}
                 >
-                  Accounts
+                  Sites
                 </Link>
                 <Typography variant="h6" fontWeight={700} color="text.primary" noWrap>
                   {filteredAccount}
@@ -225,7 +225,7 @@ const AccountChart = React.memo(
               </MuiBreadcrumbs>
             ) : (
               <Typography variant="h6" fontWeight={700}>
-                {showSegmentMode ? "Pipeline by Segment" : "Pipeline by Account"}
+                {showSegmentMode ? "Parc par patrimoine" : "Parc par site"}
               </Typography>
             )}
           </Box>

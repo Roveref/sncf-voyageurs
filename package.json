@@ -1,7 +1,7 @@
 {
-  "name": "bearingpoint-dashboard",
+  "name": "gaif-pilot-dashboard",
   "version": "1.0.0",
-  "description": "BearingPoint Dashboard for monitoring pipeline and bookings with file upload",
+  "description": "GAIF Pilot — plateforme EAM de pilotage des installations fixes (Direction GAIF SNCF Voyageurs)",
   "private": true,
   "license": "UNLICENSED",
   "engines": {

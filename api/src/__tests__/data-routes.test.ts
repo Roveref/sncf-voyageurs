@@ -160,7 +160,7 @@ describe("PUT /api/data/opportunities/:id", () => {
   });
 
   it("updates opportunity successfully", async () => {
-    mockRun.mockReturnValueOnce({ changes: 1 }); // user_opportunities update
+    mockRun.mockReturnValueOnce({ changes: 1 }); // user_assets update
     const res = await request(app).put("/api/data/opportunities/OPP-1").send({ name: "Updated Name" });
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);

@@ -28,10 +28,12 @@ export default defineConfig(async ({ mode }) => {
     VitePWA({
       registerType: "autoUpdate",
       manifest: {
-        name: "BearingPoint Dashboard",
-        short_name: "BP Dashboard",
-        theme_color: "#FF3D47",
+        name: "GAIF Pilot — SNCF Voyageurs",
+        short_name: "GAIF Pilot",
+        description: "Plateforme EAM de pilotage des installations fixes — Direction GAIF SNCF Voyageurs",
+        theme_color: "#EB0070",
         background_color: "#FAF8F7",
+        lang: "fr",
         display: "standalone",
         icons: [
           {
@@ -86,11 +88,11 @@ export default defineConfig(async ({ mode }) => {
       },
     },
     server: {
-      port: 3000,
+      port: parseInt(process.env.VITE_PORT || "3000", 10),
       open: true,
       proxy: {
         "/api": {
-          target: "http://localhost:3001",
+          target: process.env.VITE_API_PROXY_TARGET || "http://localhost:3001",
           changeOrigin: true,
         },
       },

@@ -144,7 +144,7 @@ Base URL: `http://localhost:3001`
 
 #### `POST /api/data/opportunities`
 - **Body**: `{ id, name, account?, status?, grossRevenue?, netRevenue?, winPct?, segment?, manager?, partner? }`
-- **Response**: `201 { success, id }`. Inserts into `user_opportunities` table.
+- **Response**: `201 { success, id }`. Inserts into `user_assets` table.
 
 #### `GET /api/data/assignments`
 - **Query**: `empId?`, `active?` ("true" for current assignments only)

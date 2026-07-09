@@ -341,7 +341,7 @@ export const getHoursPerDay = (grade?: string): number => (grade ? (GRADE_HOURS_
 // Default grade for employees without skills data
 export const UNKNOWN_GRADE = "No grade";
 
-// BearingPoint corporate palette — aligned with booking charts (from brandConfig)
+// GAIF corporate palette — aligned with booking charts (from brandConfig)
 // Deterministic mapping per known grade; fallback for unknown grades
 const BP_GRADE_COLORS: Record<string, GradeColor> = Object.fromEntries(
   Object.entries(gradeColors).map(([grade, c]) => [grade, { bg: c.bg, text: c.text, border: c.border }])
@@ -359,7 +359,7 @@ const UNKNOWN_GRADE_COLOR: GradeColor = { bg: "#f5f3f2", text: "#8a7d75", border
 export const getGradeColor = (grade: string): GradeColor => {
   if (!grade || grade === UNKNOWN_GRADE) return UNKNOWN_GRADE_COLOR;
   if (BP_GRADE_COLORS[grade]) return BP_GRADE_COLORS[grade];
-  // Fallback for unknown grades — hash into BearingPoint palette
+  // Fallback for unknown grades — hash into GAIF palette
   let hash = 0;
   for (let i = 0; i < grade.length; i++) {
     hash = (hash << 5) - hash + grade.charCodeAt(i);
@@ -392,6 +392,23 @@ export let GRADE_ABBR: Record<string, string> = {
   Analyst: "A",
   Intern: "Int",
 };
+
+// UI-only GAIF relabeling of grade names (DB values unchanged)
+// Partner→Directeur, Director→Resp. pôle, SM→Chef mission, Manager→Expert sr,
+// SC→Expert, Consultant→Chargé mission, Analyst→Junior, Intern→Apprenti
+export const GRADE_UI_LABEL: Record<string, string> = {
+  Partner: "Directeur",
+  Director: "Resp. pôle",
+  "Senior Manager": "Chef mission",
+  Manager: "Expert sr",
+  "Senior Consultant": "Expert",
+  Consultant: "Chargé mission",
+  Analyst: "Junior",
+  Intern: "Apprenti",
+};
+
+/** Renvoie le libellé GAIF d'un grade. Fallback = grade d'origine. */
+export const getGradeUILabel = (grade: string): string => GRADE_UI_LABEL[grade] || grade;
 
 // ─── MDS Extract Start Date ─────────────────────────────────────────────────
 // MDS extracts can only include employees present at extraction time.

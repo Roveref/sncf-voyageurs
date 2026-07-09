@@ -149,7 +149,7 @@ const LeftPanel = memo(
       >
         {/* ═══ OPPORTUNITY ═══ */}
         <Section>
-          <SectionLabel>Opportunity</SectionLabel>
+          <SectionLabel>Actif</SectionLabel>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1.25 }}>
             <Autocomplete
               options={accountList}
@@ -161,9 +161,9 @@ const LeftPanel = memo(
               renderInput={(p) => (
                 <TextField
                   {...p}
-                  label="Account"
+                  label="Site"
                   size="small"
-                  placeholder="All accounts..."
+                  placeholder="Tous les sites..."
                   variant="filled"
                   sx={filledSx}
                 />
@@ -190,14 +190,7 @@ const LeftPanel = memo(
               )}
               isOptionEqualToValue={(o, v) => o.opportunityId === v.opportunityId}
               renderInput={(p) => (
-                <TextField
-                  {...p}
-                  label="Opportunity *"
-                  size="small"
-                  placeholder="Search..."
-                  variant="filled"
-                  sx={filledSx}
-                />
+                <TextField {...p} label="Actif *" size="small" placeholder="Search..." variant="filled" sx={filledSx} />
               )}
               size="small"
               slotProps={{ listbox: { sx: { maxHeight: 200 } } }}
@@ -207,7 +200,7 @@ const LeftPanel = memo(
 
         {/* ═══ PROFILE (grade + skills + person) ═══ */}
         <Section>
-          <SectionLabel>Profile</SectionLabel>
+          <SectionLabel>Rôle</SectionLabel>
 
           <FieldLabel>Grade *</FieldLabel>
           <Box sx={{ display: "flex", gap: 0.5, mb: 0.5 }}>
@@ -272,7 +265,7 @@ const LeftPanel = memo(
 
           <Divider sx={{ my: 1.5 }} />
 
-          <FieldLabel>Skills</FieldLabel>
+          <FieldLabel>Compétences</FieldLabel>
           <SkillsAutocomplete
             value={form.skills}
             onChange={(skills) => updateForm({ skills })}
@@ -388,7 +381,7 @@ const LeftPanel = memo(
           {/* Utilization + Probability — inline sliders */}
           <Box sx={{ display: "flex", gap: 1.5, alignItems: "flex-start" }}>
             <Box sx={{ flex: 1 }}>
-              <FieldLabel>Utilization</FieldLabel>
+              <FieldLabel>Charge</FieldLabel>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1, px: 0.5 }}>
                 <Slider
                   value={form.utilization}
@@ -415,7 +408,7 @@ const LeftPanel = memo(
               </Box>
             </Box>
             <Box sx={{ flex: 1 }}>
-              <FieldLabel>Probability</FieldLabel>
+              <FieldLabel>Probabilité</FieldLabel>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1, px: 0.5 }}>
                 <Slider
                   value={form.probability}

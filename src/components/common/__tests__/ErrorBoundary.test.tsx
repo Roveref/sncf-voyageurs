@@ -46,8 +46,8 @@ describe("ErrorBoundary", () => {
         <BrokenChild shouldThrow />
       </ErrorBoundary>
     );
-    // The default fallback contains a "Something went wrong" heading and a Reload button
-    expect(container.textContent).toContain("Something went wrong");
+    // The default fallback contains "Une erreur est survenue" heading and a Recharger button
+    expect(container.textContent).toContain("Une erreur est survenue");
     expect(container.querySelector("button")).not.toBeNull();
     document.body.removeChild(container);
   });

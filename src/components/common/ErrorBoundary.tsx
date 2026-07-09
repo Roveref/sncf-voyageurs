@@ -60,17 +60,17 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
             }}
           >
             <Typography variant="h6" color="error" sx={{ fontWeight: 700 }}>
-              {this.props.fallbackMessage || "Something went wrong"}
+              {this.props.fallbackMessage || "Une erreur est survenue"}
             </Typography>
             <Typography
               variant="body2"
               color="text.secondary"
               sx={{ maxWidth: 500, textAlign: "center", fontFamily: "monospace", fontSize: "0.75rem" }}
             >
-              {this.state.error?.message || "An unexpected error occurred during rendering."}
+              {this.state.error?.message || "Une erreur inattendue est survenue lors du rendu."}
             </Typography>
             <Button variant="contained" onClick={this.handleReset} sx={{ mt: 1 }}>
-              Reload
+              Recharger
             </Button>
           </Paper>
         </Box>

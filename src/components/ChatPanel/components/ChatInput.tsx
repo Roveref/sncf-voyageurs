@@ -11,6 +11,7 @@ import Tooltip from "@mui/material/Tooltip";
 import CircularProgress from "@mui/material/CircularProgress";
 import Slider from "@mui/material/Slider";
 import Collapse from "@mui/material/Collapse";
+import { alpha } from "@mui/material/styles";
 import SendIcon from "@mui/icons-material/Send";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
@@ -18,6 +19,7 @@ import MicIcon from "@mui/icons-material/Mic";
 import MicOffIcon from "@mui/icons-material/MicOff";
 import TuneIcon from "@mui/icons-material/Tune";
 import { easing, timing } from "../../../styles/animations";
+import { brand } from "../../../config/brandConfig";
 import type { ScoringConfig } from "../../../services/api";
 
 interface ChatInputProps {
@@ -114,8 +116,8 @@ const ChatInput = memo(
                 Staffing filters
               </Typography>
               {[
-                { label: "Availability", key: "minAvailPct" as const, levels: ["Strict", "Medium", "Flexible"] },
-                { label: "Skills", key: "minSkillsPct" as const, levels: ["Strict", "Medium", "Flexible"] },
+                { label: "Availability", key: "minAvailPct" as const, levels: ["Strict", "Moyen", "Flexible"] },
+                { label: "Skills", key: "minSkillsPct" as const, levels: ["Strict", "Moyen", "Flexible"] },
                 { label: "Grade", key: "maxGradeDist" as const, levels: ["Exact", "±1", "±2"] },
                 { label: "Period", key: "periodTolerance" as const, levels: ["Exact", "±1 month", "±3 months"] },
               ].map(({ label, key, levels }) => (
@@ -196,14 +198,14 @@ const ChatInput = memo(
                 height: 36,
                 borderRadius: "50%",
                 color: isListening ? "#fff" : "rgba(255,255,255,0.5)",
-                bgcolor: isListening ? "#FF3D47" : "transparent",
+                bgcolor: isListening ? brand.primary : "transparent",
                 animation: isListening ? "pulse 1.5s infinite" : "none",
                 "@keyframes pulse": {
-                  "0%": { boxShadow: "0 0 0 0 rgba(255,61,71,0.4)" },
-                  "70%": { boxShadow: "0 0 0 8px rgba(255,61,71,0)" },
-                  "100%": { boxShadow: "0 0 0 0 rgba(255,61,71,0)" },
+                  "0%": { boxShadow: `0 0 0 0 ${alpha(brand.primary, 0.4)}` },
+                  "70%": { boxShadow: `0 0 0 8px ${alpha(brand.primary, 0)}` },
+                  "100%": { boxShadow: `0 0 0 0 ${alpha(brand.primary, 0)}` },
                 },
-                "&:hover": { bgcolor: isListening ? "#CC2931" : "rgba(255,255,255,0.1)" },
+                "&:hover": { bgcolor: isListening ? brand.primaryDark : "rgba(255,255,255,0.1)" },
               }}
             >
               {isListening ? <MicOffIcon sx={{ fontSize: 18 }} /> : <MicIcon sx={{ fontSize: 18 }} />}

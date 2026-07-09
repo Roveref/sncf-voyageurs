@@ -27,16 +27,16 @@ export const validateOpportunityForm = (
     newErrors.netRevenue = "Required";
   }
   if (!formData.serviceLine1?.trim()) {
-    newErrors.serviceLine1 = "Required";
+    newErrors.serviceLine1 = "Requis";
   }
 
   if (isBooked && !formData.estimatedBookingDate) {
-    newErrors.estimatedBookingDate = "Required when status is Booked";
+    newErrors.estimatedBookingDate = "Requis pour le statut En exploitation";
   }
 
   const hasAllocations = formData.allocation1 || formData.allocation2 || formData.allocation3;
   if (hasAllocations && totalAllocation !== 100) {
-    newErrors.allocation = "Total allocation must equal 100%";
+    newErrors.allocation = "Le total d'allocation doit être de 100%";
   }
 
   return newErrors;
@@ -60,13 +60,13 @@ export const generateOpportunityId = (): string => {
 };
 
 export const STATUS_OPTIONS = [
-  { value: 1, label: "Lead Identified" },
-  { value: 4, label: "Go Approved" },
-  { value: 6, label: "Proposal Submitted" },
-  { value: 11, label: "Client Won" },
-  { value: 13, label: "AEL" },
-  { value: 14, label: "Booked" },
-  { value: 15, label: "Lost" },
+  { value: 1, label: "Émergence" },
+  { value: 4, label: "Investissement / CEB" },
+  { value: 6, label: "Étude en cours" },
+  { value: 11, label: "Maintenance lourde" },
+  { value: 13, label: "Conventionné" },
+  { value: 14, label: "En exploitation" },
+  { value: 15, label: "Déclassé" },
 ];
 
 export const getStatusColor = (status: number, theme: Theme) => {

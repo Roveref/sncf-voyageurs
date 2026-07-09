@@ -21,10 +21,10 @@ import type { TimelineAssignment, StagedNeed, GanttRange, MonthColumn } from "./
 import type { StaffingNeedItem } from "../../../types/actions";
 
 const SECTION_CONFIG = {
-  past: { label: "Past staffing", color: "#9ca3af", barAlpha: 0.4 },
-  current: { label: "Current staffing", color: "#3b82f6", barAlpha: 0.9 },
-  upcoming: { label: "Upcoming staffing", color: "#f59e0b", barAlpha: 0.7 },
-  needs: { label: "Staffing needs", color: "#8b5cf6", barAlpha: 0.8 },
+  past: { label: "Affectations passées", color: "#9ca3af", barAlpha: 0.4 },
+  current: { label: "Affectations en cours", color: "#3b82f6", barAlpha: 0.9 },
+  upcoming: { label: "Affectations à venir", color: "#f59e0b", barAlpha: 0.7 },
+  needs: { label: "Besoins d'intervention", color: "#8b5cf6", barAlpha: 0.8 },
 } as const;
 
 type Section = keyof typeof SECTION_CONFIG;
@@ -517,7 +517,7 @@ const EnhancedStaffingTimeline = memo(
             flexShrink: 0,
           }}
         >
-          <Typography sx={{ fontSize: "0.88rem", fontWeight: 700 }}>Staffing Timeline</Typography>
+          <Typography sx={{ fontSize: "0.88rem", fontWeight: 700 }}>Planning des affectations</Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
             {/* Legend */}
             {(Object.keys(SECTION_CONFIG) as Section[]).map((s) => (

@@ -183,7 +183,7 @@ const OpportunitySizeCard = React.memo(
         <CardContent sx={{ p: 3, height: "100%" }}>
           {/* Card Title */}
           <Typography variant="h6" fontWeight={700}>
-            Pipeline Size Analysis
+            Analyse de la valeur du parc
           </Typography>
 
           <Divider sx={{ my: 2 }} />
@@ -200,7 +200,7 @@ const OpportunitySizeCard = React.memo(
               }}
             >
               <Typography variant="caption" color="text.secondary" gutterBottom display="block">
-                Average Size
+                Valeur moyenne
               </Typography>
               <Box sx={{ display: "flex", alignItems: "baseline", gap: 1, flexWrap: "wrap" }}>
                 <AnimatedCurrency value={averageSize} variant="h5" color="text.primary" />
@@ -368,10 +368,10 @@ const OpportunitySizeCard = React.memo(
                       color="primary.main"
                       sx={{ fontWeight: 700, fontSize: "1.1rem" }}
                     />{" "}
-                    opportunities
-                    {showIO && paretoAnalysisIO.top20Count > 0 && (
+                    actifs
+                    {false && showIO && paretoAnalysisIO.top20Count > 0 && (
                       <Box component="span" sx={{ ml: 0.5, color: "primary.main", fontSize: "0.75rem" }}>
-                        (I&O: {paretoAnalysisIO.top20Count} opps)
+                        (GAIF: {paretoAnalysisIO.top20Count} actifs)
                       </Box>
                     )}
                   </Typography>

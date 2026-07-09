@@ -21,7 +21,7 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import { alpha } from "@mui/material/styles";
 import { EmployeeAvatar, StatusBadge, UtilizationBar } from "./UtilizationBadge";
-import { getGradeColor, SUB_TEAM_COLORS, compareGrades } from "../../constants";
+import { getGradeColor, getGradeUILabel, SUB_TEAM_COLORS, compareGrades } from "../../constants";
 import { fmtHD } from "../../constants/theme";
 import { dividerBorder } from "../../../../styles/borders";
 
@@ -47,7 +47,7 @@ const GradeBadge = memo(({ grade }: any) => {
         color: colors.text,
       }}
     >
-      {grade}
+      {getGradeUILabel(grade)}
     </Box>
   );
 });
@@ -479,9 +479,9 @@ export const EmployeeTableView = memo(({ employees, onViewEmployee, onAssignEmpl
                     sx={{ "& .MuiSvgIcon-root": { fontSize: 16 } }}
                   />
                 </TableCell>
-                <SortableHeader label="Employee" sortKey="name" currentSort={sort} onSort={handleSort} />
-                <SortableHeader label="Grade" sortKey="grade" currentSort={sort} onSort={handleSort} />
-                <SortableHeader label="Team" sortKey="subTeam" currentSort={sort} onSort={handleSort} />
+                <SortableHeader label="Collaborateur" sortKey="name" currentSort={sort} onSort={handleSort} />
+                <SortableHeader label="Rôle" sortKey="grade" currentSort={sort} onSort={handleSort} />
+                <SortableHeader label="Pôle" sortKey="subTeam" currentSort={sort} onSort={handleSort} />
                 <TableCell
                   sx={{
                     px: 2,

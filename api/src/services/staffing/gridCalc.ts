@@ -64,9 +64,7 @@ function loadJobcodeMapping(): Map<string, { segment: string; serviceLine: strin
   const map = new Map<string, { segment: string; serviceLine: string }>();
   try {
     const rows = db
-      .prepare(
-        "SELECT jobCode, subSegmentCode, serviceLine1 FROM crm_opportunities WHERE jobCode IS NOT NULL AND jobCode != ''"
-      )
+      .prepare("SELECT jobCode, subSegmentCode, serviceLine1 FROM assets WHERE jobCode IS NOT NULL AND jobCode != ''")
       .all() as { jobCode: string; subSegmentCode: string; serviceLine1: string }[];
     for (const r of rows) {
       map.set(r.jobCode, {

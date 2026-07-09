@@ -7,7 +7,7 @@ import { keyframes } from "@emotion/react";
 import { easing, timing } from "../../styles/animations";
 import { brand } from "../../config/brandConfig";
 
-// BearingPoint Brand Colors (from brandConfig)
+// GAIF Brand Colors (from brandConfig)
 const colors = {
   R50: brand.primary,
   R60: brand.primaryDark,
@@ -134,7 +134,7 @@ export const NoDataEmptyState = memo(({ onUploadClick }: { onUploadClick?: () =>
           animation: `${fadeIn} 0.6s ${easing.elegant} 0.2s both`,
         }}
       >
-        No data loaded yet
+        Aucune donnée chargée
       </Typography>
 
       <Typography
@@ -146,7 +146,7 @@ export const NoDataEmptyState = memo(({ onUploadClick }: { onUploadClick?: () =>
           animation: `${fadeIn} 0.6s ${easing.elegant} 0.3s both`,
         }}
       >
-        Upload your Excel file to get started and explore your dashboard insights
+        Importez votre fichier Excel pour commencer et explorer les données du tableau de bord
       </Typography>
 
       <Button
@@ -167,7 +167,7 @@ export const NoDataEmptyState = memo(({ onUploadClick }: { onUploadClick?: () =>
           },
         }}
       >
-        Upload Excel File
+        Importer un fichier Excel
       </Button>
     </EmptyStateContainer>
   );
@@ -178,7 +178,7 @@ export const NoDataEmptyState = memo(({ onUploadClick }: { onUploadClick?: () =>
  * Displayed when filters return no results
  */
 export const NoResultsEmptyState = memo(
-  ({ onClearFilters, message = "No results found" }: { onClearFilters?: any; message?: string }) => {
+  ({ onClearFilters, message = "Aucun résultat trouvé" }: { onClearFilters?: any; message?: string }) => {
     return (
       <EmptyStateContainer animation={fadeIn}>
         <IconContainer iconAnimation={pulse}>
@@ -215,7 +215,7 @@ export const NoResultsEmptyState = memo(
             animation: `${fadeIn} 0.6s ${easing.elegant} 0.2s both`,
           }}
         >
-          Try adjusting your filters or search criteria to see more results
+          Essayez d'ajuster vos filtres ou critères de recherche pour voir plus de résultats
         </Typography>
 
         {onClearFilters && (
@@ -237,7 +237,7 @@ export const NoResultsEmptyState = memo(
               },
             }}
           >
-            Clear Filters
+            Effacer les filtres
           </Button>
         )}
       </EmptyStateContainer>
@@ -251,9 +251,9 @@ export const NoResultsEmptyState = memo(
  */
 export const ErrorEmptyState = memo(
   ({
-    errorMessage = "Something went wrong",
+    errorMessage = "Une erreur est survenue",
     onRetry,
-    retryLabel = "Try Again",
+    retryLabel = "Réessayer",
   }: {
     errorMessage?: string;
     onRetry?: () => void;
@@ -313,7 +313,7 @@ export const ErrorEmptyState = memo(
             animation: `${fadeIn} 0.6s ${easing.elegant} 0.3s both`,
           }}
         >
-          We encountered an issue while processing your request. Please try again.
+          Un problème est survenu lors du traitement de votre demande. Veuillez réessayer.
         </Typography>
 
         {onRetry && (
@@ -347,7 +347,7 @@ export const ErrorEmptyState = memo(
  * LoadingEmptyState Component (Bonus)
  * Displayed while data is being processed
  */
-export const LoadingEmptyState = memo(({ message = "Loading your data..." }: { message?: string }) => {
+export const LoadingEmptyState = memo(({ message = "Chargement des données..." }: { message?: string }) => {
   const spinnerAnimation = keyframes`
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -389,7 +389,7 @@ export const LoadingEmptyState = memo(({ message = "Loading your data..." }: { m
           animation: `${fadeIn} 0.6s ${easing.elegant} 0.2s both`,
         }}
       >
-        Please wait while we process your information
+        Veuillez patienter pendant le traitement de vos informations
       </Typography>
     </EmptyStateContainer>
   );

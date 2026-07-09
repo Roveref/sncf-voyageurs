@@ -23,27 +23,27 @@ interface OnboardingStep {
 const STEPS: OnboardingStep[] = [
   {
     targetAttr: "tabs",
-    message: "Switch between Pipeline, Staffing, and Project views",
+    message: "Basculez entre Parc d'actifs, Maintenance, Plan de charge et les autres vues",
     placement: "bottom",
   },
   {
     targetAttr: "sidebar",
-    message: "Filter by segment or service line",
+    message: "Filtrez par patrimoine, famille d'actif ou entité (TN/TER/IC)",
     placement: "right",
   },
   {
     targetAttr: "heatmap",
-    message: "Colors show each employee's utilization",
+    message: "Les couleurs indiquent le taux de charge de chaque collaborateur GAIF",
     placement: "top",
   },
   {
     targetAttr: "fab",
-    message: "Create opportunities, accounts, or staffing needs",
+    message: "Créez des actifs, des sites ou des besoins d'intervention",
     placement: "top",
   },
   {
     targetAttr: "chat",
-    message: "Ask the AI assistant about your data",
+    message: "Interrogez l'assistant IA GAIF sur vos actifs et interventions",
     placement: "top",
   },
 ];
@@ -256,7 +256,7 @@ const OnboardingOverlay = memo(() => {
               onClick={complete}
               sx={{ fontSize: "0.75rem", color: "text.secondary", textTransform: "none", p: 0, minWidth: "auto" }}
             >
-              Skip tour
+              Ignorer la visite
             </Button>
 
             <Button
@@ -274,7 +274,7 @@ const OnboardingOverlay = memo(() => {
                 borderRadius: 1.5,
               }}
             >
-              {step < STEPS.length ? "Next" : "Done"}
+              {step < STEPS.length ? "Suivant" : "Terminé"}
             </Button>
           </Box>
         </Paper>

@@ -329,7 +329,7 @@ const DataTable = memo(({ rows, columns, filters, onFilterChange, page, onPageCh
                   colSpan={columns.length + 1}
                   style={{ padding: "32px 0", textAlign: "center", color: "text.disabled" }}
                 >
-                  {activeFilterCount > 0 ? "No results for these filters" : "No data imported"}
+                  {activeFilterCount > 0 ? "Aucun résultat pour ces filtres" : "Aucune donnée importée"}
                 </td>
               </tr>
             )}

@@ -1,5 +1,5 @@
 /**
- * Route POST /api/pptx/generate — Génère un PPTX BearingPoint
+ * Route POST /api/pptx/generate — Génère un PPTX GAIF (template hérité)
  */
 
 import { Router, Request, Response } from "express";

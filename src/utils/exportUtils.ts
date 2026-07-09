@@ -762,26 +762,30 @@ export const flattenOpportunitiesForExport = (
   showNetRevenue: boolean = false
 ): Record<string, unknown>[] => {
   return opportunities.map((opp) => {
-    const revenue = showNetRevenue ? opp.netRevenue : opp.grossRevenue;
     const ioRevenue = calculateRevenueWithSegmentLogic(opp, showNetRevenue);
     const partners = getTechnologyPartnerTags(opp);
+    const maintenanceCost = opp.serviceOffering2Pct;
 
     return {
-      opportunityId: opp.opportunityId ?? "",
-      opportunity: opp.opportunity ?? "",
-      Account: opp.account ?? "",
-      Status: statusText[opp.status as number] ?? opp.status ?? "",
-      winPct: opp.winPct != null ? `${Math.round(opp.winPct as number)}%` : "",
-      Revenue: typeof revenue === "number" ? Math.round(revenue) : (revenue ?? ""),
-      "I&O Revenue": typeof ioRevenue === "number" ? Math.round(ioRevenue) : (ioRevenue ?? ""),
-      creationDate: formatDateSafely(opp.creationDate as string | Date | null),
-      "Start Date": formatDateSafely(opp.creationDate as string | Date | null),
-      "Close Date": formatDateSafely(opp.estimatedBookingDate as string | Date | null),
-      "Service Line": opp.serviceLine1 ?? "",
-      Segment: opp.subSegmentCode ?? "",
-      Owner: opp.manager ?? "",
-      "Technology Partners": partners.join(", "),
-      Manual: opp.isManual ? "Yes" : "",
+      "ID Actif": opp.opportunityId ?? "",
+      Actif: opp.opportunity ?? "",
+      Site: opp.account ?? "",
+      Statut: statusText[opp.status as number] ?? opp.status ?? "",
+      "Disponibilité %": opp.winPct != null ? `${Math.round(opp.winPct as number)}%` : "",
+      "Val. achat":
+        typeof opp.grossRevenue === "number" ? Math.round(opp.grossRevenue as number) : (opp.grossRevenue ?? ""),
+      "Val. résid.": typeof opp.netRevenue === "number" ? Math.round(opp.netRevenue as number) : (opp.netRevenue ?? ""),
+      "Coût annuel":
+        typeof maintenanceCost === "number" ? Math.round(maintenanceCost as number) : (maintenanceCost ?? ""),
+      "Coût GAIF": typeof ioRevenue === "number" ? Math.round(ioRevenue) : (ioRevenue ?? ""),
+      "Date acquisition": formatDateSafely(opp.creationDate as string | Date | null),
+      "Date mise en service": formatDateSafely(opp.creationDate as string | Date | null),
+      "Prochaine VR": formatDateSafely(opp.estimatedBookingDate as string | Date | null),
+      Patrimoine: opp.serviceLine1 ?? "",
+      Famille: opp.subSegmentCode ?? "",
+      Responsable: opp.manager ?? "",
+      Prestataire: partners.join(", "),
+      Intervention: opp.isManual ? "Oui" : "",
     };
   });
 };

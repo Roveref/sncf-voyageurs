@@ -15,8 +15,6 @@ import { getUniqueValues } from "../../utils/dataUtils";
 import { easing } from "../../styles/animations";
 import { getIncludedValues } from "../../utils/filterHelpers";
 import AccountFilterModal from "./AccountFilterModal";
-import TechnologyPartnerFilterModal from "./TechnologyPartnerFilterModal";
-import PeopleFilterModal from "./PeopleFilterModal";
 
 // Function to get all unique technology partners from the three columns
 const getTechnologyPartners = (data: Record<string, any>[]) => {
@@ -34,7 +32,7 @@ const getTechnologyPartners = (data: Record<string, any>[]) => {
   return Array.from(partners).sort();
 };
 
-// Function to get all unique people from Manager, Partner, EM (Engagement Manager), EP (Engagement Partner)
+// Function to get all unique people from Manager, Partner, EM (responsable mission), EP (expert référent)
 const getAllPeople = (data: Record<string, any>[]) => {
   const people = new Set();
 
@@ -126,7 +124,7 @@ const FilterPanel = ({
     handleTechnologyPartnerChange(currentPartners.filter((partner) => partner !== partnerToRemove));
   };
 
-  // Handler for People filter (unified: Manager, Partner, Engagement Manager, Engagement Partner)
+  // Handler for People filter (unified: Manager, Partner, responsable mission, expert référent)
   const handlePeopleChange = (newValue: string[]) => {
     onFilterChange({ people: newValue || [] });
   };
@@ -177,7 +175,7 @@ const FilterPanel = ({
       {onSearchTextChange && (
         <TextField
           size="small"
-          placeholder="Search..."
+          placeholder="Rechercher..."
           value={searchText}
           onChange={(e) => onSearchTextChange(e.target.value)}
           inputProps={{ "aria-label": "Search" }}
@@ -217,7 +215,7 @@ const FilterPanel = ({
           variant="standard"
           onClick={() => setAccountModalOpen(true)}
           value=""
-          placeholder={getIncludedValues(filters.accounts).length > 0 ? "" : "Accounts"}
+          placeholder={getIncludedValues(filters.accounts).length > 0 ? "" : "Sites"}
           inputProps={{ "aria-label": "Filter by account" }}
           InputProps={{
             readOnly: true,
@@ -285,153 +283,73 @@ const FilterPanel = ({
         manualAccounts={manualAccounts}
       />
 
-      {/* Technology Partners Filter - Click to open modal */}
-      <Box sx={{ flex: 1 }}>
-        <TextField
-          fullWidth
-          size="small"
-          variant="standard"
-          onClick={() => setTechPartnerModalOpen(true)}
-          value=""
-          placeholder={getIncludedValues(filters.technologyPartners).length > 0 ? "" : "Technology Partners"}
-          inputProps={{ "aria-label": "Filter by technology partner" }}
-          InputProps={{
-            readOnly: true,
-            startAdornment: getIncludedValues(filters.technologyPartners).length > 0 && (
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, alignItems: "center" }}>
-                {getIncludedValues(filters.technologyPartners).map((partner) => (
-                  <Chip
-                    key={partner}
-                    label={partner}
-                    size="small"
-                    onDelete={(e) => {
-                      e.stopPropagation();
-                      handleRemoveTechPartner(partner);
-                    }}
-                    onMouseDown={(e) => {
-                      e.stopPropagation();
-                    }}
-                    draggable="true"
-                    onDragStart={(e) => {
-                      e.dataTransfer.setData("technologyPartner", partner);
-                      e.dataTransfer.effectAllowed = "move";
-                    }}
-                    sx={{
-                      cursor: "grab",
-                      "&:active": {
-                        cursor: "grabbing",
-                      },
-                    }}
-                  />
-                ))}
-              </Box>
-            ),
-          }}
-          sx={{
-            cursor: "pointer",
-            "& .MuiInput-underline:before": { display: "none" },
-            "& .MuiInput-underline:after": { display: "none" },
-            "& .MuiInputBase-root": {
-              height: 40,
-              alignItems: "center",
+      {/* Technology Partners Filter — hidden for GAIF Pilot */}
+      {false && (
+        <Box sx={{ flex: 1 }}>
+          <TextField
+            fullWidth
+            size="small"
+            variant="standard"
+            onClick={() => setTechPartnerModalOpen(true)}
+            value=""
+            placeholder={getIncludedValues(filters.technologyPartners).length > 0 ? "" : "Prestataires"}
+            inputProps={{ "aria-label": "Filter by technology partner" }}
+            InputProps={{
+              readOnly: true,
+              startAdornment: getIncludedValues(filters.technologyPartners).length > 0 && (
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, alignItems: "center" }}>
+                  {getIncludedValues(filters.technologyPartners).map((partner) => (
+                    <Chip
+                      key={partner}
+                      label={partner}
+                      size="small"
+                      onDelete={(e) => {
+                        e.stopPropagation();
+                        handleRemoveTechPartner(partner);
+                      }}
+                      onMouseDown={(e) => {
+                        e.stopPropagation();
+                      }}
+                      draggable="true"
+                      onDragStart={(e) => {
+                        e.dataTransfer.setData("technologyPartner", partner);
+                        e.dataTransfer.effectAllowed = "move";
+                      }}
+                      sx={{
+                        cursor: "grab",
+                        "&:active": {
+                          cursor: "grabbing",
+                        },
+                      }}
+                    />
+                  ))}
+                </Box>
+              ),
+            }}
+            sx={{
               cursor: "pointer",
-              bgcolor: "action.hover",
-              borderRadius: 1,
-              px: 1.5,
-              fontSize: "0.875rem",
-            },
-            "& .MuiInputBase-input": {
-              cursor: "pointer",
-              py: 0,
-              "&::placeholder": { fontSize: "0.875rem" },
-            },
-          }}
-        />
-      </Box>
+              "& .MuiInput-underline:before": { display: "none" },
+              "& .MuiInput-underline:after": { display: "none" },
+              "& .MuiInputBase-root": {
+                height: 40,
+                alignItems: "center",
+                cursor: "pointer",
+                bgcolor: "action.hover",
+                borderRadius: 1,
+                px: 1.5,
+                fontSize: "0.875rem",
+              },
+              "& .MuiInputBase-input": {
+                cursor: "pointer",
+                py: 0,
+                "&::placeholder": { fontSize: "0.875rem" },
+              },
+            }}
+          />
+        </Box>
+      )}
 
-      {/* Technology Partner Filter Modal */}
-      <TechnologyPartnerFilterModal
-        open={techPartnerModalOpen}
-        onClose={() => setTechPartnerModalOpen(false)}
-        data={data}
-        selectedPartners={getIncludedValues(filters.technologyPartners)}
-        onApply={handleTechPartnerModalApply}
-        showNetRevenue={showNetRevenue}
-      />
-
-      {/* People Filter - Click to open modal */}
-      <Box sx={{ flex: 1 }}>
-        <TextField
-          fullWidth
-          size="small"
-          variant="standard"
-          onClick={() => setPeopleModalOpen(true)}
-          value=""
-          placeholder={getIncludedValues(filters.people).length > 0 ? "" : "People"}
-          inputProps={{ "aria-label": "Filter by person" }}
-          InputProps={{
-            readOnly: true,
-            startAdornment: getIncludedValues(filters.people).length > 0 && (
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, alignItems: "center" }}>
-                {getIncludedValues(filters.people).map((person) => (
-                  <Chip
-                    key={person}
-                    label={person}
-                    size="small"
-                    onDelete={(e) => {
-                      e.stopPropagation();
-                      handleRemovePerson(person);
-                    }}
-                    onMouseDown={(e) => {
-                      e.stopPropagation();
-                    }}
-                    draggable="true"
-                    onDragStart={(e) => {
-                      e.dataTransfer.setData("person", person);
-                      e.dataTransfer.effectAllowed = "move";
-                    }}
-                    sx={{
-                      cursor: "grab",
-                      "&:active": {
-                        cursor: "grabbing",
-                      },
-                    }}
-                  />
-                ))}
-              </Box>
-            ),
-          }}
-          sx={{
-            cursor: "pointer",
-            "& .MuiInput-underline:before": { display: "none" },
-            "& .MuiInput-underline:after": { display: "none" },
-            "& .MuiInputBase-root": {
-              height: 40,
-              alignItems: "center",
-              cursor: "pointer",
-              bgcolor: "action.hover",
-              borderRadius: 1,
-              px: 1.5,
-              fontSize: "0.875rem",
-            },
-            "& .MuiInputBase-input": {
-              cursor: "pointer",
-              py: 0,
-              "&::placeholder": { fontSize: "0.875rem" },
-            },
-          }}
-        />
-      </Box>
-
-      {/* People Filter Modal */}
-      <PeopleFilterModal
-        open={peopleModalOpen}
-        onClose={() => setPeopleModalOpen(false)}
-        data={data}
-        selectedPeople={getIncludedValues(filters.people)}
-        onApply={handlePeopleModalApply}
-        showNetRevenue={showNetRevenue}
-      />
+      {/* Technology Partner + People filters supprimés (Chantier B — purge features BP) */}
 
       {/* Clear All Button */}
       {activeFilterCount > 0 && (

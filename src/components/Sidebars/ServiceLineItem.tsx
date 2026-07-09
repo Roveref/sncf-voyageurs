@@ -343,8 +343,8 @@ const ServiceLineItem = memo(
               gap: 0.5,
             }}
           >
-            {/* Expand button for service offerings */}
-            {hasOfferings && (
+            {/* Expand button for service offerings — hidden for GAIF (N et N-1 suffisent) */}
+            {false && hasOfferings && (
               <Box
                 onClick={(e) => {
                   e.stopPropagation();
@@ -371,8 +371,8 @@ const ServiceLineItem = memo(
             )}
           </Box>
         </Box>
-        {/* Service Offerings dropdown - using lighter shades of service line color */}
-        {hasOfferings && (
+        {/* Service Offerings dropdown — hidden for GAIF (N et N-1 suffisent) */}
+        {false && hasOfferings && (
           <Collapse in={isLineExpanded} timeout="auto">
             <Box
               sx={{

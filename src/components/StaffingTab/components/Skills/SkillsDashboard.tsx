@@ -319,10 +319,10 @@ const GapAnalysis = memo(({ allSkills, _employees }: any) => {
           }}
         >
           <TrackChangesIcon sx={{ fontSize: 14 }} />
-          Bus Factor Risk (1-2 experts)
+          Risque de bus factor (1-2 experts)
         </Typography>
         {gaps.busFactorRisks.length === 0 ? (
-          <Typography sx={{ fontSize: "0.75rem", color: "text.disabled" }}>No risks identified</Typography>
+          <Typography sx={{ fontSize: "0.75rem", color: "text.disabled" }}>Aucun risque identifié</Typography>
         ) : (
           <Box sx={{ "& > * + *": { mt: 0.5 } }}>
             {gaps.busFactorRisks.map((s: any) => (
@@ -363,10 +363,10 @@ const GapAnalysis = memo(({ allSkills, _employees }: any) => {
           }}
         >
           <EmojiEventsIcon sx={{ fontSize: 14 }} />
-          Training Opportunities (avg. level {"<"} 2)
+          Opportunités de formation (niveau moyen {"<"} 2)
         </Typography>
         {gaps.trainingOpps.length === 0 ? (
-          <Typography sx={{ fontSize: "0.75rem", color: "text.disabled" }}>No opportunities identified</Typography>
+          <Typography sx={{ fontSize: "0.75rem", color: "text.disabled" }}>Aucune opportunité identifiée</Typography>
         ) : (
           <Box sx={{ "& > * + *": { mt: 0.5 } }}>
             {gaps.trainingOpps.map((s: any) => (

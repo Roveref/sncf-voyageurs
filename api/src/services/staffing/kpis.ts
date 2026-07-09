@@ -121,7 +121,7 @@ export function getTrend(params: {
       const points = months.map((m) => {
         const row = db
           .prepare(
-            "SELECT COUNT(*) as count, COALESCE(SUM(grossRevenue),0) as revenue, COALESCE(SUM(weightedBooking),0) as weighted FROM crm_opportunities WHERE status NOT IN (14,15) AND creationDate >= ? AND creationDate < ?"
+            "SELECT COUNT(*) as count, COALESCE(SUM(grossRevenue),0) as revenue, COALESCE(SUM(weightedBooking),0) as weighted FROM assets WHERE status NOT IN (14,15) AND creationDate >= ? AND creationDate < ?"
           )
           .get(m.start, m.end) as any;
         return {
@@ -139,7 +139,7 @@ export function getTrend(params: {
     const points = months.map((m) => {
       const row = db
         .prepare(
-          "SELECT COUNT(*) as count, COALESCE(SUM(grossRevenue),0) as revenue FROM crm_opportunities WHERE status = 14 AND bookingDate >= ? AND bookingDate < ?"
+          "SELECT COUNT(*) as count, COALESCE(SUM(grossRevenue),0) as revenue FROM assets WHERE status = 14 AND bookingDate >= ? AND bookingDate < ?"
         )
         .get(m.start, m.end) as any;
       return { label: m.label, start: m.start, end: m.end, count: row.count, revenue: Math.round(row.revenue) };
@@ -186,12 +186,12 @@ export function getTrend(params: {
   if (params.metric === "pipeline") {
     const p1 = db
       .prepare(
-        "SELECT COUNT(*) as count, COALESCE(SUM(grossRevenue),0) as revenue FROM crm_opportunities WHERE status NOT IN (14,15) AND creationDate BETWEEN ? AND ?"
+        "SELECT COUNT(*) as count, COALESCE(SUM(grossRevenue),0) as revenue FROM assets WHERE status NOT IN (14,15) AND creationDate BETWEEN ? AND ?"
       )
       .get(params.periodStart, midStr) as any;
     const p2 = db
       .prepare(
-        "SELECT COUNT(*) as count, COALESCE(SUM(grossRevenue),0) as revenue FROM crm_opportunities WHERE status NOT IN (14,15) AND creationDate BETWEEN ? AND ?"
+        "SELECT COUNT(*) as count, COALESCE(SUM(grossRevenue),0) as revenue FROM assets WHERE status NOT IN (14,15) AND creationDate BETWEEN ? AND ?"
       )
       .get(midStr, params.periodEnd) as any;
     return {
@@ -206,12 +206,12 @@ export function getTrend(params: {
   // bookings
   const b1 = db
     .prepare(
-      "SELECT COUNT(*) as count, COALESCE(SUM(grossRevenue),0) as revenue FROM crm_opportunities WHERE status = 14 AND bookingDate BETWEEN ? AND ?"
+      "SELECT COUNT(*) as count, COALESCE(SUM(grossRevenue),0) as revenue FROM assets WHERE status = 14 AND bookingDate BETWEEN ? AND ?"
     )
     .get(params.periodStart, midStr) as any;
   const b2 = db
     .prepare(
-      "SELECT COUNT(*) as count, COALESCE(SUM(grossRevenue),0) as revenue FROM crm_opportunities WHERE status = 14 AND bookingDate BETWEEN ? AND ?"
+      "SELECT COUNT(*) as count, COALESCE(SUM(grossRevenue),0) as revenue FROM assets WHERE status = 14 AND bookingDate BETWEEN ? AND ?"
     )
     .get(midStr, params.periodEnd) as any;
   return {

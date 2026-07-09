@@ -17,12 +17,12 @@ describe("getStatusMap", () => {
     }
   });
 
-  it("contains recognizable status text in each entry", () => {
+  it("contains recognizable status text in each entry (GAIF phases)", () => {
     const map = getStatusMap();
-    expect(map[1]).toContain("Lead Identified");
-    expect(map[4]).toContain("Go Approved");
-    expect(map[6]).toContain("Proposal Submitted");
-    expect(map[11]).toContain("Client Tells Us We Have Won");
+    expect(map[1]).toContain("Émergence");
+    expect(map[4]).toContain("Investissement");
+    expect(map[6]).toContain("Étude");
+    expect(map[11]).toContain("Maintenance");
   });
 });
 
@@ -71,8 +71,8 @@ describe("COLORS", () => {
     }
   });
 
-  it("starts with BearingPoint red", () => {
-    expect(COLORS[0]).toBe("#FF3D47");
+  it("starts with the primary brand color", () => {
+    expect(COLORS[0]).toBe("#EB0070");
   });
 });
 

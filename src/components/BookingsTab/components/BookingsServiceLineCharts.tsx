@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback, useRef, memo } from "
 import Grid from "@mui/material/Grid2";
 import SimpleBarChart from "./SimpleBarChart";
 import { DetachableCard } from "../../shared";
+import { useCrmData } from "../../../queries/useCrmData";
 
 interface ChartFilter {
   type: string;
@@ -19,6 +20,31 @@ interface BookingsServiceLineChartsProps {
   drillDownResetKey: number;
 }
 
+// ── BU mapping — aligné avec src/data/gaifSites.ts ──
+const BU_LABEL: Record<string, string> = {
+  TN: "Transilien",
+  TER: "TER",
+  IC: "Intercités",
+};
+const BU_CODE_FROM_LABEL: Record<string, string> = {
+  Transilien: "TN",
+  TER: "TER",
+  Intercités: "IC",
+};
+
+const resolveBU = (opp: any, accountByName: Map<string, string>, accountById: Map<string, string>): string | null => {
+  // 1) Lookup via crmAccounts (source de vérité : colonne parentAccount = TN/TER/IC).
+  if (opp.accountId) {
+    const byId = accountById.get(String(opp.accountId));
+    if (byId && BU_LABEL[byId]) return byId;
+  }
+  if (opp.account) {
+    const byName = accountByName.get(String(opp.account));
+    if (byName && BU_LABEL[byName]) return byName;
+  }
+  return null;
+};
+
 const BookingsServiceLineCharts = memo(
   ({
     chartFilteredData,
@@ -30,298 +56,136 @@ const BookingsServiceLineCharts = memo(
     setChartFilter,
     drillDownResetKey,
   }: BookingsServiceLineChartsProps) => {
-    // Drill-down state for service line chart
-    const [drillDownServiceLine, setDrillDownServiceLine] = useState<string | null>(null);
+    // Niveau 1 : BU (Transilien / TER / Intercités) → drill sur un site du BU
+    const [drillDownBU, setDrillDownBU] = useState<string | null>(null);
+
+    // Maps accountId/accountName → BU (TN/TER/IC) depuis les sites hydratés.
+    const { crmAccounts } = useCrmData();
+    const { accountByName, accountById } = useMemo(() => {
+      const byName = new Map<string, string>();
+      const byId = new Map<string, string>();
+      crmAccounts.forEach((a: any) => {
+        if (a.parentAccount) {
+          if (a.account) byName.set(a.account, a.parentAccount);
+          if (a.accountId) byId.set(a.accountId, a.parentAccount);
+        }
+      });
+      return { accountByName: byName, accountById: byId };
+    }, [crmAccounts]);
 
     // Reset drill-down when parent signals a reset
     const prevResetKey = useRef(drillDownResetKey);
     useEffect(() => {
       if (drillDownResetKey !== prevResetKey.current) {
         prevResetKey.current = drillDownResetKey;
-        setDrillDownServiceLine(null);
+        setDrillDownBU(null);
       }
     }, [drillDownResetKey]);
 
-    // Calculate filtered service line data based on date filter and drill-down state
-    // Uses same logic as Pipeline: when allocation is active, group by Allocated Service Line
-    const filteredBookingsByServiceLine = useMemo(() => {
-      let filteredBooked = chartFilteredData.filter((item) => item.status === 14);
-      if (!filteredBooked || filteredBooked.length === 0) return [];
+    const buildGroups = useCallback(
+      (base: any[]) => {
+        if (base.length === 0) return [] as any[];
+        const map: Record<string, any> = {};
+        base.forEach((opp) => {
+          const revenue = showNetRevenue ? opp.netRevenue || 0 : opp.grossRevenue || 0;
+          const allocatedRevenue = opp.isAllocated
+            ? showNetRevenue
+              ? opp.allocatedNetRevenue || opp.allocatedGrossRevenue || 0
+              : opp.allocatedGrossRevenue || 0
+            : revenue;
+          const calculatedRevenue = calculateIORevenue(opp);
 
-      // If drilling down, filter by the selected service line (using Allocated Service Line if allocated)
-      if (drillDownServiceLine) {
-        filteredBooked = filteredBooked.filter((opp) => {
-          // If allocated, check Allocated Service Line
-          if (opp.isAllocated && opp.allocatedServiceLine) {
-            const allocatedLines = opp.allocatedServiceLine
-              .split(",")
-              .map((name: string) => name.trim())
-              .filter((name: string) => name !== "" && name !== "-");
-            return allocatedLines.includes(drillDownServiceLine);
+          // Clef de groupe : BU (racine) ou site (drill-down).
+          let key: string | null = null;
+          if (drillDownBU) {
+            key = String(opp.serviceLine1 || opp.account || "");
+          } else {
+            const bu = resolveBU(opp, accountByName, accountById);
+            key = bu ? BU_LABEL[bu] : null;
           }
-          // Otherwise check Service Line 1
-          return opp.serviceLine1 === drillDownServiceLine;
-        });
-      }
+          if (!key) return;
 
-      const byServiceLine: any[] = [];
-      const serviceLinesMap: Record<string, any> = {};
-
-      filteredBooked.forEach((opp) => {
-        const grossRevenue = showNetRevenue ? opp.netRevenue || 0 : opp.grossRevenue || 0;
-        const isAllocated =
-          opp.isAllocated &&
-          (showNetRevenue ? opp.allocatedNetRevenue || opp.allocatedGrossRevenue : opp.allocatedGrossRevenue);
-        const allocatedRevenue = isAllocated
-          ? showNetRevenue
-            ? opp.allocatedNetRevenue || opp.allocatedGrossRevenue || 0
-            : opp.allocatedGrossRevenue || 0
-          : grossRevenue;
-        const calculatedRevenue = calculateIORevenue(opp);
-
-        // When drilling down, group by Service Offering 1
-        if (drillDownServiceLine) {
-          const serviceLine = opp.serviceOffering1;
-          if (!serviceLine) return;
-
-          if (!serviceLinesMap[serviceLine]) {
-            serviceLinesMap[serviceLine] = {
-              name: serviceLine,
+          if (!map[key]) {
+            map[key] = {
+              name: key,
               value: 0,
               allocatedValue: 0,
               calculatedValue: 0,
               count: 0,
-              isOffering: true,
+              isOffering: false,
             };
-            byServiceLine.push(serviceLinesMap[serviceLine]);
           }
-
-          serviceLinesMap[serviceLine].value += grossRevenue;
-          serviceLinesMap[serviceLine].allocatedValue += allocatedRevenue;
-          serviceLinesMap[serviceLine].calculatedValue += calculatedRevenue;
-          serviceLinesMap[serviceLine].count += 1;
-        } else {
-          // When not drilling down, use Allocated Service Line if allocated, otherwise Service Line 1
-          if (opp.isAllocated && opp.allocatedServiceLine) {
-            // Split allocated service line if it contains multiple names
-            const allocatedServiceLines = opp.allocatedServiceLine
-              .split(",")
-              .map((name: string) => name.trim())
-              .filter((name: string) => name !== "" && name !== "-");
-
-            // Divide revenue equally among allocated service lines
-            const sharePerAllocated = 1 / allocatedServiceLines.length;
-
-            allocatedServiceLines.forEach((serviceLine: string) => {
-              if (!serviceLinesMap[serviceLine]) {
-                serviceLinesMap[serviceLine] = {
-                  name: serviceLine,
-                  value: 0,
-                  allocatedValue: 0,
-                  calculatedValue: 0,
-                  count: 0,
-                  isOffering: false,
-                };
-                byServiceLine.push(serviceLinesMap[serviceLine]);
-              }
-
-              serviceLinesMap[serviceLine].value += grossRevenue * sharePerAllocated;
-              serviceLinesMap[serviceLine].allocatedValue += allocatedRevenue * sharePerAllocated;
-              serviceLinesMap[serviceLine].calculatedValue += calculatedRevenue * sharePerAllocated;
-              serviceLinesMap[serviceLine].count += sharePerAllocated;
-            });
-          } else {
-            // Use Service Line 1 for non-allocated opportunities
-            const serviceLine = opp.serviceLine1;
-            if (!serviceLine) return;
-
-            if (!serviceLinesMap[serviceLine]) {
-              serviceLinesMap[serviceLine] = {
-                name: serviceLine,
-                value: 0,
-                allocatedValue: 0,
-                calculatedValue: 0,
-                count: 0,
-                isOffering: false,
-              };
-              byServiceLine.push(serviceLinesMap[serviceLine]);
-            }
-
-            serviceLinesMap[serviceLine].value += grossRevenue;
-            serviceLinesMap[serviceLine].allocatedValue += allocatedRevenue;
-            serviceLinesMap[serviceLine].calculatedValue += calculatedRevenue;
-            serviceLinesMap[serviceLine].count += 1;
-          }
-        }
-      });
-
-      byServiceLine.sort((a, b) => b.value - a.value);
-      return byServiceLine;
-    }, [chartFilteredData, drillDownServiceLine, showNetRevenue, calculateIORevenue]);
-
-    // Calculate filtered losses by service line (same allocation logic as bookings)
-    const filteredLossesByServiceLine = useMemo(() => {
-      let filteredLost = chartFilteredData.filter((item) => item.status === 15);
-      if (!filteredLost || filteredLost.length === 0) return [];
-
-      // If drilling down, filter by the selected service line (using Allocated Service Line if allocated)
-      if (drillDownServiceLine) {
-        filteredLost = filteredLost.filter((opp) => {
-          // If allocated, check Allocated Service Line
-          if (opp.isAllocated && opp.allocatedServiceLine) {
-            const allocatedLines = opp.allocatedServiceLine
-              .split(",")
-              .map((name: string) => name.trim())
-              .filter((name: string) => name !== "" && name !== "-");
-            return allocatedLines.includes(drillDownServiceLine);
-          }
-          // Otherwise check Service Line 1
-          return opp.serviceLine1 === drillDownServiceLine;
+          map[key].value += revenue;
+          map[key].allocatedValue += allocatedRevenue;
+          map[key].calculatedValue += calculatedRevenue;
+          map[key].count += 1;
         });
-      }
-
-      const byServiceLine: any[] = [];
-      const serviceLinesMap: Record<string, any> = {};
-
-      filteredLost.forEach((opp) => {
-        const grossRevenue = showNetRevenue ? opp.netRevenue || 0 : opp.grossRevenue || 0;
-        const isAllocated =
-          opp.isAllocated &&
-          (showNetRevenue ? opp.allocatedNetRevenue || opp.allocatedGrossRevenue : opp.allocatedGrossRevenue);
-        const allocatedRevenue = isAllocated
-          ? showNetRevenue
-            ? opp.allocatedNetRevenue || opp.allocatedGrossRevenue || 0
-            : opp.allocatedGrossRevenue || 0
-          : grossRevenue;
-        const calculatedRevenue = calculateIORevenue(opp);
-
-        // When drilling down, group by Service Offering 1
-        if (drillDownServiceLine) {
-          const serviceLine = opp.serviceOffering1;
-          if (!serviceLine) return;
-
-          if (!serviceLinesMap[serviceLine]) {
-            serviceLinesMap[serviceLine] = {
-              name: serviceLine,
-              value: 0,
-              allocatedValue: 0,
-              calculatedValue: 0,
-              count: 0,
-              isOffering: true,
-            };
-            byServiceLine.push(serviceLinesMap[serviceLine]);
-          }
-
-          serviceLinesMap[serviceLine].value += grossRevenue;
-          serviceLinesMap[serviceLine].allocatedValue += allocatedRevenue;
-          serviceLinesMap[serviceLine].calculatedValue += calculatedRevenue;
-          serviceLinesMap[serviceLine].count += 1;
-        } else {
-          // When not drilling down, use Allocated Service Line if allocated, otherwise Service Line 1
-          if (opp.isAllocated && opp.allocatedServiceLine) {
-            // Split allocated service line if it contains multiple names
-            const allocatedServiceLines = opp.allocatedServiceLine
-              .split(",")
-              .map((name: string) => name.trim())
-              .filter((name: string) => name !== "" && name !== "-");
-
-            // Divide revenue equally among allocated service lines
-            const sharePerAllocated = 1 / allocatedServiceLines.length;
-
-            allocatedServiceLines.forEach((serviceLine: string) => {
-              if (!serviceLinesMap[serviceLine]) {
-                serviceLinesMap[serviceLine] = {
-                  name: serviceLine,
-                  value: 0,
-                  allocatedValue: 0,
-                  calculatedValue: 0,
-                  count: 0,
-                  isOffering: false,
-                };
-                byServiceLine.push(serviceLinesMap[serviceLine]);
-              }
-
-              serviceLinesMap[serviceLine].value += grossRevenue * sharePerAllocated;
-              serviceLinesMap[serviceLine].allocatedValue += allocatedRevenue * sharePerAllocated;
-              serviceLinesMap[serviceLine].calculatedValue += calculatedRevenue * sharePerAllocated;
-              serviceLinesMap[serviceLine].count += sharePerAllocated;
-            });
-          } else {
-            // Use Service Line 1 for non-allocated opportunities
-            const serviceLine = opp.serviceLine1;
-            if (!serviceLine) return;
-
-            if (!serviceLinesMap[serviceLine]) {
-              serviceLinesMap[serviceLine] = {
-                name: serviceLine,
-                value: 0,
-                allocatedValue: 0,
-                calculatedValue: 0,
-                count: 0,
-                isOffering: false,
-              };
-              byServiceLine.push(serviceLinesMap[serviceLine]);
-            }
-
-            serviceLinesMap[serviceLine].value += grossRevenue;
-            serviceLinesMap[serviceLine].allocatedValue += allocatedRevenue;
-            serviceLinesMap[serviceLine].calculatedValue += calculatedRevenue;
-            serviceLinesMap[serviceLine].count += 1;
-          }
-        }
-      });
-
-      byServiceLine.sort((a, b) => b.value - a.value);
-      return byServiceLine;
-    }, [chartFilteredData, drillDownServiceLine, showNetRevenue, calculateIORevenue]);
-
-    // Service line chart click handler for drill-down + filtering
-    const handleServiceLineChartClick = useCallback(
-      (chartEvent: any) => {
-        if (!chartEvent || !chartEvent.activePayload || chartEvent.activePayload.length === 0) return;
-
-        const clickedItem = chartEvent.activePayload[0].payload;
-
-        if (drillDownServiceLine) {
-          // Already drilling down — filter by offering
-          setChartFilter({ type: "offering", value: clickedItem.name });
-        } else {
-          // Drill down to service offerings + filter
-          setDrillDownServiceLine(clickedItem.name);
-          setChartFilter({ type: "serviceLine", value: clickedItem.name });
-        }
+        return Object.values(map).sort((a: any, b: any) => b.value - a.value);
       },
-      [drillDownServiceLine, setChartFilter]
+      [showNetRevenue, calculateIORevenue, drillDownBU, accountByName, accountById]
     );
 
-    // Back button handler
-    const handleBackFromServiceLineDrillDown = useCallback(() => {
-      setDrillDownServiceLine(null);
+    const filteredBookingsByEntity = useMemo(() => {
+      const base = chartFilteredData.filter((item) => {
+        if (!(item.isManual === true && item.status !== 15)) return false;
+        if (drillDownBU && resolveBU(item, accountByName, accountById) !== drillDownBU) return false;
+        return true;
+      });
+      return buildGroups(base);
+    }, [chartFilteredData, drillDownBU, buildGroups, accountByName, accountById]);
+
+    const filteredLossesByEntity = useMemo(() => {
+      const base = chartFilteredData.filter((item) => {
+        if (!(item.isManual === true && item.status === 15)) return false;
+        if (drillDownBU && resolveBU(item, accountByName, accountById) !== drillDownBU) return false;
+        return true;
+      });
+      return buildGroups(base);
+    }, [chartFilteredData, drillDownBU, buildGroups, accountByName, accountById]);
+
+    const handleChartClick = useCallback(
+      (chartEvent: any) => {
+        if (!chartEvent || !chartEvent.activePayload || chartEvent.activePayload.length === 0) return;
+        const clickedItem = chartEvent.activePayload[0].payload;
+        const label = String(clickedItem?.name || "");
+        if (drillDownBU) {
+          // Niveau site → filtre global sur l'actif/site cliqué.
+          setChartFilter({ type: "account", value: label });
+        } else {
+          const code = BU_CODE_FROM_LABEL[label];
+          if (code) setDrillDownBU(code);
+        }
+      },
+      [drillDownBU, setChartFilter]
+    );
+
+    const handleBack = useCallback(() => {
+      setDrillDownBU(null);
       setChartFilter(null);
     }, [setChartFilter]);
+
+    const title = drillDownBU
+      ? `${BU_LABEL[drillDownBU]} — détail par site`
+      : showLost
+        ? "Déclassés par entité"
+        : "Maintenance par entité";
 
     return (
       <Grid size={{ xs: 12, lg: 6 }} sx={{ overflow: "visible", minHeight: 450 }}>
         <DetachableCard
-          group="Bookings"
+          group="Maintenance"
           storageKey="pip-bookings-serviceline"
-          title="Bookings by Service Line"
+          title={title}
           defaultWidth={600}
           defaultHeight={500}
         >
           <SimpleBarChart
-            data={showLost ? filteredLossesByServiceLine : filteredBookingsByServiceLine}
-            title={
-              drillDownServiceLine
-                ? `Service Offerings - ${drillDownServiceLine}`
-                : showLost
-                  ? "Lost by Service Line"
-                  : "Bookings by Service Line"
-            }
+            data={showLost ? filteredLossesByEntity : filteredBookingsByEntity}
+            title={title}
             showIO={showIO}
-            onChartClick={handleServiceLineChartClick}
-            onBackClick={handleBackFromServiceLineDrillDown}
-            isDrillDown={!!drillDownServiceLine}
+            onChartClick={handleChartClick}
+            onBackClick={handleBack}
+            isDrillDown={!!drillDownBU}
           />
         </DetachableCard>
       </Grid>

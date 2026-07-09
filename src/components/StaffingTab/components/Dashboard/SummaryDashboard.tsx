@@ -142,7 +142,7 @@ export const UtilizationDistribution = memo(
         return b;
       }
 
-      // Target-relative buckets — BearingPoint palette (warm brown → cool grey)
+      // Target-relative buckets — GAIF palette (warm brown → cool grey)
       const b = [
         { key: "bench", label: "0% (bench)", color: "#4a3728", count: 0 }, // darkest brown (Partner text)
         { key: "critical", label: "< 50% of target", color: "#a8917e", count: 0 }, // warm brown (Partner border)
@@ -231,16 +231,16 @@ UtilizationDistribution.displayName = "UtilizationDistribution";
 
 // ─── Grade pyramid (target vs actual) ─────────────────────────────────────────
 
-// Tiers from top (most senior) to bottom (most junior)
+// Tiers du plus senior au plus junior — libellés GAIF
 export const PYRAMID_TIERS = [
-  { grades: ["Partner"], display: "Partner" },
-  { grades: ["Director"], display: "Director" },
-  { grades: ["Senior Manager"], display: "Senior Manager" },
-  { grades: ["Manager"], display: "Manager" },
-  { grades: ["Senior Consultant"], display: "Senior Consultant" },
-  { grades: ["Consultant"], display: "Consultant" },
-  { grades: ["Analyst"], display: "Analyst" },
-  { grades: ["Intern"], display: "Intern" },
+  { grades: ["Partner"], display: "Directeur" },
+  { grades: ["Director"], display: "Resp. pôle" },
+  { grades: ["Senior Manager"], display: "Chef mission" },
+  { grades: ["Manager"], display: "Expert sr" },
+  { grades: ["Senior Consultant"], display: "Expert" },
+  { grades: ["Consultant"], display: "Chargé mission" },
+  { grades: ["Analyst"], display: "Junior" },
+  { grades: ["Intern"], display: "Apprenti" },
 ];
 
 /** Working-day FTE for an employee: presence-based (arrival/departure), mode-independent */
@@ -796,7 +796,7 @@ export const GradePyramid = memo(
                         pointerEvents: "none",
                       }}
                     >
-                      {tier.count} Emp. – {tier.totalDays.toFixed(0)}d – {tier.tuContrib.toFixed(1)}% TU
+                      {tier.count} emp. – {tier.totalDays.toFixed(0)}j – {tier.tuContrib.toFixed(1)}% TU
                     </Typography>
                   </Box>
                 </Box>
@@ -865,7 +865,7 @@ export const GradePyramid = memo(
                     onClick={onTierClick ? () => onTierClick(tier.display) : undefined}
                   >
                     <Tooltip
-                      title={`${tier.display} – ${actual.toFixed(1)}% / target ${target}%${isOnTarget ? " ✓" : gapHours > 0 ? ` – ${(gapHours / 8).toFixed(0)}d to target` : ""}${showIO === "show" && tierIoTU != null ? ` · I&O ${tierIoTU.toFixed(1)}%` : ""}`}
+                      title={`${tier.display} – ${actual.toFixed(1)}% / cible ${target}%${isOnTarget ? " ✓" : gapHours > 0 ? ` – ${(gapHours / 8).toFixed(0)}j à la cible` : ""}${showIO === "show" && tierIoTU != null ? ` · GAIF ${tierIoTU.toFixed(1)}%` : ""}`}
                       placement="top"
                       arrow
                     >
@@ -881,10 +881,10 @@ export const GradePyramid = memo(
                         }}
                       >
                         <Typography variant="body2" sx={{ color: gradeColors.text }}>
-                          {tier.display} – {tier.count} Emp.
-                          {tier.fte > 0 && tier.fte !== tier.count ? ` / ${tier.fte.toFixed(1)} FTE` : ""}
+                          {tier.display} – {tier.count} emp.
+                          {tier.fte > 0 && tier.fte !== tier.count ? ` / ${tier.fte.toFixed(1)} ETP` : ""}
                           {tierRealFte != null && tierRealFte < tier.fte - 0.05
-                            ? ` – ${tierRealFte.toFixed(1)} actual`
+                            ? ` – ${tierRealFte.toFixed(1)} réel`
                             : ""}
                         </Typography>
                       </Box>
@@ -983,7 +983,7 @@ export const GradePyramid = memo(
                           left: `${Math.min(target, 100)}%`,
                           zIndex: 1,
                         }}
-                        title={`Target: ${target}%`}
+                        title={`Cible : ${target}%`}
                       />
                     </Box>
                   </Box>
@@ -1000,7 +1000,7 @@ export const GradePyramid = memo(
                           whiteSpace: "nowrap",
                         }}
                       >
-                        M+ / M−
+                        Encadrement / Opérationnel
                       </Typography>
                       <Divider sx={{ flex: 1 }} />
                     </Box>

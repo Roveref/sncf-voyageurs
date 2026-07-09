@@ -10,9 +10,9 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 // Mock the database module before imports
 vi.mock("../db/database.js", () => {
   const rows: Record<string, any[]> = {
-    crm_opportunities: [{ id: "OPP-1", name: "Test Opp", status: 6 }],
+    assets: [{ id: "OPP-1", name: "Test Opp", status: 6 }],
     user_staffing_needs: [],
-    user_opportunities: [],
+    user_assets: [],
     user_actions: [],
   };
   return {
@@ -20,8 +20,8 @@ vi.mock("../db/database.js", () => {
       prepare: (sql: string) => ({
         run: (..._args: any[]) => ({ changes: 1 }),
         get: (...args: any[]) => {
-          if (sql.includes("crm_opportunities") && sql.includes("SELECT")) {
-            return rows.crm_opportunities.find((r) => r.id === args[0]) || null;
+          if (sql.includes("assets") && sql.includes("SELECT")) {
+            return rows.assets.find((r) => r.id === args[0]) || null;
           }
           if (sql.includes("user_staffing_needs") && sql.includes("SELECT") && sql.includes("profile")) {
             return null; // No duplicate

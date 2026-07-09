@@ -180,10 +180,10 @@ const MonthlyDetailsTable = React.memo(
             </Box>
             <Box>
               <Typography variant="subtitle1" fontWeight={600}>
-                Monthly Detailed Data
+                Détail mensuel
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {displayYears.join(", ")} • {cumulativeData.length} months
+                {displayYears.join(", ")} • {cumulativeData.length} mois
               </Typography>
             </Box>
           </Box>
@@ -298,7 +298,7 @@ const MonthlyDetailsTable = React.memo(
                         letterSpacing: 0.3,
                       }}
                     >
-                      Monthly
+                      Mensuel
                     </Typography>
                     <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
                       {displayYears.map((year) => {
@@ -359,7 +359,7 @@ const MonthlyDetailsTable = React.memo(
                           letterSpacing: 0.3,
                         }}
                       >
-                        Cumulated
+                        Cumulé
                       </Typography>
                       <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25 }}>
                         {displayYears.map((year, yearIndex) => {

@@ -41,7 +41,7 @@ export function simulateImpact(params: {
 
   if (params.type === "lose_opportunity" && params.targetId) {
     const opp = db
-      .prepare("SELECT opportunity, account, grossRevenue, jobCode FROM crm_opportunities WHERE opportunityId = ?")
+      .prepare("SELECT opportunity, account, grossRevenue, jobCode FROM assets WHERE opportunityId = ?")
       .get(params.targetId) as any;
     if (opp) {
       scenario = `Perte de l'opportunite "${opp.opportunity}" (${opp.account})`;
@@ -50,14 +50,14 @@ export function simulateImpact(params: {
       if (opp.jobCode) affectedJobCodes.push(opp.jobCode);
     }
     const allOpps = db
-      .prepare("SELECT grossRevenue FROM crm_opportunities WHERE status NOT IN (15) AND opportunityId != ?")
+      .prepare("SELECT grossRevenue FROM assets WHERE status NOT IN (15) AND opportunityId != ?")
       .all(params.targetId) as any[];
     remainingRevenue = allOpps.reduce((s: number, o: any) => s + (o.grossRevenue || 0), 0);
     remainingOpps = allOpps.length;
   } else if (params.type === "lose_account" && params.targetName) {
     const opps = db
       .prepare(
-        "SELECT opportunityId, opportunity, grossRevenue, jobCode FROM crm_opportunities WHERE account LIKE ? AND status NOT IN (15)"
+        "SELECT opportunityId, opportunity, grossRevenue, jobCode FROM assets WHERE account LIKE ? AND status NOT IN (15)"
       )
       .all(`%${params.targetName}%`) as any[];
     scenario = `Perte du compte "${params.targetName}" (${opps.length} opportunites)`;
@@ -65,7 +65,7 @@ export function simulateImpact(params: {
     lostOpps = opps.length;
     affectedJobCodes = opps.filter((o: any) => o.jobCode).map((o: any) => o.jobCode);
     const remaining = db
-      .prepare("SELECT grossRevenue FROM crm_opportunities WHERE status NOT IN (15) AND account NOT LIKE ?")
+      .prepare("SELECT grossRevenue FROM assets WHERE status NOT IN (15) AND account NOT LIKE ?")
       .all(`%${params.targetName}%`) as any[];
     remainingRevenue = remaining.reduce((s: number, o: any) => s + (o.grossRevenue || 0), 0);
     remainingOpps = remaining.length;

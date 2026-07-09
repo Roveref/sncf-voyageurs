@@ -31,7 +31,7 @@ import {
 import { StatusChartTooltip } from "./ChartTooltips";
 import { formatCompactCurrency } from "../../../utils/formatters";
 
-// BearingPoint brand colors
+// GAIF brand colors
 const COLORS = {
   earlyOthers: "#FFBDC0",
   midOthers: "#FFA3A8",
@@ -77,7 +77,7 @@ const BarTotalLabels = ({ data, textColor }: { data: any[]; textColor: string })
               textAnchor="start"
               dominantBaseline="middle"
             >
-              {count} opp{count !== 1 ? "s" : ""}
+              {count} actif{count !== 1 ? "s" : ""}
             </text>
             <text
               x={xPos + 10}
@@ -135,7 +135,7 @@ const StatusChart = React.memo(
         >
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
             {isDrillActive && (
-              <Tooltip title={drillDownOffering ? "Back to Offerings" : "Back to Service Lines"}>
+              <Tooltip title={drillDownOffering ? "Retour aux sites" : "Retour aux entités"}>
                 <IconButton
                   onClick={onBackClick}
                   size="small"
@@ -167,7 +167,7 @@ const StatusChart = React.memo(
                   onClick={onClearAllDrillDown ?? onBackClick}
                   sx={{ cursor: "pointer", fontSize: "inherit", lineHeight: "inherit" }}
                 >
-                  Service Lines
+                  Parc par entité
                 </Link>
                 {drillDownOffering ? (
                   <Link
@@ -188,7 +188,7 @@ const StatusChart = React.memo(
               </MuiBreadcrumbs>
             ) : (
               <Typography variant="h6" fontWeight={700}>
-                Pipeline by Service Line
+                Parc par entité
               </Typography>
             )}
           </Box>

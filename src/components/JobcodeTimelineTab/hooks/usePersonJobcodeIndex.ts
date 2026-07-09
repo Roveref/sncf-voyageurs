@@ -7,9 +7,9 @@
  * against the same normalization on the jobcode side.
  *
  * Sources (union, one pass each):
- *   1. crm_opportunities.{manager, partner, em, ep} → opp.jobCode
+ *   1. assets.{manager, partner, em, ep} → opp.jobCode
  *   2. user_staffing_needs.assignedTo → opp.jobCode  (lookup via opportunityId)
- *   3. user_revenue_team.name         → opp.jobCode  (lookup via opportunityId)
+ *   3. user_asset_team.name            → opp.jobCode  (lookup via opportunityId)
  *   4. mds_assignments → jobNo (== jobCode after normalization)
  *
  * Memoized on the four source arrays. At ~5k opps + 2k MDS records the

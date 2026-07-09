@@ -312,7 +312,7 @@ export function useImportExport({
       });
 
     report += `\n${"=".repeat(120)}\n`;
-    report += `Generated from BearingPoint Dashboard - ${today}\n`;
+    report += `Generated from GAIF Pilot - ${today}\n`;
 
     return report;
   }, [

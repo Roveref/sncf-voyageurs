@@ -183,7 +183,7 @@ const StableControls = memo(
             onClick={() => onFilterChange((prev: any) => ({ ...prev, gradeTransitionOnly: !prev.gradeTransitionOnly }))}
             size="small"
             sx={granButtonSx(filters.gradeTransitionOnly)}
-            title="Show only employees with a grade transition"
+            title="Afficher uniquement les collaborateurs avec transition de niveau"
           >
             Grade {"\u0394"}
           </Button>

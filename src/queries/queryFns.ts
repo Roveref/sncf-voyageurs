@@ -15,6 +15,7 @@ import {
   hydrateRegions,
   hydrateEmployees,
   hydrateGrid,
+  hydrateGaif,
   fetchSkillsCatalog,
   apiFetch,
   API_BASE,
@@ -74,4 +75,5 @@ export const queryFns = {
   skillsCatalog: () => fetchSkillsCatalog(),
   employees: () => hydrateEmployees(),
   grid: () => hydrateGrid(),
+  gaif: () => hydrateGaif(),
 };

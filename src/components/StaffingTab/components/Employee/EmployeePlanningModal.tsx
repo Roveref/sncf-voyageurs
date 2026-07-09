@@ -428,7 +428,7 @@ export const EmployeePlanningModal = memo(({ isOpen, onClose, employee }: any) =
           {employee.assignments.length === 0 && (
             <Box sx={{ textAlign: "center", py: 6, color: "text.secondary" }}>
               <CalendarTodayIcon sx={{ fontSize: 48, display: "block", mx: "auto", mb: 1.5, color: "#d1d5db" }} />
-              <Typography>No assignments for this employee</Typography>
+              <Typography>Aucune affectation pour ce collaborateur</Typography>
             </Box>
           )}
         </Box>

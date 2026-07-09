@@ -16,6 +16,7 @@ import { apiFetch } from "../../services/api";
 import { animations, keyframes as animationKeyframes } from "../../styles/animations";
 
 import TopAccountsSection from "./components/TopAccountsSection";
+import VrCalendar from "./components/VrCalendar";
 import OpportunityList from "../OpportunityList";
 import ScrollReveal from "../common/ScrollReveal";
 import { DetachableCard } from "../shared";
@@ -249,8 +250,9 @@ const BookingsTab = ({
 
   // Calculate Booking Insights based on chartFilteredData
   const insightsData = useMemo(() => {
-    const bookings = chartFilteredData.filter((item: Opp) => item.status === 14);
-    const losses = chartFilteredData.filter((item: Opp) => item.status === 15);
+    // Maintenance : interventions = données manuelles (user_assets), pas les actifs CRM
+    const bookings = chartFilteredData.filter((item: Opp) => item.isManual === true && item.status !== 15);
+    const losses = chartFilteredData.filter((item: Opp) => item.isManual === true && item.status === 15);
 
     const bookingsTotalRevenue = bookings.reduce((sum: number, opp: Opp) => {
       const revenue = showNetRevenue ? opp.netRevenue || 0 : opp.grossRevenue || 0;
@@ -336,6 +338,12 @@ const BookingsTab = ({
       extensionTotal,
     };
   }, [chartFilteredData, showNetRevenue, calculateIORevenue]);
+
+  // Coût annuel maintenance — sum of serviceOffering2Pct across all assets in the parc
+  const annualMaintenanceCost = useMemo(
+    () => (data || []).reduce((sum: number, opp: Opp) => sum + (Number(opp.serviceOffering2Pct || 0) || 0), 0),
+    [data]
+  );
 
   // PHASE 2: Use modularized hook for date analysis
   const dateAnalysis = useDateAnalysis(data, dateRange, showNetRevenue);
@@ -486,11 +494,16 @@ const BookingsTab = ({
           />
         </Box>
 
+        {/* Calendrier VR — visites réglementaires à venir (PSGA) */}
+        <Box sx={{ mb: 2 }}>
+          <VrCalendar />
+        </Box>
+
         {/* Booking Insights Section */}
         <DetachableCard
-          group="Bookings"
+          group="Maintenance"
           storageKey="pip-bookings-insights"
-          title="Booking Insights"
+          title="Indicateurs maintenance"
           defaultWidth={900}
           defaultHeight={400}
         >
@@ -500,14 +513,15 @@ const BookingsTab = ({
             showIO={showIO}
             bookingTargets={bookingTargets}
             showNetRevenue={showNetRevenue}
+            annualMaintenanceCost={annualMaintenanceCost}
           />
         </DetachableCard>
 
         {/* Cumulative Chart Section - Full Width */}
         <DetachableCard
-          group="Bookings"
+          group="Maintenance"
           storageKey="pip-bookings-timeline"
-          title="Cumulative Bookings"
+          title="Maintenance cumulative"
           defaultWidth={900}
           defaultHeight={500}
         >
@@ -566,9 +580,9 @@ const BookingsTab = ({
         <ScrollReveal>
           <Grid size={12} sx={{ mt: 3, overflow: "visible" }}>
             <DetachableCard
-              group="Bookings"
+              group="Maintenance"
               storageKey="pip-bookings-top-accounts"
-              title="Top Accounts"
+              title="Top sites par coût maintenance"
               defaultWidth={900}
               defaultHeight={550}
             >
@@ -597,7 +611,7 @@ const BookingsTab = ({
                 >
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                     <Typography variant="h6" fontWeight={600}>
-                      {showLost ? "Lost" : "Bookings"} of Top
+                      {showLost ? "Déclassés" : "Maintenance"} of Top
                     </Typography>
                     <TextField
                       type="number"
@@ -610,14 +624,14 @@ const BookingsTab = ({
                       sx={{ width: 60 }}
                     />
                     <Typography variant="h6" fontWeight={600}>
-                      Accounts
+                      Sites
                     </Typography>
                   </Box>
 
                   <IconButton
                     onClick={handleResetFilters}
-                    title="Reset filters"
-                    aria-label="Reset filters"
+                    title="Réinitialiser les filtres"
+                    aria-label="Réinitialiser les filtres"
                     size="small"
                     sx={{ borderRadius: 1, color: "grey.500", "&:hover": { bgcolor: "grey.100", color: "grey.700" } }}
                   >
@@ -641,9 +655,9 @@ const BookingsTab = ({
         {/* Opportunity List */}
         <Grid size={12} sx={{ mt: 3, overflow: "visible" }}>
           <DetachableCard
-            group="Bookings"
+            group="Maintenance"
             storageKey="pip-bookings-opp-list"
-            title="Booked Opportunities"
+            title="Actifs en maintenance"
             defaultWidth={1100}
             defaultHeight={700}
           >
@@ -672,7 +686,7 @@ const BookingsTab = ({
                     return baseData;
                 }
               })()}
-              title={showLost ? "Lost Opportunities" : "Booked Opportunities"}
+              title={showLost ? "Actifs en fin de vie" : "Actifs en maintenance"}
               selectedOpportunities={selectedOpportunities}
               onSelectionChange={onSelection}
               showNetRevenue={showNetRevenue}

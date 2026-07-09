@@ -74,7 +74,7 @@ const ScenariosTab = memo(({ empNameMap, opportunityData, collapsedGroups }: any
       {filtered.length === 0 ? (
         <Box sx={{ p: 4, textAlign: "center" }}>
           <Typography variant="body2" color="text.secondary">
-            {allScenarios.length === 0 ? "No scenarios" : "No results matching your search"}
+            {allScenarios.length === 0 ? "Aucun scénario" : "Aucun résultat pour cette recherche"}
           </Typography>
         </Box>
       ) : (

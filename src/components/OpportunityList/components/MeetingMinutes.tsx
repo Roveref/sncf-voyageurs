@@ -45,7 +45,7 @@ const MeetingMinutes = ({ id }: { id: string }) => {
   const [open, setOpen] = useState(false);
   const [allActions, setAllActions] = useState<any[]>([]);
   const [meetingDetails, setMeetingDetails] = useState({
-    title: "Pipeline Review Meeting",
+    title: "Revue du parc d'actifs",
     date: new Date().toISOString().split("T")[0],
     attendees: "",
     summary: "",
@@ -150,22 +150,22 @@ const MeetingMinutes = ({ id }: { id: string }) => {
 
     // Add action items grouped by client then opportunity
     Object.entries(filteredGroupedByClient).forEach(([clientName, opportunities]: [string, any]) => {
-      minutes += `### Client: ${clientName}\n\n`;
+      minutes += `### Site: ${clientName}\n\n`;
 
-      // Iterate through each opportunity for this client
+      // Iterate through each asset for this site
       Object.entries(opportunities).forEach(([oppName, oppActions]: [string, any]) => {
-        // Use the first action to get opportunity details
+        // Use the first action to get asset details
         const firstAction = oppActions[0];
 
         minutes += `#### ${oppName}\n\n`;
 
-        // Add opportunity details including ID, EM, EP, Manager, Partner and Status
-        minutes += `**Opportunity ID:** ${firstAction.opportunityId || "N/A"}\n`;
-        minutes += `**Status:** ${firstAction.opportunityStatus || "N/A"}\n`;
-        minutes += `**Engagement Manager:** ${firstAction.opportunityEM || "N/A"}\n`;
-        minutes += `**Engagement Partner:** ${firstAction.opportunityEP || "N/A"}\n`;
-        minutes += `**Manager:** ${firstAction.opportunityManager || "N/A"}\n`;
-        minutes += `**Partner:** ${firstAction.opportunityPartner || "N/A"}\n\n`;
+        // Add asset details including ID, expert team and lifecycle phase
+        minutes += `**Actif ID:** ${firstAction.opportunityId || "N/A"}\n`;
+        minutes += `**Phase cycle de vie:** ${firstAction.opportunityStatus || "N/A"}\n`;
+        minutes += `**Responsable mission:** ${firstAction.opportunityEM || "N/A"}\n`;
+        minutes += `**Expert référent:** ${firstAction.opportunityEP || "N/A"}\n`;
+        minutes += `**Chef de projet:** ${firstAction.opportunityManager || "N/A"}\n`;
+        minutes += `**Directeur de patrimoine:** ${firstAction.opportunityPartner || "N/A"}\n\n`;
 
         oppActions.forEach((action: any) => {
           const priorityLabels: Record<string, string> = {
@@ -230,7 +230,7 @@ const MeetingMinutes = ({ id }: { id: string }) => {
 
     // Format the filename with the meeting date
     const meetingDate = meetingDetails.date || new Date().toISOString().split("T")[0];
-    element.download = `pipeline_meeting_minutes_${meetingDate.replace(/-/g, "")}.md`;
+    element.download = `revue_parc_actifs_${meetingDate.replace(/-/g, "")}.md`;
 
     document.body.appendChild(element);
     element.click();
@@ -276,8 +276,8 @@ const MeetingMinutes = ({ id }: { id: string }) => {
           <>
             <Box sx={{ mb: 3, mt: 1 }}>
               <Typography variant="body2" color="text.secondary">
-                Create meeting minutes with actions from all opportunities. You can add meeting details and customize
-                the content before exporting.
+                CrÃ©ez un compte-rendu avec les actions de toutes les opportunitÃ©s. Vous pouvez ajouter les dÃ©tails de
+                la rÃ©union et personnaliser le contenu avant l'export.
               </Typography>
             </Box>
 
@@ -296,12 +296,12 @@ const MeetingMinutes = ({ id }: { id: string }) => {
               }}
             >
               <Typography variant="subtitle1" gutterBottom fontWeight={600}>
-                Meeting Details
+                DÃ©tails de la rÃ©union
               </Typography>
 
               <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
                 <TextField
-                  label="Meeting Title"
+                  label="Titre de la rÃ©union"
                   variant="outlined"
                   fullWidth
                   size="small"
@@ -314,7 +314,7 @@ const MeetingMinutes = ({ id }: { id: string }) => {
 
                 <Box sx={{ display: "flex", gap: 2 }}>
                   <TextField
-                    label="Meeting Date"
+                    label="Date de la rÃ©union"
                     type="date"
                     variant="outlined"
                     size="small"
@@ -326,7 +326,7 @@ const MeetingMinutes = ({ id }: { id: string }) => {
                 </Box>
 
                 <TextField
-                  label="Attendees (one per line)"
+                  label="Participants (un par ligne)"
                   variant="outlined"
                   fullWidth
                   multiline
@@ -341,7 +341,7 @@ const MeetingMinutes = ({ id }: { id: string }) => {
                 />
 
                 <TextField
-                  label="Meeting Summary"
+                  label="RÃ©sumÃ© de la rÃ©union"
                   variant="outlined"
                   fullWidth
                   multiline
@@ -349,7 +349,7 @@ const MeetingMinutes = ({ id }: { id: string }) => {
                   size="small"
                   value={meetingDetails.summary}
                   onChange={(e) => setMeetingDetails({ ...meetingDetails, summary: e.target.value })}
-                  placeholder="Key decisions and discussion points from the meeting..."
+                  placeholder="DÃ©cisions clÃ©s et points de discussion de la rÃ©union..."
                   InputProps={{
                     startAdornment: <DescriptionIcon color="action" sx={{ mr: 1, mt: 1 }} />,
                   }}
@@ -363,7 +363,7 @@ const MeetingMinutes = ({ id }: { id: string }) => {
           <>
             <Box sx={{ mb: 2 }}>
               <Typography variant="subtitle1" gutterBottom fontWeight={600}>
-                Action Items Overview
+                AperÃ§u des actions
               </Typography>
 
               <FormControlLabel
@@ -374,7 +374,7 @@ const MeetingMinutes = ({ id }: { id: string }) => {
                     color="primary"
                   />
                 }
-                label="Include completed actions"
+                label="Inclure les actions terminÃ©es"
               />
 
               <Box sx={{ mb: 3, mt: 2, display: "flex", gap: 1, flexWrap: "wrap" }}>
@@ -419,7 +419,7 @@ const MeetingMinutes = ({ id }: { id: string }) => {
             <Divider sx={{ mb: 2 }} />
 
             <Typography variant="subtitle1" gutterBottom fontWeight={600}>
-              Actions by Client
+              Actions par client
             </Typography>
 
             {Object.keys(actionsByClient).length > 0 ? (
@@ -609,10 +609,10 @@ const MeetingMinutes = ({ id }: { id: string }) => {
                 }}
               >
                 <Typography variant="body2" color="text.secondary">
-                  No actions found for any opportunities
+                  Aucune action trouvÃ©e pour les opportunitÃ©s
                 </Typography>
                 <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 0.5 }}>
-                  Add actions to opportunities to include them in the meeting minutes
+                  Ajoutez des actions aux opportunitÃ©s pour les inclure dans le compte-rendu
                 </Typography>
               </Paper>
             )}
@@ -641,10 +641,10 @@ const MeetingMinutes = ({ id }: { id: string }) => {
           <Box sx={{ textAlign: "center", py: 4 }}>
             <CheckCircleOutlineIcon color="success" sx={{ fontSize: 60, mb: 2 }} />
             <Typography variant="h6" gutterBottom>
-              Meeting Minutes Generated Successfully
+              Compte-rendu gÃ©nÃ©rÃ© avec succÃ¨s
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Your meeting minutes have been downloaded as a markdown file.
+              Votre compte-rendu a Ã©tÃ© tÃ©lÃ©chargÃ© au format markdown.
             </Typography>
             <Box sx={{ mt: 4, p: 3, bgcolor: alpha(theme.palette.success.main, 0.08), borderRadius: 2 }}>
               <Typography variant="body2">
@@ -679,7 +679,7 @@ const MeetingMinutes = ({ id }: { id: string }) => {
         onClick={handleOpen}
         sx={{ ml: 1 }}
       >
-        Meeting Minutes
+        Compte-rendu
       </Button>
 
       <Dialog
@@ -699,7 +699,7 @@ const MeetingMinutes = ({ id }: { id: string }) => {
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <FormatListBulletedIcon sx={{ mr: 1.5, color: "primary.main" }} />
             <Typography variant="h6" fontWeight={600}>
-              Generate Pipeline Meeting Minutes
+              GÃ©nÃ©rer un compte-rendu de revue parc actifs
             </Typography>
           </Box>
         </DialogTitle>
@@ -709,11 +709,11 @@ const MeetingMinutes = ({ id }: { id: string }) => {
         <DialogContent sx={{ px: 3, py: 2 }}>
           <Stepper activeStep={activeStep} orientation="vertical">
             <Step>
-              <StepLabel>Meeting Information</StepLabel>
+              <StepLabel>Informations de la rÃ©union</StepLabel>
               <StepContent>{getStepContent(0)}</StepContent>
             </Step>
             <Step>
-              <StepLabel>Review Action Items</StepLabel>
+              <StepLabel>Revoir les actions</StepLabel>
               <StepContent>{getStepContent(1)}</StepContent>
             </Step>
             <Step>
@@ -727,13 +727,13 @@ const MeetingMinutes = ({ id }: { id: string }) => {
 
         <DialogActions sx={{ px: 3, py: 2.5, justifyContent: "space-between" }}>
           <Button onClick={handleClose} color="inherit">
-            {activeStep === 2 ? "Close" : "Cancel"}
+            {activeStep === 2 ? "Fermer" : "Annuler"}
           </Button>
 
           <Box>
             {activeStep > 0 && activeStep < 2 && (
               <Button onClick={handleBack} sx={{ mr: 1 }}>
-                Back
+                Retour
               </Button>
             )}
 
@@ -744,7 +744,7 @@ const MeetingMinutes = ({ id }: { id: string }) => {
                 color="primary"
                 disabled={Object.keys(actionsByClient).length === 0}
               >
-                Next
+                Suivant
               </Button>
             )}
 
@@ -756,7 +756,7 @@ const MeetingMinutes = ({ id }: { id: string }) => {
                 onClick={downloadMinutes}
                 disabled={Object.keys(actionsByClient).length === 0}
               >
-                Generate & Download
+                GÃ©nÃ©rer et tÃ©lÃ©charger
               </Button>
             )}
           </Box>

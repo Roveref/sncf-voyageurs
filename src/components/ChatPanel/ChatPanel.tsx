@@ -2,7 +2,7 @@
  * ChatPanel — Panneau flottant de chat IA
  *
  * FAB en bas à gauche → ouvre un panneau de conversation avec l'IA.
- * S'adapte au provider : Be.on° (Ollama local) ou Claude (Anthropic).
+ * S'adapte au provider : GAIF Pilot (Ollama local) ou Claude (Anthropic).
  */
 
 import { memo, useState, useRef, useEffect, useCallback, useMemo } from "react";
@@ -30,7 +30,7 @@ import {
   type DashboardContext,
 } from "../../services/api";
 import { easing, timing, keyframes } from "../../styles/animations";
-import { chatBranding } from "../../config/brandConfig";
+import { brand, chatBranding } from "../../config/brandConfig";
 import { useThemeStore } from "../../stores/useThemeStore";
 import { useUserDataStore } from "../../stores/useUserDataStore";
 import { useUIStore } from "../../stores/useUIStore";
@@ -46,10 +46,12 @@ import { ChatMarkdown, parseStructuredBlocks, type ChatAction, type ChatChart } 
 // ── Suggestions rapides ──
 
 const QUICK_PROMPTS = [
-  "Who is available this month?",
-  "Summarize the pipeline",
-  "Top 5 opportunities by revenue",
-  "Current alerts",
+  "Quels actifs critiques ont une VR en retard ?",
+  "Bâtiments en état Insuffisant à TPSL Achères ?",
+  "Performance contrat TSO sur les sites Z2N ce trimestre",
+  "Prochaines échéances de contrat à moins de 6 mois",
+  "Dossiers fonciers en cours de désimbrication",
+  "Avancement déploiement Maximo v9 par site",
 ];
 
 // Detect if a message should use the /summarize endpoint instead of /chat
@@ -613,8 +615,8 @@ const ChatPanel = memo(() => {
                     />
                     <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.5)", mb: 3, fontSize: 14 }}>
                       {provider === "claude"
-                        ? "Ask Claude a question about the demo data."
-                        : "Ask a question about your staffing, pipeline or bookings data."}
+                        ? "Posez une question à Claude sur les données."
+                        : "Posez une question sur vos actifs, interventions ou équipe."}
                     </Typography>
 
                     {/* Suggestions rapides */}
@@ -789,7 +791,7 @@ const ChatPanel = memo(() => {
                             size="small"
                             onClick={handleStop}
                             aria-label="Stop generation"
-                            sx={{ color: "rgba(255,255,255,0.5)", "&:hover": { color: "#FF3D47" } }}
+                            sx={{ color: "rgba(255,255,255,0.5)", "&:hover": { color: brand.primary } }}
                           >
                             <StopCircleOutlinedIcon sx={{ fontSize: 16 }} />
                           </IconButton>
@@ -802,7 +804,7 @@ const ChatPanel = memo(() => {
                             size="small"
                             onClick={handleStop}
                             aria-label="Stop generation"
-                            sx={{ color: "rgba(255,255,255,0.5)", "&:hover": { color: "#FF3D47" } }}
+                            sx={{ color: "rgba(255,255,255,0.5)", "&:hover": { color: brand.primary } }}
                           >
                             <StopCircleOutlinedIcon sx={{ fontSize: 16 }} />
                           </IconButton>

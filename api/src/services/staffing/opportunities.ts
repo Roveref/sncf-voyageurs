@@ -25,7 +25,7 @@ export function getAccountOverview(params: { account: string; periodStart: strin
   // Opportunities for this account
   const opps = db
     .prepare(
-      "SELECT opportunityId, opportunity, status, grossRevenue, netRevenue, winPct, jobCode, manager, partner, creationDate, bookingDate FROM crm_opportunities WHERE account LIKE ? AND status != 15"
+      "SELECT opportunityId, opportunity, status, grossRevenue, netRevenue, winPct, jobCode, manager, partner, creationDate, bookingDate FROM assets WHERE account LIKE ? AND status != 15"
     )
     .all(`%${params.account}%`) as any[];
 
@@ -75,7 +75,7 @@ export function getAccountOverview(params: { account: string; periodStart: strin
     opportunityIds.length > 0
       ? (db
           .prepare(
-            `SELECT a.opportunityId, a.description, a.owner, a.dueDate, a.priority, a.status, o.opportunity as oppName FROM user_actions a JOIN crm_opportunities o ON a.opportunityId = o.opportunityId WHERE a.opportunityId IN (${opportunityIds.map(() => "?").join(",")}) AND a.status != 'done' ORDER BY a.dueDate LIMIT 10`
+            `SELECT a.opportunityId, a.description, a.owner, a.dueDate, a.priority, a.status, o.opportunity as oppName FROM user_actions a JOIN assets o ON a.opportunityId = o.opportunityId WHERE a.opportunityId IN (${opportunityIds.map(() => "?").join(",")}) AND a.status != 'done' ORDER BY a.dueDate LIMIT 10`
           )
           .all(...opportunityIds) as any[])
       : [];
@@ -133,7 +133,7 @@ export function detectStaffingGaps(params: { periodStart: string; periodEnd: str
   // 1. Won/Go opportunities without staffing needs
   const oppsNoStaffing = db
     .prepare(
-      `SELECT o.opportunityId, o.opportunity, o.account, o.grossRevenue FROM crm_opportunities o
+      `SELECT o.opportunityId, o.opportunity, o.account, o.grossRevenue FROM assets o
      WHERE o.status IN (4, 11) AND NOT EXISTS (SELECT 1 FROM user_staffing_needs n WHERE n.opportunityId = o.opportunityId)`
     )
     .all() as any[];
@@ -160,7 +160,7 @@ export function detectStaffingGaps(params: { periodStart: string; periodEnd: str
   const urgentNeeds = db
     .prepare(
       `SELECT n.grade, n.quantity, n.startDate, n.endDate, n.skills, o.opportunity as oppName, o.account
-     FROM user_staffing_needs n JOIN crm_opportunities o ON n.opportunityId = o.opportunityId
+     FROM user_staffing_needs n JOIN assets o ON n.opportunityId = o.opportunityId
      WHERE n.startDate BETWEEN ? AND date(?, '+30 days') ORDER BY n.startDate`
     )
     .all(today, today) as any[];
@@ -251,7 +251,7 @@ export function getAlerts(params: { lookaheadDays?: number }): {
     db
       .prepare(
         `SELECT a.description, a.owner, a.dueDate, o.opportunity as oppName
-     FROM user_actions a JOIN crm_opportunities o ON a.opportunityId = o.opportunityId
+     FROM user_actions a JOIN assets o ON a.opportunityId = o.opportunityId
      WHERE a.status != 'done' AND a.dueDate < ?
      ORDER BY a.dueDate LIMIT 20`
       )
@@ -336,7 +336,7 @@ export function getAlerts(params: { lookaheadDays?: number }): {
     db
       .prepare(
         `SELECT opportunity as name, account, grossRevenue, creationDate, lastStatusChangeDate
-     FROM crm_opportunities WHERE status = 6
+     FROM assets WHERE status = 6
      AND (lastStatusChangeDate IS NOT NULL AND lastStatusChangeDate < date(?, '-60 days')
        OR lastStatusChangeDate IS NULL AND creationDate < date(?, '-60 days'))
      ORDER BY grossRevenue DESC LIMIT 15`
@@ -406,7 +406,7 @@ export function getPipelineForecast(params: { periodStart: string; periodEnd: st
     db
       .prepare(
         `SELECT status, COUNT(*) as count, COALESCE(SUM(grossRevenue),0) as gross, COALESCE(SUM(weightedBooking),0) as weighted
-     FROM crm_opportunities WHERE status NOT IN (15)
+     FROM assets WHERE status NOT IN (15)
      AND (estimatedBookingDate >= ? OR bookingDate >= ? OR (estimatedBookingDate IS NULL AND creationDate >= date(?, '-365 days')))
      GROUP BY status ORDER BY status`
       )
@@ -428,14 +428,14 @@ export function getPipelineForecast(params: { periodStart: string; periodEnd: st
     const row = db
       .prepare(
         `SELECT COALESCE(SUM(grossRevenue),0) as gross, COALESCE(SUM(weightedBooking),0) as weighted
-       FROM crm_opportunities WHERE status NOT IN (14, 15)
+       FROM assets WHERE status NOT IN (14, 15)
        AND estimatedBookingDate >= ? AND estimatedBookingDate < ?`
       )
       .get(m.start, m.end) as any;
     const booked = db
       .prepare(
         `SELECT COALESCE(SUM(grossRevenue),0) as revenue
-       FROM crm_opportunities WHERE status = 14 AND bookingDate >= ? AND bookingDate < ?`
+       FROM assets WHERE status = 14 AND bookingDate >= ? AND bookingDate < ?`
       )
       .get(m.start, m.end) as any;
     return {
@@ -451,7 +451,7 @@ export function getPipelineForecast(params: { periodStart: string; periodEnd: st
     db
       .prepare(
         `SELECT opportunity as name, account, grossRevenue, weightedBooking, winPct, status, estimatedBookingDate
-     FROM crm_opportunities WHERE status NOT IN (14, 15)
+     FROM assets WHERE status NOT IN (14, 15)
      ORDER BY weightedBooking DESC LIMIT 10`
       )
       .all() as any[]

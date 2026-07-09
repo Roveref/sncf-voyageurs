@@ -30,7 +30,7 @@ describe("LoginPage", () => {
 
   it("renders the dashboard title", () => {
     render(<LoginPage />);
-    expect(screen.getByText("B. Dashboard")).toBeInTheDocument();
+    expect(screen.getByText("GAIF Pilot")).toBeInTheDocument();
   });
 
   it("renders Username input field", () => {
@@ -49,7 +49,7 @@ describe("LoginPage", () => {
 
   it("renders Sign in button", () => {
     render(<LoginPage />);
-    expect(screen.getByRole("button", { name: /Sign in/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Connexion/i })).toBeInTheDocument();
   });
 
   it("password field type is password", () => {
@@ -77,7 +77,7 @@ describe("LoginPage", () => {
     render(<LoginPage />);
     await userEvent.type(screen.getByRole("textbox"), "admin");
     await userEvent.type(document.querySelector("input[type='password']")!, "password");
-    await userEvent.click(screen.getByRole("button", { name: /Sign in/i }));
+    await userEvent.click(screen.getByRole("button", { name: /Connexion/i }));
     expect(mockFetch).toHaveBeenCalledWith("/api/auth/login", expect.objectContaining({ method: "POST" }));
   });
 
@@ -89,7 +89,7 @@ describe("LoginPage", () => {
     render(<LoginPage />);
     await userEvent.type(screen.getByRole("textbox"), "wrong");
     await userEvent.type(document.querySelector("input[type='password']")!, "wrong");
-    await userEvent.click(screen.getByRole("button", { name: /Sign in/i }));
+    await userEvent.click(screen.getByRole("button", { name: /Connexion/i }));
     expect(await screen.findByText("Invalid credentials")).toBeInTheDocument();
   });
 
@@ -98,7 +98,7 @@ describe("LoginPage", () => {
     render(<LoginPage />);
     await userEvent.type(screen.getByRole("textbox"), "admin");
     await userEvent.type(document.querySelector("input[type='password']")!, "pass");
-    await userEvent.click(screen.getByRole("button", { name: /Sign in/i }));
-    expect(await screen.findByText("Cannot reach server")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /Connexion/i }));
+    expect(await screen.findByText("Impossible de joindre le serveur")).toBeInTheDocument();
   });
 });

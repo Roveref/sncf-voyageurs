@@ -24,10 +24,20 @@ import {
 } from "recharts";
 import { RevenueChartTooltip } from "./ChartTooltips";
 import { formatCompactCurrency } from "../../../utils/formatters";
-import { chartPalette } from "../../../config/brandConfig";
+import { chartPalette, serviceLineColors, brand } from "../../../config/brandConfig";
 
-// BearingPoint color palette (from brandConfig)
+// GAIF color palette (from brandConfig)
 const COLORS = [...chartPalette];
+
+// Couleur alignée avec le reste : si le nom est un patrimoine GAIF connu, on utilise
+// la couleur brand (serviceLineColors). Sinon (ex. sites), dégradé brand primary.
+const SITE_SHADES = [brand.primary, brand.primaryDark, brand.primaryLight, brand.primaryDeep, brand.primaryLighter];
+
+const resolveBarColor = (name: string, index: number): string => {
+  if (!name) return COLORS[index % COLORS.length];
+  if (serviceLineColors[name]) return serviceLineColors[name];
+  return SITE_SHADES[index % SITE_SHADES.length];
+};
 
 /**
  * Custom labels rendered using Recharts v3 hooks
@@ -150,7 +160,7 @@ const SimpleBarChart = React.memo(
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
               {isDrillDown && onBackClick && (
-                <MuiTooltip title="Back">
+                <MuiTooltip title="Retour">
                   <IconButton
                     onClick={onBackClick}
                     size="small"
@@ -310,8 +320,8 @@ const SimpleBarChart = React.memo(
               cursor="pointer"
               onClick={handleBarClick}
             >
-              {sortedData.map((_entry, index) => (
-                <Cell key={`cell-allocated-${index}`} fill={COLORS[index % COLORS.length]} />
+              {sortedData.map((entry, index) => (
+                <Cell key={`cell-allocated-${index}`} fill={resolveBarColor(entry.name, index)} />
               ))}
             </Bar>
             {/* Non-allocated portion (lighter color) */}
@@ -327,8 +337,8 @@ const SimpleBarChart = React.memo(
               cursor="pointer"
               onClick={handleBarClick}
             >
-              {sortedData.map((_entry, index) => (
-                <Cell key={`cell-other-${index}`} fill={`${COLORS[index % COLORS.length]}40`} />
+              {sortedData.map((entry, index) => (
+                <Cell key={`cell-other-${index}`} fill={`${resolveBarColor(entry.name, index)}40`} />
               ))}
             </Bar>
             {/* Labels at bar ends using Recharts v3 hooks */}

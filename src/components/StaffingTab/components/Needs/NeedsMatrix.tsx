@@ -351,7 +351,7 @@ const NeedsMatrix = memo(
     if (allNeeds.length === 0) {
       return (
         <Box sx={{ textAlign: "center", py: 4, color: "text.disabled" }}>
-          <Typography variant="body2">No staffing needs</Typography>
+          <Typography variant="body2">Aucun besoin d'expert</Typography>
         </Box>
       );
     }

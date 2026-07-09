@@ -28,7 +28,7 @@ import { GRADE_BUCKETS } from "../../../utils/constants";
 import type { RevenueTeamMember } from "../../../types";
 import { brand } from "../../../config/brandConfig";
 
-// BearingPoint secondary palette for grade buckets
+// GAIF secondary palette for grade buckets
 const BUCKET_COLORS: Record<string, string> = {
   "M/SM": brand.secondary,
   Director: brand.secondaryLight,
@@ -213,7 +213,7 @@ const RevenueTeamDialog = memo(
                       renderInput={(params) => (
                         <TextField
                           {...params}
-                          placeholder="Name"
+                          placeholder="Nom"
                           sx={{
                             "& .MuiOutlinedInput-root": {
                               "& fieldset": { border: "none" },

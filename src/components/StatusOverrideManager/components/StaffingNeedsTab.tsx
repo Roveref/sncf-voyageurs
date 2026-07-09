@@ -202,7 +202,7 @@ const StaffingNeedsTab = memo(() => {
       {totalItems === 0 ? (
         <Box sx={{ p: 4, textAlign: "center" }}>
           <Typography variant="body2" color="text.secondary">
-            {allOriginalItems === 0 ? "No staffing needs" : "No results matching your search"}
+            {allOriginalItems === 0 ? "Aucun besoin d'intervention" : "Aucun résultat pour cette recherche"}
           </Typography>
         </Box>
       ) : (

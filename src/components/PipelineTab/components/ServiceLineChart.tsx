@@ -50,10 +50,10 @@ const ServiceLineChart = React.memo(({ data, onChartClick, showIO }: any) => {
       >
         <div>
           <Typography variant="h6" gutterBottom fontWeight={700}>
-            Pipeline by Service Line
+            Parc par entité
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Distribution of revenue across service lines
+            Distribution de la valeur par entité / site
           </Typography>
         </div>
       </Box>
@@ -85,7 +85,7 @@ const ServiceLineChart = React.memo(({ data, onChartClick, showIO }: any) => {
           <Tooltip content={<RevenueChartTooltip showIO={showIO} />} />
           <Bar
             dataKey="originalValue"
-            name="Revenue"
+            name="Coût"
             shape={roundedBarShape(["originalValue"])}
             animationBegin={0}
             animationDuration={600}
@@ -99,7 +99,7 @@ const ServiceLineChart = React.memo(({ data, onChartClick, showIO }: any) => {
             <LabelList
               dataKey="count"
               position="right"
-              formatter={(value) => `${value} opps`}
+              formatter={(value) => `${value} actifs`}
               style={{ fill: theme.palette.text.secondary, fontSize: 12 }}
             />
           </Bar>

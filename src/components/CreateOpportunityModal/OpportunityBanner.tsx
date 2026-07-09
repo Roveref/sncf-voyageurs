@@ -44,7 +44,7 @@ const OpportunityBanner = ({
           {/* Opportunity Name Input */}
           <TextField
             fullWidth
-            placeholder="Opportunity Name"
+            placeholder="Nom de l'actif"
             value={formData.opportunity}
             onChange={(e) => onChange("opportunity", e.target.value)}
             onBlur={(e) => onBlurField?.("opportunity", e.target.value)}
@@ -62,10 +62,10 @@ const OpportunityBanner = ({
           />
 
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            {/* Win % Input */}
+            {/* Disponibilité % Input */}
             <TextField
               type="number"
-              placeholder="Win %"
+              placeholder="Disponibilité %"
               value={formData.winPct}
               onChange={(e) => onChange("winPct", e.target.value)}
               size="small"

@@ -405,6 +405,12 @@ export async function hydrateGrid() {
   return res.json();
 }
 
+export async function hydrateGaif() {
+  const res = await apiFetch(`${API_BASE}/hydrate/gaif`);
+  if (!res.ok) throw new Error(`API error: ${res.status}`);
+  return res.json();
+}
+
 export async function saveChanges(data: Record<string, unknown>) {
   const { TAB_ID } = await import("../utils/tabId");
   const res = await apiFetch(`${API_BASE}/hydrate/changes`, {

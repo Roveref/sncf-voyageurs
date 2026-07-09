@@ -26,7 +26,7 @@ router.get("/", (req: Request, res: Response) => {
   const notifRows = regionParam
     ? (db
         .prepare(
-          `SELECT n.id, n.type, n.title, n.message, n.opportunityId, n.empId, n.isRead, n.createdAt FROM user_notifications n LEFT JOIN crm_opportunities o ON o.opportunityId = n.opportunityId LEFT JOIN user_opportunities uo ON uo.opportunityId = n.opportunityId WHERE n.isRead = 0 AND (o.region = ? OR o.country = ? OR uo.opportunityId IS NOT NULL) ORDER BY n.createdAt DESC LIMIT 50`
+          `SELECT n.id, n.type, n.title, n.message, n.opportunityId, n.empId, n.isRead, n.createdAt FROM user_notifications n LEFT JOIN assets o ON o.opportunityId = n.opportunityId LEFT JOIN user_assets uo ON uo.opportunityId = n.opportunityId WHERE n.isRead = 0 AND (o.region = ? OR o.country = ? OR uo.opportunityId IS NOT NULL) ORDER BY n.createdAt DESC LIMIT 50`
         )
         .all(regionParam, regionParam) as any[])
     : (db
@@ -36,7 +36,7 @@ router.get("/", (req: Request, res: Response) => {
         .all() as any[]);
 
   // Include open actions as virtual notifications (filtered by region)
-  const actionQuery = `SELECT a.id, a.opportunityId, a.description, a.owner, a.dueDate, a.status, a.createdAt, COALESCE(o.opportunity, uo.opportunity) as oppName, COALESCE(o.account, uo.account) as account FROM user_actions a LEFT JOIN crm_opportunities o ON o.opportunityId = a.opportunityId LEFT JOIN user_opportunities uo ON uo.opportunityId = a.opportunityId WHERE a.status != 'done' ${regionParam ? `AND (o.region = ? OR o.country = ? OR uo.opportunityId IS NOT NULL)` : ""} ORDER BY a.dueDate ASC`;
+  const actionQuery = `SELECT a.id, a.opportunityId, a.description, a.owner, a.dueDate, a.status, a.createdAt, COALESCE(o.opportunity, uo.opportunity) as oppName, COALESCE(o.account, uo.account) as account FROM user_actions a LEFT JOIN assets o ON o.opportunityId = a.opportunityId LEFT JOIN user_assets uo ON uo.opportunityId = a.opportunityId WHERE a.status != 'done' ${regionParam ? `AND (o.region = ? OR o.country = ? OR uo.opportunityId IS NOT NULL)` : ""} ORDER BY a.dueDate ASC`;
   const actionRows = regionParam
     ? (db.prepare(actionQuery).all(regionParam, regionParam) as any[])
     : (db.prepare(actionQuery).all() as any[]);
@@ -45,7 +45,7 @@ router.get("/", (req: Request, res: Response) => {
     id: `action_${a.id}`,
     type: "open_action",
     title: a.description || "Action",
-    message: `${a.owner || ""}${a.dueDate ? ` · Due ${a.dueDate.slice(8, 10)}/${a.dueDate.slice(5, 7)}` : ""}${a.oppName ? ` · ${a.oppName}` : ""}`,
+    message: `${a.owner || ""}${a.dueDate ? ` · Échéance ${a.dueDate.slice(8, 10)}/${a.dueDate.slice(5, 7)}` : ""}${a.oppName ? ` · ${a.oppName}` : ""}`,
     opportunityId: a.opportunityId,
     isRead: 0,
     createdAt: a.createdAt || a.dueDate || "",
@@ -66,14 +66,14 @@ router.get("/count", (req: Request, res: Response) => {
     ? (
         db
           .prepare(
-            `SELECT COUNT(*) as count FROM user_notifications n LEFT JOIN crm_opportunities o ON o.opportunityId = n.opportunityId LEFT JOIN user_opportunities uo ON uo.opportunityId = n.opportunityId WHERE n.isRead = 0 AND (o.region = ? OR o.country = ? OR uo.opportunityId IS NOT NULL)`
+            `SELECT COUNT(*) as count FROM user_notifications n LEFT JOIN assets o ON o.opportunityId = n.opportunityId LEFT JOIN user_assets uo ON uo.opportunityId = n.opportunityId WHERE n.isRead = 0 AND (o.region = ? OR o.country = ? OR uo.opportunityId IS NOT NULL)`
           )
           .get(regionParam, regionParam) as any
       )?.count || 0
     : (db.prepare("SELECT COUNT(*) as count FROM user_notifications WHERE isRead = 0").get() as any)?.count || 0;
 
   const actionQuery = regionParam
-    ? `SELECT COUNT(*) as count FROM user_actions a LEFT JOIN crm_opportunities o ON o.opportunityId = a.opportunityId LEFT JOIN user_opportunities uo ON uo.opportunityId = a.opportunityId WHERE a.status != 'done' AND (o.region = ? OR o.country = ? OR uo.opportunityId IS NOT NULL)`
+    ? `SELECT COUNT(*) as count FROM user_actions a LEFT JOIN assets o ON o.opportunityId = a.opportunityId LEFT JOIN user_assets uo ON uo.opportunityId = a.opportunityId WHERE a.status != 'done' AND (o.region = ? OR o.country = ? OR uo.opportunityId IS NOT NULL)`
     : `SELECT COUNT(*) as count FROM user_actions WHERE status != 'done'`;
   const actionCount = regionParam
     ? (db.prepare(actionQuery).get(regionParam, regionParam) as any)?.count || 0

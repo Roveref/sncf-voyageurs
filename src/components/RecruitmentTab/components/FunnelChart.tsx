@@ -6,7 +6,7 @@ import Chip from "@mui/material/Chip";
 import { alpha, useTheme } from "@mui/material/styles";
 import type { FunnelData } from "../utils/calculations";
 
-export type FunnelStage = "all" | "evaluated" | "interviewed" | "hired";
+export type FunnelStage = "all" | "evaluated" | "interviewed" | "hired"; // GAIF: all=Total NC, evaluated=Analysée, interviewed=Plan action, hired=Résolue
 
 interface Props {
   funnel: FunnelData;
@@ -41,28 +41,28 @@ const FunnelChart = React.memo(({ funnel, activeStage, onStageClick }: Props) =>
   const stages: StageConfig[] = [
     {
       key: "all",
-      label: "Candidatures",
+      label: "Total NC",
       value: funnel.total,
       color: theme.palette.primary.main,
       gradient: [theme.palette.primary.main, theme.palette.primary.dark],
     },
     {
       key: "evaluated",
-      label: "Evalues",
+      label: "Analysées",
       value: funnel.evaluated,
       color: theme.palette.info.main,
       gradient: [theme.palette.info.light, theme.palette.info.main],
     },
     {
       key: "interviewed",
-      label: "Entretiens",
+      label: "Plan d'action",
       value: funnel.interviewed,
       color: theme.palette.warning.main,
       gradient: ["#FFB74D", theme.palette.warning.main],
     },
     {
       key: "hired",
-      label: "Recrutes",
+      label: "Résolues",
       value: funnel.hired,
       color: theme.palette.success.main,
       gradient: [theme.palette.success.light, theme.palette.success.main],
@@ -105,7 +105,7 @@ const FunnelChart = React.memo(({ funnel, activeStage, onStageClick }: Props) =>
     >
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
         <Typography variant="h6" fontWeight={600}>
-          Funnel de recrutement
+          Funnel de résolution NC
         </Typography>
         {activeStage !== "all" && (
           <Chip

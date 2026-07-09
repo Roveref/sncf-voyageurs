@@ -145,27 +145,27 @@ describe("getRevenueForSorting", () => {
 // ─── getRevenueSortModeLabel ──────────────────────────────────────────────────
 
 describe("getRevenueSortModeLabel", () => {
-  it("returns 'Total Gross' for mode=total and showNetRevenue=false", () => {
-    expect(getRevenueSortModeLabel("total", false)).toBe("Total Gross");
+  it("returns 'Total Brut' for mode=total and showNetRevenue=false", () => {
+    expect(getRevenueSortModeLabel("total", false)).toBe("Total Brut");
   });
 
   it("returns 'Total Net' for mode=total and showNetRevenue=true", () => {
     expect(getRevenueSortModeLabel("total", true)).toBe("Total Net");
   });
 
-  it("returns 'I&O Gross' for mode=io and showNetRevenue=false", () => {
-    expect(getRevenueSortModeLabel("io", false)).toBe("I&O Gross");
+  it("returns 'GAIF Brut' for mode=io and showNetRevenue=false", () => {
+    expect(getRevenueSortModeLabel("io", false)).toBe("GAIF Brut");
   });
 
-  it("returns 'I&O Net' for mode=io and showNetRevenue=true", () => {
-    expect(getRevenueSortModeLabel("io", true)).toBe("I&O Net");
+  it("returns 'GAIF Net' for mode=io and showNetRevenue=true", () => {
+    expect(getRevenueSortModeLabel("io", true)).toBe("GAIF Net");
   });
 
-  it("returns 'Filtre Gross' for mode=filtered and showNetRevenue=false", () => {
-    expect(getRevenueSortModeLabel("filtered", false)).toBe("Filtre Gross");
+  it("returns 'Filtré Brut' for mode=filtered and showNetRevenue=false", () => {
+    expect(getRevenueSortModeLabel("filtered", false)).toBe("Filtré Brut");
   });
 
-  it("returns 'Total Gross' for an unknown mode (default branch)", () => {
-    expect(getRevenueSortModeLabel("unknown", false)).toBe("Total Gross");
+  it("returns 'Total Brut' for an unknown mode (default branch)", () => {
+    expect(getRevenueSortModeLabel("unknown", false)).toBe("Total Brut");
   });
 });

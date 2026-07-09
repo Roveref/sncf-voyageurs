@@ -32,7 +32,8 @@ export const TOOLS: ToolDefinition[] = [
         },
         status: {
           type: "number",
-          description: "Status code (1=Lead, 4=Go, 6=Proposal, 11=Won, 14=Booked, 15=Lost). For opps_by_status.",
+          description:
+            "Phase cycle de vie GAIF : 1=Émergence, 4=Investissement/CEB, 6=Étude, 11=Maintenance lourde, 13=Conventionné, 14=En exploitation, 15=Déclassé. For opps_by_status.",
         },
         account: { type: "string", description: "Account name (partial match). For opps_by_account." },
         grade: { type: "string", description: "Exact grade (e.g. Consultant). For employees_by_grade." },
@@ -80,7 +81,7 @@ export const TOOLS: ToolDefinition[] = [
   {
     name: "find_staffing_candidates",
     description:
-      "Finds and ranks the best candidates for a staffing need. Multi-criteria scoring: grade fit (30pts), date overlap (25pts), actual availability (25pts), skills (15pts), tech partner (3pts), service line (2pts). Accounts for part-time (FTE) and grade transitions. Also returns fragmentation and transition loss. Use this tool when asked who to assign to a project, which profile for a need, or the best candidates for an assignment.",
+      "GAIF — Suggère les meilleurs experts GAIF pour intervenir sur un actif / une intervention / un projet d'investissement. Scoring multi-critères : adéquation rôle (30pts), chevauchement dates (25pts), disponibilité réelle (25pts), compétences (15pts), patrimoine (3pts), site (2pts). Tient compte du temps partiel et des transitions de rôle. Usage : « qui affecter au projet X ? », « quel expert pour cette intervention ? », « top candidats pour la mission Y ? ». Renvoie aussi la fragmentation et les pertes de transition.",
     input_schema: {
       type: "object",
       properties: {
@@ -142,7 +143,7 @@ export const TOOLS: ToolDefinition[] = [
   {
     name: "get_sap_mds_variance",
     description:
-      "Compares actual SAP hours to planned MDS hours (forecast) per employee. Shows the delta in hours and TU percentage points, with a status (overperformance / underperformance / aligned). Use for questions like 'who exceeds the forecast?', 'actual vs planned gap?', 'staffing variance'.",
+      "GAIF — Compare la charge réelle (SAP) vs la charge planifiée (MDS) par collaborateur GAIF. Écart en heures et en points TU, avec statut (surcharge / sous-charge / aligné). Usage : « qui dépasse la charge planifiée ? », « écart charge réelle vs plan ? », « variance d'affectation équipe GAIF ».",
     input_schema: {
       type: "object",
       properties: {
@@ -158,15 +159,15 @@ export const TOOLS: ToolDefinition[] = [
   {
     name: "create_staffing_need",
     description:
-      "Creates a staffing need for an opportunity. Use this tool when the user asks to create a staffing need, add a required profile, etc.",
+      "GAIF — Crée un besoin d'expert/intervenant sur un actif ou un projet d'investissement. Usage : « il faut un expert signalisation sur TPSL Achères », « besoin d'un responsable mission pour la régénération caténaire ».",
     input_schema: {
       type: "object",
       properties: {
-        opportunityId: { type: "string", description: "Opportunity ID (crm_opportunities.id)" },
+        opportunityId: { type: "string", description: "Asset ID (assets.id)" },
         profile: {
           type: "string",
           description:
-            "Target grade/profile: Intern, Analyst, Consultant, Senior Consultant, Manager, Senior Manager, Director, Partner",
+            "Rôle cible GAIF : Apprenti, Junior, Chargé mission, Expert, Expert senior, Chef mission, Resp. pôle, Directeur",
         },
         quantity: { type: "number", description: "Number of people. Default: 1" },
         startDate: { type: "string", description: "Start date (YYYY-MM-DD)" },
@@ -184,11 +185,11 @@ export const TOOLS: ToolDefinition[] = [
   {
     name: "create_action",
     description:
-      "Creates an action/task on an opportunity. Use this tool when the user asks to add an action, reminder, or to-do on an opportunity.",
+      "GAIF — Crée une action/tâche sur un actif (VR à planifier, NC à résoudre, contrat à renouveler, doctrine à rédiger). Usage : « il faut planifier la VR Gx sur TN Paris-Est », « résoudre la NC signalisation Lyon ».",
     input_schema: {
       type: "object",
       properties: {
-        opportunityId: { type: "string", description: "Opportunity ID" },
+        opportunityId: { type: "string", description: "Asset ID" },
         description: { type: "string", description: "Action description" },
         owner: { type: "string", description: "Action owner" },
         dueDate: { type: "string", description: "Due date (YYYY-MM-DD)" },
@@ -199,17 +200,22 @@ export const TOOLS: ToolDefinition[] = [
   },
   {
     name: "update_opportunity_status",
-    description: "Changes an opportunity's status. Use when the user asks to move an opp to booked, lost, won, etc.",
+    description:
+      "GAIF — Change la phase cycle de vie d'un actif (Émergence → Investissement → Étude → Maintenance → Exploitation → Déclassé).",
     input_schema: {
       type: "object",
       properties: {
-        opportunityId: { type: "string", description: "Opportunity ID" },
+        opportunityId: { type: "string", description: "Asset ID" },
         newStatus: {
           type: "number",
-          description: "New status: 1=Lead, 4=Go Approved, 6=Proposal, 11=Won, 14=Booked, 15=Lost",
+          description:
+            "Phase GAIF : 1=Émergence, 4=Investissement/CEB, 6=Étude, 11=Maintenance lourde, 13=Conventionné, 14=En exploitation, 15=Déclassé",
         },
         comment: { type: "string", description: "Optional comment" },
-        bookingDate: { type: "string", description: "Booking/loss date (YYYY-MM-DD), required for Booked or Lost" },
+        bookingDate: {
+          type: "string",
+          description: "Date effective du changement de phase (YYYY-MM-DD), requise pour Exploitation ou Déclassé",
+        },
       },
       required: ["opportunityId", "newStatus"],
     },
@@ -217,17 +223,22 @@ export const TOOLS: ToolDefinition[] = [
   // ── Opportunity management ──
   {
     name: "create_opportunity",
-    description: "Creates a manual opportunity. Use when the user wants to add an opp that doesn't exist in the CRM.",
+    description:
+      "GAIF — Crée un actif manuel (installation fixe non remontée via Dynamics). Usage : « ajouter un nouveau poste signalisation », « référencer une sous-station qui n'est pas dans le SI ».",
     input_schema: {
       type: "object",
       properties: {
-        name: { type: "string", description: "Opportunity name" },
-        account: { type: "string", description: "Client account name" },
-        grossRevenue: { type: "number", description: "Gross revenue in euros" },
-        netRevenue: { type: "number", description: "Net revenue in euros (optional, default = gross)" },
-        status: { type: "number", description: "Status: 1=Lead, 4=Go, 6=Proposal, 11=Won, 14=Booked. Default: 1" },
-        serviceLine: { type: "string", description: "Main service line" },
-        winPct: { type: "number", description: "Win probability (0-100). Default: 50" },
+        name: { type: "string", description: "Nom de l'actif" },
+        account: { type: "string", description: "Site / Technicentre de rattachement" },
+        grossRevenue: { type: "number", description: "Valeur d'acquisition (€)" },
+        netRevenue: { type: "number", description: "Valeur résiduelle (€, optionnel, défaut = valeur d'acquisition)" },
+        status: {
+          type: "number",
+          description:
+            "Phase GAIF : 1=Émergence, 4=Investissement, 6=Étude, 11=Maintenance, 14=Exploitation. Défaut : 1",
+        },
+        serviceLine: { type: "string", description: "Patrimoine principal (Ferroviaire, Immobilier, IO, etc.)" },
+        winPct: { type: "number", description: "Probabilité d'engagement investissement (0-100). Défaut : 50" },
       },
       required: ["name", "account", "grossRevenue"],
     },
@@ -235,11 +246,11 @@ export const TOOLS: ToolDefinition[] = [
   {
     name: "update_revenue_team",
     description:
-      "Updates an opportunity's revenue team. Replaces the entire team. Each member has a name, a grade bucket (M/SM, Director, Partner) and a percentage.",
+      "GAIF — Met à jour l'équipe projet rattachée à un actif (expert référent, chef mission, responsable pôle). Remplace l'équipe complète.",
     input_schema: {
       type: "object",
       properties: {
-        opportunityId: { type: "string", description: "Opportunity ID" },
+        opportunityId: { type: "string", description: "Asset ID" },
         members: {
           type: "array",
           items: {
@@ -251,7 +262,7 @@ export const TOOLS: ToolDefinition[] = [
             },
             required: ["name", "gradeBucket", "percentage"],
           },
-          description: "List of members",
+          description: "Membres de l'équipe projet (rôle + % d'implication)",
         },
       },
       required: ["opportunityId", "members"],
@@ -259,10 +270,11 @@ export const TOOLS: ToolDefinition[] = [
   },
   {
     name: "delete_opportunity",
-    description: "Deletes a manual opportunity (stored in user_opportunities). Does not work for CRM opportunities.",
+    description:
+      "GAIF — Supprime un actif manuel (stocké dans user_assets). Ne s'applique pas aux actifs remontés via Dynamics.",
     input_schema: {
       type: "object",
-      properties: { opportunityId: { type: "string", description: "Manual opportunity ID to delete" } },
+      properties: { opportunityId: { type: "string", description: "Asset ID à supprimer (manuel)" } },
       required: ["opportunityId"],
     },
   },
@@ -270,7 +282,7 @@ export const TOOLS: ToolDefinition[] = [
   {
     name: "get_pipeline_kpis",
     description:
-      "Complete pipeline analysis: weighted booking by status, monthly forecast, top deals, client concentration (top 3 accounts), capacity gap (available hours vs needs). Use for any complex question about the pipeline, forecast, risk concentration, or capacity/needs alignment.",
+      "GAIF — Analyse globale du parc d'actifs : valeur pondérée par phase cycle de vie, forecast CAPEX mensuel, top actifs par valeur, concentration par site (top 3 sites), écart capacité (heures équipe GAIF vs besoins d'intervention). Usage : « état global du parc », « risque de concentration sur quels sites ? », « écart charge équipe vs besoins interventions ».",
     input_schema: {
       type: "object",
       properties: {
@@ -283,15 +295,16 @@ export const TOOLS: ToolDefinition[] = [
   {
     name: "search_entity",
     description:
-      "Fuzzy search by name across employees, opportunities and accounts. Returns matching entities with their IDs. Use this tool FIRST when the user mentions an entity by approximate name to find the exact ID before calling other tools or SQL.",
+      "GAIF — Recherche floue par nom sur experts GAIF, actifs et sites/technicentres. Renvoie les IDs. Usage : à appeler EN PREMIER quand l'utilisateur mentionne un actif ou un site par nom approximatif pour récupérer l'ID exact avant toute autre requête.",
     input_schema: {
       type: "object",
       properties: {
-        query: { type: "string", description: "Search term (name, partial name, etc.)" },
+        query: { type: "string", description: "Terme de recherche (nom actif, site, expert, etc.)" },
         type: {
           type: "string",
           enum: ["all", "employee", "opportunity", "account"],
-          description: "Entity type to search. Default: all",
+          description:
+            "Type d'entité : all (tous), employee (expert), opportunity (actif), account (site). Défaut : all",
         },
       },
       required: ["query"],
@@ -301,7 +314,7 @@ export const TOOLS: ToolDefinition[] = [
   {
     name: "simulate_impact",
     description:
-      "Simulates the impact of losing an opportunity, an employee, or an entire account. Computes the pipeline revenue delta, freed employees, and team TU impact (before/after). Use for what-if questions ('what happens if we lose this deal?', 'impact of X leaving?').",
+      "GAIF — Simule l'impact du retrait d'un actif, du départ d'un expert, ou de la perte d'un site entier. Calcule le delta de valeur du parc, les experts libérés, l'impact sur la charge équipe (avant/après). Usage : « que se passe-t-il si on ferme le TPSL Achères ? », « impact si l'expert signalisation part ? ».",
     input_schema: {
       type: "object",
       properties: {
@@ -327,7 +340,7 @@ export const TOOLS: ToolDefinition[] = [
   {
     name: "detect_staffing_gaps",
     description:
-      "Detects all staffing issues over a period: Won/Go opportunities without staffing needs, over-allocated employees (>100%), urgent assignments without resources (<30d), long bench (>20d without chargeable), skill gaps. Operational risk overview.",
+      "GAIF — Détecte tous les problèmes de staffing équipe GAIF : actifs engagés sans expert référent affecté, experts surchargés (>100%), interventions urgentes sans ressource (<30j), expert en sous-charge prolongée (>20j), compétences manquantes sur le patrimoine. Vision opérationnelle des risques équipe.",
     input_schema: {
       type: "object",
       properties: {
@@ -340,7 +353,7 @@ export const TOOLS: ToolDefinition[] = [
   {
     name: "get_alerts",
     description:
-      "Retrieves active alerts: overdue actions, assignments ending soon, upcoming departures, stagnant proposals (>60d), over-allocated employees. Operational alert dashboard.",
+      "GAIF — Tableau d'alertes opérationnelles : actions en retard, affectations se terminant, départs à venir, actifs stagnant en phase Étude (>60j), experts surchargés. Vision court-terme pour pilotage quotidien.",
     input_schema: {
       type: "object",
       properties: {
@@ -399,15 +412,62 @@ export const TOOLS: ToolDefinition[] = [
   {
     name: "match_candidate_to_need",
     description:
-      "Associates an HR candidate (hr_candidates) with a staffing need (user_staffing_needs). Use when a recruitment candidate matches an identified need on an opportunity.",
+      "Associates an HR candidate (nonconformities) with a staffing need (user_staffing_needs). Use when a recruitment candidate matches an identified need on an opportunity.",
     input_schema: {
       type: "object",
       properties: {
-        candidateId: { type: "string", description: "Candidate ID (hr_candidates.id)" },
+        candidateId: { type: "string", description: "Candidate ID (nonconformities.id)" },
         staffingNeedId: { type: "string", description: "Staffing need ID (user_staffing_needs.id)" },
         matchScore: { type: "number", description: "Match score (0-100). Optional." },
       },
       required: ["candidateId", "staffingNeedId"],
+    },
+  },
+  {
+    name: "get_comite_actions",
+    description:
+      "GAIF — Returns open actions associated with one of the 4 official GAIF committees (COPIL Réseau, COPIL Immo, COTECH IDFM, COPIL RSE). Use when user asks 'quelles actions sont en attente au COPIL Immo' or 'résumé du prochain COTECH IDFM'.",
+    input_schema: {
+      type: "object",
+      properties: {
+        comite: {
+          type: "string",
+          description: "Committee key: copil-reseau, copil-immo, cotech-idfm, copil-rse",
+        },
+      },
+      required: ["comite"],
+    },
+  },
+  {
+    name: "get_compliance_gaps",
+    description:
+      "GAIF — Returns assets with conformity rate below a threshold (default 95%), optionally filtered by patrimoine and site. Use for 'actifs non conformes', 'écarts de conformité', 'où sont les NC ?'.",
+    input_schema: {
+      type: "object",
+      properties: {
+        patrimoine: {
+          type: "string",
+          description:
+            "Optional patrimoine filter: Ferroviaire, Immobilier, IO, Courants Faibles, Propriete Intellectuelle, Gares Lignes, Foncier",
+        },
+        site: { type: "string", description: "Optional site filter (LIKE match on serviceLine1)" },
+        threshold: { type: "number", description: "Conformity threshold % (default 95)" },
+      },
+    },
+  },
+  {
+    name: "knowledge_base_lookup",
+    description:
+      "GAIF — Search the GAIF doctrinal corpus (PSGA, prescriptions, notes parties prenantes, présentation A2P). Use for 'que dit le PSGA sur X', 'quelle est la doctrine GAIF pour Y', or to retrieve the canonical definition of a concept.",
+    input_schema: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description: "Keywords (min 3 chars). Examples: 'externalisation IO', 'comitologie', 'seuils PSGA'.",
+        },
+      },
+      required: ["query"],
     },
   },
 ];

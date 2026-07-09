@@ -20,6 +20,7 @@ import changesRouter from "./changes.js";
 import recruitmentRouter from "./recruitment.js";
 import employeesRouter from "./employees.js";
 import gridRouter from "./grid.js";
+import gaifRouter from "./gaif.js";
 
 const router = Router();
 
@@ -32,6 +33,7 @@ router.use(changesRouter);
 router.use(recruitmentRouter);
 router.use(employeesRouter);
 router.use(gridRouter);
+router.use(gaifRouter);
 
 // ── GET /api/hydrate/regions ──
 
@@ -80,12 +82,12 @@ router.get("/ready", (_req: Request, res: Response) => {
     .prepare(
       `
     SELECT
-      (SELECT COUNT(*) FROM crm_opportunities) as opportunities,
+      (SELECT COUNT(*) FROM assets) as opportunities,
       (SELECT COUNT(*) FROM employees) as employees,
       (SELECT COUNT(*) FROM mds_assignments) as assignments,
       (SELECT COUNT(*) FROM sap_records) as sapRecords,
       (SELECT COUNT(*) FROM hr_skills) as skills,
-      (SELECT COUNT(*) FROM crm_accounts) as crmAccounts
+      (SELECT COUNT(*) FROM sites) as crmAccounts
   `
     )
     .get() as {

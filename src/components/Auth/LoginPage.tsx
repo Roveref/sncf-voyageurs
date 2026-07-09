@@ -27,13 +27,13 @@ const LoginPage = memo(() => {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setError(data.error || "Login failed");
+        setError(data.error || "Echec de connexion");
         return;
       }
       const data = await res.json();
       setAuth(data.token, data.user);
     } catch {
-      setError("Cannot reach server");
+      setError("Impossible de joindre le serveur");
     } finally {
       setLoading(false);
     }
@@ -50,7 +50,10 @@ const LoginPage = memo(() => {
         sx={{ p: 5, width: 380, display: "flex", flexDirection: "column", gap: 2.5, borderRadius: 3 }}
       >
         <Typography variant="h5" fontWeight={700} textAlign="center" sx={{ color: "#330000", mb: 1 }}>
-          B. Dashboard
+          GAIF Pilot
+        </Typography>
+        <Typography variant="caption" textAlign="center" sx={{ color: "#666", mt: -1.5, mb: 1 }}>
+          Direction GAIF — SNCF Voyageurs
         </Typography>
 
         {error && (
@@ -60,7 +63,7 @@ const LoginPage = memo(() => {
         )}
 
         <TextField
-          label="Username"
+          label="Nom d'utilisateur"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           autoFocus
@@ -69,7 +72,7 @@ const LoginPage = memo(() => {
           size="small"
         />
         <TextField
-          label="Password"
+          label="Mot de passe"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -84,7 +87,7 @@ const LoginPage = memo(() => {
           disabled={loading}
           sx={{ mt: 1, bgcolor: "#CC2931", "&:hover": { bgcolor: "#99171D" } }}
         >
-          {loading ? <CircularProgress size={22} color="inherit" /> : "Sign in"}
+          {loading ? <CircularProgress size={22} color="inherit" /> : "Connexion"}
         </Button>
       </Paper>
     </Box>

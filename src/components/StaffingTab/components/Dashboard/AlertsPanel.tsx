@@ -447,7 +447,7 @@ export const AlertsPanel = memo(({ alerts, isOpen, onClose, onNavigateToEmployee
           {groups.length === 0 ? (
             <Box sx={{ textAlign: "center", py: 6, color: "grey.400" }}>
               <ErrorIcon sx={{ fontSize: 40, mx: "auto", mb: 1.5, color: "grey.300", display: "block" }} />
-              <Typography variant="body2">No alerts</Typography>
+              <Typography variant="body2">Aucune alerte</Typography>
             </Box>
           ) : (
             groups.map((g) => (

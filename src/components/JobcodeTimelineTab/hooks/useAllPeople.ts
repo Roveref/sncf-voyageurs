@@ -3,9 +3,9 @@
  * in any role on any opportunity / jobcode in the system.
  *
  * Sources (union):
- *   1. crm_opportunities.{manager, partner, em, ep}
+ *   1. assets.{manager, partner, em, ep}
  *   2. user_staffing_needs.assignedTo  (per-opportunity)
- *   3. user_revenue_team.name          (per-opportunity)
+ *   3. user_asset_team.name             (per-opportunity)
  *   4. mds_assignments → "${firstName} ${lastName}" (consultants tracked
  *      in MDS even when they're not in any user-authored need)
  *

@@ -119,7 +119,7 @@ const EditActions = memo(
         )}
         {pendingAction === "reduce_days" && (
           <>
-            <Typography sx={barLabel}>Keep</Typography>
+            <Typography sx={barLabel}>Garder</Typography>
             <TextField
               size="small"
               type="number"

@@ -154,7 +154,7 @@ const BookingsTimelineCharts = memo(
           {/* ── Header (same layout as Pipeline) ── */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap" }}>
             <Typography variant="h6" fontWeight={700}>
-              {showLost ? "Cumulative Lost" : "Cumulative Bookings"}
+              {showLost ? "Déclassements cumulés" : "Maintenance cumulative"}
             </Typography>
 
             {/* Year selector chips */}
@@ -247,7 +247,7 @@ const BookingsTimelineCharts = memo(
                       userSelect: "none",
                     }}
                   >
-                    Status 11
+                    Maintenance lourde
                   </Typography>
                   <Switch
                     size="small"
@@ -314,7 +314,7 @@ const BookingsTimelineCharts = memo(
                       userSelect: "none",
                     }}
                   >
-                    Breakdown
+                    Détail par source
                   </Typography>
                   <Switch
                     size="small"
@@ -466,7 +466,7 @@ const BookingsTimelineCharts = memo(
                         yAxisId="left"
                         dataKey={dataKey}
                         fill={COLOR_BY_YEAR[year]?.bar || brand.primaryDark}
-                        name={`${year} ${showLost ? "Lost" : "Bookings"}`}
+                        name={`${year} ${showLost ? "Déclassés" : "Maintenance"}`}
                         shape={roundedBarShapeTop([dataKey])}
                         isAnimationActive={!hasRenderedRef.current}
                         animationDuration={600}

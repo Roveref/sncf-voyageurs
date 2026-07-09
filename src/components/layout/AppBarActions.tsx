@@ -76,7 +76,7 @@ const CrmDeltaIndicator = memo(
     };
 
     return (
-      <Tooltip title={filterActive ? "Click to remove filter" : "Click to see modified opportunities"}>
+      <Tooltip title={filterActive ? "Cliquer pour retirer le filtre" : "Cliquer pour voir les actifs modifiés"}>
         <Chip
           icon={
             isPositive ? (
@@ -151,13 +151,17 @@ const AppBarActions = memo(
           ...(!dataReady && { visibility: "hidden", pointerEvents: "none" }),
         }}
       >
-        {/* Four-state I&O toggle: off -> show -> ioOnly -> ioTeam -> off */}
-        {dataReady && (
+        {/* Four-state I&O toggle: hidden for GAIF Pilot */}
+        {false && dataReady && (
           <FormControlLabel
             title={
-              { off: "I&O hidden", show: "Show I&O", ioOnly: "I&O only", ioTeam: "I&O Team", ioLead: "I&O Lead" }[
-                showIO
-              ]
+              {
+                off: "GAIF masqué",
+                show: "Afficher GAIF",
+                ioOnly: "GAIF uniquement",
+                ioTeam: "Équipe GAIF",
+                ioLead: "Responsable GAIF",
+              }[showIO]
             }
             control={
               <Switch
@@ -202,7 +206,15 @@ const AppBarActions = memo(
                   fontWeight={500}
                   sx={{ fontSize: "0.8rem", color: "white", ...transitionSx }}
                 >
-                  {{ off: "I&O", show: "I&O", ioOnly: "I&O Only", ioTeam: "I&O Team", ioLead: "I&O Lead" }[showIO]}
+                  {
+                    {
+                      off: "GAIF",
+                      show: "GAIF",
+                      ioOnly: "GAIF uniquement",
+                      ioTeam: "Équipe GAIF",
+                      ioLead: "Responsable GAIF",
+                    }[showIO]
+                  }
                 </Typography>
               </Box>
             }
@@ -224,7 +236,7 @@ const AppBarActions = memo(
               <Switch
                 checked={showLost}
                 onChange={toggleLost}
-                inputProps={{ "aria-label": showLost ? "Switch to Bookings view" : "Switch to Lost view" }}
+                inputProps={{ "aria-label": showLost ? "Afficher maintenance" : "Afficher fin de vie" }}
                 sx={{
                   "& .MuiSwitch-switchBase": transitionSx,
                   "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
@@ -250,7 +262,7 @@ const AppBarActions = memo(
                   fontWeight={500}
                   sx={{ fontSize: "0.8rem", color: "white", ...transitionSx }}
                 >
-                  {showLost ? "Lost" : "Bookings"}
+                  {showLost ? "Déclassés" : "Maintenance"}
                 </Typography>
               </Box>
             }
@@ -272,7 +284,7 @@ const AppBarActions = memo(
               <Switch
                 checked={showNetRevenue}
                 onChange={toggleNetRevenue}
-                inputProps={{ "aria-label": showNetRevenue ? "Switch to Gross Revenue" : "Switch to Net Revenue" }}
+                inputProps={{ "aria-label": showNetRevenue ? "Afficher valeur d'achat" : "Afficher valeur résiduelle" }}
                 sx={{
                   "& .MuiSwitch-switchBase": transitionSx,
                   "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
@@ -294,7 +306,7 @@ const AppBarActions = memo(
                   fontWeight={500}
                   sx={{ fontSize: "0.8rem", color: "white", ...transitionSx }}
                 >
-                  {showNetRevenue ? "Net" : "Gross"}
+                  {showNetRevenue ? "Val. résid." : "Val. achat"}
                 </Typography>
               </Box>
             }

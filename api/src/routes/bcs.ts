@@ -158,7 +158,7 @@ router.get("/:jobcode", (req: Request, res: Response) => {
       .prepare(
         `SELECT opportunityId, opportunity, account, grossRevenue, netRevenue, cm1Pct, status,
                 creationDate, bookingDate, serviceLine1
-         FROM crm_opportunities WHERE jobCode = ?`
+         FROM assets WHERE jobCode = ?`
       )
       .all(jobcode) as {
       opportunityId: string;

@@ -6,6 +6,7 @@
 
 import React, { memo } from "react";
 import TableSortLabel from "@mui/material/TableSortLabel";
+import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
@@ -77,105 +78,42 @@ const OpportunityTableHeader = memo(
             direction={orderBy === "account" ? order : "asc"}
             onClick={() => onSortRequest("account")}
           >
-            Account
+            Site
           </TableSortLabel>
         </Box>
 
-        {/* Date */}
+        {/* Prochaine VR */}
         <Box>
           <TableSortLabel
-            active={orderBy === "creationDate"}
-            direction={orderBy === "creationDate" ? order : "asc"}
-            onClick={() => onSortRequest("creationDate")}
+            active={orderBy === "estimatedBookingDate"}
+            direction={orderBy === "estimatedBookingDate" ? order : "asc"}
+            onClick={() => onSortRequest("estimatedBookingDate")}
           >
-            Date
+            Prochaine VR
           </TableSortLabel>
         </Box>
 
-        {/* Revenue with sort mode selector */}
+        {/* Coût maintenance */}
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
-          <TableSortLabel
-            active={orderBy === (showNetRevenue ? "netRevenue" : "grossRevenue")}
-            direction={orderBy === (showNetRevenue ? "netRevenue" : "grossRevenue") ? order : "asc"}
-            onClick={() => onSortRequest(showNetRevenue ? "netRevenue" : "grossRevenue")}
-            sx={{
-              "& .MuiTableSortLabel-icon": {
-                opacity: 1,
-              },
-            }}
-          >
-            {/* Empty label - only keep the sort arrow */}
-          </TableSortLabel>
+          <Typography variant="caption" sx={{ fontWeight: 600, color: "text.secondary", fontSize: "0.7rem" }}>
+            Coût maint.
+          </Typography>
 
-          {/* Sort mode selector button */}
-          <Button
-            size="small"
-            onClick={onRevenueMenuClick}
-            endIcon={<ArrowDropDownIcon />}
-            sx={{
-              ml: 0.5,
-              minWidth: "auto",
-              fontSize: "0.75rem",
-              textTransform: "none",
-              color: "text.secondary",
-              fontWeight: 600,
-              whiteSpace: "nowrap",
-              "&:hover": {
-                color: "primary.main",
-                backgroundColor: alpha(theme.palette.primary.main, 0.04),
-              },
-            }}
-          >
-            {getRevenueSortModeLabel(revenueSortMode, showNetRevenue)}
-          </Button>
+          {/* Sort mode menu hidden for GAIF — single column "Coût maint." */}
+        </Box>
 
-          {/* Revenue sort mode menu */}
-          <Menu
-            anchorEl={revenueMenuAnchor}
-            open={Boolean(revenueMenuAnchor)}
-            onClose={onRevenueMenuClose}
-            PaperProps={{
-              sx: {
-                minWidth: 220,
-                boxShadow: `0 4px 20px ${alpha(theme.palette.common.black, 0.15)}`,
-              },
-            }}
-          >
-            <MenuItem onClick={() => onRevenueSortModeChange("total")} selected={revenueSortMode === "total"}>
-              <ListItemIcon>
-                <AccountBalanceIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText
-                primary={`Total ${showNetRevenue ? "Net" : "Gross"}`}
-                secondary="Total opportunity revenue"
-                secondaryTypographyProps={{ fontSize: "0.75rem" }}
-              />
-            </MenuItem>
-            {showIO && (
-              <MenuItem onClick={() => onRevenueSortModeChange("io")} selected={revenueSortMode === "io"}>
-                <ListItemIcon>
-                  <BusinessCenterIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText
-                  primary={`I&O ${showNetRevenue ? "Net" : "Gross"}`}
-                  secondary="Revenue allocated to I&O"
-                  secondaryTypographyProps={{ fontSize: "0.75rem" }}
-                />
-              </MenuItem>
-            )}
-            {isFiltered && (
-              <MenuItem onClick={() => onRevenueSortModeChange("filtered")} selected={revenueSortMode === "filtered"}>
-                <ListItemIcon>
-                  <FilterListIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText
-                  primary={`Filtered ${showNetRevenue ? "Net" : "Gross"}`}
-                  secondary="Revenue per service line filter"
-                  secondaryTypographyProps={{ fontSize: "0.75rem" }}
-                />
-              </MenuItem>
-            )}
-          </Menu>
+        {/* Valeur d'achat */}
+        <Box sx={{ textAlign: "right" }}>
+          <Typography variant="caption" sx={{ fontWeight: 600, color: "text.secondary", fontSize: "0.7rem" }}>
+            Val. achat
+          </Typography>
+        </Box>
+
+        {/* Valeur résiduelle */}
+        <Box sx={{ textAlign: "right" }}>
+          <Typography variant="caption" sx={{ fontWeight: 600, color: "text.secondary", fontSize: "0.7rem" }}>
+            Val. résid.
+          </Typography>
         </Box>
 
         {/* Opportunity Name */}
@@ -185,7 +123,7 @@ const OpportunityTableHeader = memo(
             direction={orderBy === "opportunity" ? order : "asc"}
             onClick={() => onSortRequest("opportunity")}
           >
-            Opportunity
+            Actif
           </TableSortLabel>
         </Box>
 
@@ -197,7 +135,7 @@ const OpportunityTableHeader = memo(
               direction={orderBy === "winPct" ? order : "asc"}
               onClick={() => onSortRequest("winPct")}
             >
-              Win %
+              Dispo %
             </TableSortLabel>
           </Box>
         )}
@@ -209,12 +147,12 @@ const OpportunityTableHeader = memo(
             direction={orderBy === "status" ? order : "asc"}
             onClick={() => onSortRequest("status")}
           >
-            Status
+            Statut
           </TableSortLabel>
         </Box>
 
-        {/* Technology */}
-        <Box sx={{ textAlign: "center" }}>Technology</Box>
+        {/* Criticité */}
+        <Box sx={{ textAlign: "center" }}>Criticité</Box>
 
         {/* Staffing (empty header) */}
         <Box />

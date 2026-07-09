@@ -191,7 +191,7 @@ const StatusOverrideTab = memo(() => {
       {filtered.length === 0 ? (
         <Box sx={{ p: 4, textAlign: "center" }}>
           <Typography variant="body2" color="text.secondary">
-            {overrideCount === 0 ? "No status modifications" : "No results matching your search"}
+            {overrideCount === 0 ? "Aucune modification de phase" : "Aucun résultat pour cette recherche"}
           </Typography>
         </Box>
       ) : (

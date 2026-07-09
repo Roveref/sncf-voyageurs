@@ -9,8 +9,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserDataStore } from "../../../stores/useUserDataStore";
-import { useComputedStore } from "../../../stores/useComputedStore";
-import { safeJsonParse } from "../../../utils/safeJson";
+import { useStaffingIndex, lookupStaffingForAsset } from "../../../queries/useStaffingIndex";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
@@ -44,7 +43,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import CloseIcon from "@mui/icons-material/Close";
 import EventIcon from "@mui/icons-material/Event";
 import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
-import { GRADE_ORDER } from "../../StaffingTab/constants";
+import { GRADE_ORDER, getGradeUILabel } from "../../StaffingTab/constants";
 import { useUIStore } from "../../../stores/useUIStore";
 import { computeNeedStatus, getAssignmentsFromEditorStates } from "../../StaffingTab/utils/needStatusUtils";
 import AssignmentIcon from "@mui/icons-material/Assignment";
@@ -58,12 +57,6 @@ const emptyNeed = {
   endDate: "",
   skills: [] as string[],
   probability: 1,
-};
-
-// ── Helper: read staffing index from localStorage ───────────────────────────
-const readStaffingIndex = (): Record<string, any[]> | null => {
-  const raw = localStorage.getItem("staffing_employee_index");
-  return raw ? safeJsonParse<Record<string, any[]> | null>(raw, null) : null;
 };
 
 // ── Helper: get initials for avatar ─────────────────────────────────────────
@@ -103,30 +96,13 @@ const StaffingNeeds = ({
     setCreateStaffingNeedModalOpen(true);
   };
 
-  // ── Current staffing from staffing index ──────────────────────────────────
-  const staffingIndexVersion = useComputedStore((s) => s.staffingIndexVersion);
-  const staffingIndex = useMemo(readStaffingIndex, [staffingIndexVersion]);
-
-  const currentStaffing = useMemo(() => {
-    if (!staffingIndex) return [];
-    // Try Job Code first (7-digit chargeable), then Opportunity ID (6-digit GO)
-    const lookupKeys: string[] = [];
-    if (jobCode) lookupKeys.push(String(jobCode).trim());
-    if (opportunityId) lookupKeys.push(String(opportunityId).trim());
-
-    const seen = new Set();
-    const results: any[] = [];
-    for (const key of lookupKeys) {
-      const entries = staffingIndex[key];
-      if (!entries) continue;
-      for (const entry of entries) {
-        if (seen.has(entry.empId)) continue;
-        seen.add(entry.empId);
-        results.push({ ...entry, matchedKey: key });
-      }
-    }
-    return results;
-  }, [staffingIndex, jobCode, opportunityId]);
+  // ── Current staffing from React Query cache ──────────────────────────────
+  const staffingIndex = useStaffingIndex();
+  const hasStaffingData = Object.keys(staffingIndex).length > 0;
+  const currentStaffing = useMemo(
+    () => lookupStaffingForAsset(staffingIndex, opportunityId, jobCode),
+    [staffingIndex, opportunityId, jobCode]
+  );
 
   // Read staffing needs directly from store (no local mirror to avoid loops)
   const staffingNeeds = useUserDataStore((s) => s.staffingNeeds[opportunityId]) ?? EMPTY_NEEDS;
@@ -279,15 +255,15 @@ const StaffingNeeds = ({
       }}
     >
       <Typography variant="subtitle2" gutterBottom fontWeight={600} color="primary.main">
-        {editingId ? "Edit Staffing Need" : "New Staffing Need"}
+        {editingId ? "Modifier le besoin" : "Nouveau besoin"}
       </Typography>
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
         <Box sx={{ display: "flex", gap: 2 }}>
           <FormControl size="small" sx={{ flex: 2 }}>
-            <InputLabel>Grade *</InputLabel>
+            <InputLabel>Rôle *</InputLabel>
             <Select
               value={formData.grade}
-              label="Grade *"
+              label="Rôle *"
               onChange={(e) => setFormData((prev) => ({ ...prev, grade: e.target.value }))}
             >
               {[...GRADE_ORDER].reverse().map((g) => (
@@ -299,7 +275,7 @@ const StaffingNeeds = ({
           </FormControl>
           <TextField
             size="small"
-            label="Qty"
+            label="Qté"
             type="number"
             value={formData.quantity}
             onChange={(e) => setFormData((prev) => ({ ...prev, quantity: Math.max(1, parseInt(e.target.value) || 1) }))}
@@ -310,7 +286,7 @@ const StaffingNeeds = ({
         <Box sx={{ display: "flex", gap: 2 }}>
           <TextField
             size="small"
-            label="Start Date"
+            label="Début"
             type="date"
             value={formData.startDate}
             onChange={(e) => setFormData((prev) => ({ ...prev, startDate: e.target.value }))}
@@ -319,13 +295,13 @@ const StaffingNeeds = ({
           />
           <TextField
             size="small"
-            label="End Date"
+            label="Fin"
             type="date"
             value={formData.endDate}
             onChange={(e) => setFormData((prev) => ({ ...prev, endDate: e.target.value }))}
             InputLabelProps={{ shrink: true }}
             error={dateError}
-            helperText={dateError ? "End date must be after start date" : ""}
+            helperText={dateError ? "La date de fin doit être postérieure au début" : ""}
             sx={{ flex: 1 }}
           />
         </Box>
@@ -334,7 +310,7 @@ const StaffingNeeds = ({
             variant="caption"
             sx={{ fontWeight: 600, color: "text.secondary", whiteSpace: "nowrap", minWidth: 90 }}
           >
-            Probability: {Math.round((formData.probability ?? 1) * 100)}%
+            Probabilité : {Math.round((formData.probability ?? 1) * 100)}%
           </Typography>
           <Slider
             size="small"
@@ -350,12 +326,12 @@ const StaffingNeeds = ({
         </Box>
         <TextField
           size="small"
-          label="Skills (press Enter to add)"
+          label="Compétences (Entrée pour ajouter)"
           value={skillInput}
           onChange={(e) => setSkillInput(e.target.value)}
           onKeyDown={handleSkillKeyDown}
           fullWidth
-          placeholder="e.g. SAP, Cloud, Data..."
+          placeholder="ex. Signalisation, Caténaire, GTB..."
         />
         {formData.skills.length > 0 && (
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
@@ -382,7 +358,7 @@ const StaffingNeeds = ({
         )}
         <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
           <Button size="small" onClick={handleCancel}>
-            Cancel
+            Annuler
           </Button>
           <Button
             size="small"
@@ -391,7 +367,7 @@ const StaffingNeeds = ({
             disabled={!formData.grade || formData.quantity < 1 || dateError}
             startIcon={<SaveIcon />}
           >
-            {editingId ? "Update" : "Add"}
+            {editingId ? "Modifier" : "Ajouter"}
           </Button>
         </Box>
       </Box>
@@ -438,19 +414,19 @@ const StaffingNeeds = ({
             sx={{ textTransform: "none", fontSize: "0.7rem" }}
             onClick={handleOpenStaffingModal}
           >
-            Manage
+            Gérer
           </Button>
           <Button
             size="small"
             variant="text"
             sx={{ textTransform: "none", fontSize: "0.65rem", color: "primary.main", minWidth: 0 }}
             onClick={() => {
-              const oppName = opportunityRow?.opportunity || opportunityRow?.opportunity || "";
+              const oppName = opportunityRow?.opportunity || "";
               useUIStore.getState().setPendingStaffingFilter({ text: oppName, type: "project" });
               navigate("/staffing");
             }}
           >
-            Open in Staffing
+            Ouvrir dans Plan de charge
           </Button>
         </Box>
       )}
@@ -484,7 +460,7 @@ const StaffingNeeds = ({
                 </Typography>
                 {person.grade && (
                   <Chip
-                    label={person.grade}
+                    label={getGradeUILabel(person.grade)}
                     size="small"
                     sx={{ fontSize: "0.58rem", height: 16, bgcolor: alpha(theme.palette.text.secondary, 0.08) }}
                   />
@@ -514,7 +490,7 @@ const StaffingNeeds = ({
                     color="text.disabled"
                     sx={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: 0.8 }}
                   >
-                    Past Staffing
+                    Affectations passées
                   </Typography>
                   <Chip
                     label={`${pastPeople.length}`}
@@ -544,7 +520,7 @@ const StaffingNeeds = ({
                     color="text.disabled"
                     sx={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: 0.8 }}
                   >
-                    Current Staffing
+                    Affectations en cours
                   </Typography>
                   {currentPeople.length > 0 && (
                     <Chip
@@ -567,13 +543,13 @@ const StaffingNeeds = ({
                 )}
               </Box>
 
-              {!staffingIndex ? (
+              {!hasStaffingData ? (
                 <Typography variant="caption" color="text.disabled" sx={{ fontStyle: "italic", fontSize: "0.68rem" }}>
-                  Import a staffing file in the Staffing tab to view data here
+                  Données équipe non chargées
                 </Typography>
               ) : currentPeople.length === 0 ? (
                 <Typography variant="caption" color="text.disabled" sx={{ fontSize: "0.68rem" }}>
-                  No current staffing
+                  Aucune affectation en cours
                 </Typography>
               ) : (
                 <Box>{currentPeople.map(renderPersonRow)}</Box>
@@ -590,7 +566,7 @@ const StaffingNeeds = ({
                     color="text.disabled"
                     sx={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: 0.8 }}
                   >
-                    Upcoming Staffing
+                    Affectations à venir
                   </Typography>
                   <Chip
                     label={`${upcomingPeople.length}`}
@@ -643,7 +619,7 @@ const StaffingNeeds = ({
             color="text.disabled"
             sx={{ fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: 0.8 }}
           >
-            Staffing Needs
+            Besoins d'experts
           </Typography>
           {totalPeople > 0 && (
             <Chip
@@ -682,7 +658,7 @@ const StaffingNeeds = ({
       {staffingNeeds.length === 0 && !isAdding ? (
         <Box>
           <Typography variant="caption" color="text.disabled" sx={{ fontSize: "0.68rem" }}>
-            No staffing needs yet
+            Aucun besoin identifié
           </Typography>
         </Box>
       ) : (
@@ -702,10 +678,10 @@ const StaffingNeeds = ({
                 >
                   <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, minWidth: 0 }}>
                     <Typography variant="caption" fontWeight={600} noWrap sx={{ fontSize: "0.72rem" }}>
-                      {(need as any).assignedTo || "Any"}
+                      {(need as any).assignedTo || "Tous"}
                     </Typography>
                     <Chip
-                      label={need.grade || ""}
+                      label={need.grade ? getGradeUILabel(need.grade) : ""}
                       size="small"
                       sx={{ fontSize: "0.58rem", height: 16, bgcolor: alpha(theme.palette.text.secondary, 0.08) }}
                     />
@@ -762,14 +738,14 @@ const StaffingNeeds = ({
         TransitionComponent={DialogTransition}
         maxWidth="xs"
       >
-        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogTitle>Confirmer la suppression</DialogTitle>
         <DialogContent>
-          <Typography variant="body2">Are you sure you want to delete this staffing need?</Typography>
+          <Typography variant="body2">Ãtes-vous sÃ»r de vouloir supprimer ce besoin en staffing ?</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+          <Button onClick={() => setDeleteDialogOpen(false)}>Annuler</Button>
           <Button onClick={handleConfirmDelete} color="error" variant="contained">
-            Delete
+            Supprimer
           </Button>
         </DialogActions>
       </Dialog>

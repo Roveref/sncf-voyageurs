@@ -12,7 +12,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { alpha } from "@mui/material/styles";
 import React from "react";
 import { TransitionProps } from "@mui/material/transitions";
-import { getGradeColor, getGradeAbbr } from "../../constants";
+import { getGradeColor, getGradeAbbr, getGradeUILabel } from "../../constants";
 import MobileHeatmapStrip from "./MobileHeatmapStrip";
 import type { Employee } from "../../types";
 
@@ -105,7 +105,7 @@ const EmployeeDetailSheet = memo(
           <Box sx={{ px: 2, py: 1.5, display: "flex", flexWrap: "wrap", gap: 0.75 }}>
             {employee.grade && (
               <Chip
-                label={employee.grade}
+                label={getGradeUILabel(employee.grade)}
                 size="small"
                 sx={{
                   height: 24,

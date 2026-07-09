@@ -51,9 +51,10 @@ router.get("/crm", (req: Request, res: Response) => {
     const where = conditions.length > 0 ? ` WHERE ${conditions.join(" AND ")}` : "";
 
     // Fast ETag check: DB fingerprint (count + max updatedAt) avoids full payload build on 304
-    const fpRow = db
-      .prepare(`SELECT COUNT(*) as cnt, MAX(updatedAt) as maxu FROM crm_opportunities${where}`)
-      .get(...params) as { cnt: number; maxu: string | null };
+    const fpRow = db.prepare(`SELECT COUNT(*) as cnt, MAX(updatedAt) as maxu FROM assets${where}`).get(...params) as {
+      cnt: number;
+      maxu: string | null;
+    };
     const userFpRow = db
       .prepare("SELECT COUNT(*) as cnt, MAX(modifiedAt) as maxu FROM user_overrides WHERE entityType = 'opportunity'")
       .get() as { cnt: number; maxu: string | null };
@@ -78,8 +79,10 @@ router.get("/crm", (req: Request, res: Response) => {
               serviceOffering1, serviceOffering2, serviceOffering3,
               serviceOffering1Pct, serviceOffering2Pct, serviceOffering3Pct,
               technologyPartner1, technologyPartner2, technologyPartner3,
-              lostComment, primaryContactId, primaryContact
-       FROM crm_opportunities${where}
+              lostComment, primaryContactId, primaryContact,
+              utilizationPct, incidents12m, consoEau, consoElec, consoGaz,
+              surfaceM2, mtbf, mttr, etatAbe
+       FROM assets${where}
        LIMIT ? OFFSET ?`
       )
       .all(...params, pageSize, offset) as Record<string, unknown>[];
@@ -95,7 +98,7 @@ router.get("/crm", (req: Request, res: Response) => {
     // CRM Accounts — full referential (needed for opp creation and filters)
     const crmAccountRows = db
       .prepare(
-        "SELECT accountId, account, segmentCode, subSegmentCode, subSegment, country, region, parentAccount FROM crm_accounts"
+        "SELECT accountId, account, segmentCode, subSegmentCode, subSegment, country, region, parentAccount FROM sites"
       )
       .all() as Record<string, unknown>[];
     const crmAccounts =

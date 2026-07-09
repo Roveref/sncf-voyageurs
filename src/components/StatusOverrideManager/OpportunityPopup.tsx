@@ -64,7 +64,7 @@ const OpportunityPopup = memo(
           }}
         >
           <Typography variant="h6" fontWeight={600}>
-            {selectedOpportunity?.opportunity || "Opportunity Details"}
+            {selectedOpportunity?.opportunity || "Détails de l'actif"}
           </Typography>
           <IconButton onClick={onClose} size="small">
             <CloseIcon />

@@ -1,5 +1,5 @@
 /**
- * TeamStaffingColumn — Right column: Engagement Manager/Partner, Manager/Partner, Revenue Team, Staffing Needs
+ * TeamStaffingColumn — Right column: responsable mission / expert référent, équipe projet, besoins experts
  */
 
 import React, { memo, useMemo } from "react";
@@ -141,7 +141,7 @@ const TeamStaffingColumn = ({
         value={formData.em}
         onChange={(_event, newValue) => onChange("em", newValue || "")}
         renderInput={(params) => (
-          <TextField {...params} label="Engagement Manager" size="small" margin="dense" sx={dashedFieldSx} />
+          <TextField {...params} label="Responsable mission" size="small" margin="dense" sx={dashedFieldSx} />
         )}
       />
 
@@ -152,7 +152,7 @@ const TeamStaffingColumn = ({
         value={formData.ep}
         onChange={(_event, newValue) => onChange("ep", newValue || "")}
         renderInput={(params) => (
-          <TextField {...params} label="Engagement Partner" size="small" margin="dense" sx={dashedFieldSx} />
+          <TextField {...params} label="Expert référent" size="small" margin="dense" sx={dashedFieldSx} />
         )}
       />
 
@@ -176,7 +176,7 @@ const TeamStaffingColumn = ({
             },
           }}
         >
-          Copy to Account
+          Copier vers le site
         </Button>
       </Box>
 
@@ -218,7 +218,7 @@ const TeamStaffingColumn = ({
             mr: 1,
           }}
         />
-        Revenue Team
+        Équipe projet
       </Typography>
 
       {/* Revenue team member list */}
@@ -250,7 +250,7 @@ const TeamStaffingColumn = ({
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      placeholder="Name"
+                      placeholder="Nom"
                       sx={{
                         "& .MuiOutlinedInput-root": {
                           "& fieldset": { border: "none" },

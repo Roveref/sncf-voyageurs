@@ -91,7 +91,7 @@ const TabRouter = memo(
       <Box sx={{ flex: 1, overflow: isPhone ? "hidden" : "visible" }}>
         <Suspense fallback={skeletonFallback}>
           <Box sx={{ display: activeTab === 0 ? "block" : "none" }}>
-            <ErrorBoundary fallbackMessage="Error in Pipeline tab">
+            <ErrorBoundary fallbackMessage="Erreur dans l'onglet Parc d'actifs">
               <PipelineTab
                 data={pipelineData}
                 loading={loading}
@@ -114,7 +114,7 @@ const TabRouter = memo(
             </ErrorBoundary>
           </Box>
           <Box sx={{ display: activeTab === 1 ? "block" : "none" }}>
-            <ErrorBoundary fallbackMessage="Error in Bookings tab">
+            <ErrorBoundary fallbackMessage="Erreur dans l'onglet Maintenance">
               <BookingsTab
                 data={bookingsData}
                 loading={loading}
@@ -143,7 +143,7 @@ const TabRouter = memo(
             }}
           >
             <ErrorBoundary
-              fallbackMessage="Error in Staffing tab"
+              fallbackMessage="Erreur dans l'onglet Plan de charge"
               onReset={() => {
                 // No-op — staffing data lives in React Query cache, not in store
               }}
@@ -165,7 +165,7 @@ const TabRouter = memo(
           </Box>
           {activeTab === 3 && (
             <Box key="tab-3" sx={TAB_ENTER_SX}>
-              <ErrorBoundary fallbackMessage="Error in Project tab">
+              <ErrorBoundary fallbackMessage="Erreur dans l'onglet Cycle de vie">
                 <JobcodeTimelineTab
                   data={opportunityData}
                   loading={loading}
@@ -177,14 +177,14 @@ const TabRouter = memo(
           )}
           {activeTab === 4 && (
             <Box key="tab-4" sx={TAB_ENTER_SX}>
-              <ErrorBoundary fallbackMessage="Error in Recruitment tab">
+              <ErrorBoundary fallbackMessage="Erreur dans l'onglet Conformité">
                 <RecruitmentTab />
               </ErrorBoundary>
             </Box>
           )}
           {activeTab === 5 && (
             <Box key="tab-5" sx={TAB_ENTER_SX}>
-              <ErrorBoundary fallbackMessage="Error in Custom Dashboard">
+              <ErrorBoundary fallbackMessage="Erreur dans la Vue d'ensemble">
                 <CustomDashboard />
               </ErrorBoundary>
             </Box>

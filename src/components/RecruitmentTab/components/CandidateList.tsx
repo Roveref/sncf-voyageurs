@@ -136,10 +136,10 @@ function buildTimeline(c: RecruitmentCandidate): TimelineEvent[] {
 }
 
 const TYPE_COLORS: Record<string, string> = {
-  creation: "#FF3D47",
-  hr: "#806659",
-  recruiter: "#CC2931",
-  evaluation: "#98847A",
+  creation: "#EB0070",
+  hr: "#0EA5E9",
+  recruiter: "#7C3AED",
+  evaluation: "#F59E0B",
   decision: "#10B981",
 };
 
@@ -320,7 +320,7 @@ const LinkToNeedSection = memo(
           onClick={(e) => setAnchorEl(e.currentTarget)}
           sx={{ textTransform: "none", fontSize: "0.8rem" }}
         >
-          Link to Staffing Need
+          Lier à un besoin d'intervention
         </Button>
         <Popover
           open={!!anchorEl}
@@ -330,7 +330,7 @@ const LinkToNeedSection = memo(
         >
           <Box sx={{ p: 1, maxHeight: 300, overflow: "auto", minWidth: 280 }}>
             <Typography variant="caption" color="text.secondary" sx={{ px: 1, pb: 0.5, display: "block" }}>
-              Open staffing needs ({openNeeds.length})
+              Besoins d'intervention ouverts ({openNeeds.length})
             </Typography>
             {openNeeds.map((need) => (
               <MenuItem key={need.id} onClick={() => handleLink(need.id)} sx={{ fontSize: "0.8rem", py: 0.75 }}>
@@ -622,7 +622,7 @@ const CandidateRow = React.memo(
 CandidateRow.displayName = "CandidateRow";
 
 // ── MAIN COMPONENT ──
-const CandidateList = React.memo(({ data, title = "Candidates" }: Props) => {
+const CandidateList = React.memo(({ data, title = "Non-conformités" }: Props) => {
   const theme = useTheme();
 
   // Search
@@ -869,7 +869,7 @@ const CandidateList = React.memo(({ data, title = "Candidates" }: Props) => {
       <Box sx={{ display: "flex", flexDirection: "column", gap: "12px", minHeight: 200 }}>
         {paginated.length === 0 ? (
           <Box sx={{ py: 6, textAlign: "center" }}>
-            <Typography color="text.secondary">No candidates match the filters</Typography>
+            <Typography color="text.secondary">Aucune non-conformité ne correspond aux filtres</Typography>
           </Box>
         ) : (
           paginated.map((c, i) => <CandidateRow key={c.id} candidate={c} index={i} />)

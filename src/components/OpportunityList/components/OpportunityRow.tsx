@@ -43,9 +43,19 @@ import OpportunityExpandedDetails from "./OpportunityExpandedDetails";
 import { keyframes, timing, easing, staggerChildren } from "../../../styles/animations";
 import { GRID_TEMPLATE, GRID_TEMPLATE_WIN } from "../gridLayout";
 import { brand } from "../../../config/brandConfig";
+import { parseAssetMetrics, ETAT_ABE_COLORS } from "../../../data/gaifAssetMetrics";
 
 const statusColors = STATUS_COLORS;
 const statusText = STATUS_TEXT;
+
+const PATRIMOINE_DOT_COLORS: Record<string, string> = {
+  Ferroviaire: "#C8102E",
+  Immobilier: "#1E4E8C",
+  IO: "#00A3A1",
+  "Courants Faibles": "#F59E0B",
+  "Propriete Intellectuelle": "#7C3AED",
+  "Gares Lignes": "#0EA5E9",
+};
 
 /**
  * Memoized row component for opportunities
@@ -368,7 +378,17 @@ const OpportunityRow = memo(
           </Box>
 
           {/* Opportunity ID */}
-          <Box sx={{ overflow: "hidden" }}>
+          <Box sx={{ overflow: "hidden", display: "flex", alignItems: "center" }}>
+            <Box
+              sx={{
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                bgcolor: PATRIMOINE_DOT_COLORS[row.subSegmentCode] || "#94A3B8",
+                flexShrink: 0,
+                mr: 0.5,
+              }}
+            />
             <Typography
               variant="body2"
               fontWeight={500}
@@ -397,83 +417,64 @@ const OpportunityRow = memo(
             </Typography>
           </Box>
 
-          {/* Date */}
+          {/* Prochaine VR */}
           <Box sx={{ overflow: "hidden" }}>
-            <Typography
-              variant="body2"
-              sx={{
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-            >
-              {row.creationDate
-                ? new Date(row.creationDate).toLocaleDateString("fr-FR", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                  })
-                : "-"}
+            {(() => {
+              const vrDate = row.estimatedBookingDate;
+              if (!vrDate)
+                return (
+                  <Typography variant="body2" color="text.disabled">
+                    —
+                  </Typography>
+                );
+              const vr = new Date(vrDate);
+              const now = new Date();
+              const diffDays = Math.floor((vr.getTime() - now.getTime()) / 86400000);
+              const isOverdue = diffDays < 0;
+              const isUrgent = diffDays >= 0 && diffDays <= 30;
+              const formatted = vr.toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "2-digit" });
+              return (
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontSize: "0.78rem",
+                    whiteSpace: "nowrap",
+                    color: isOverdue ? "error.main" : isUrgent ? "warning.main" : "text.primary",
+                    fontWeight: isOverdue || isUrgent ? 700 : 400,
+                  }}
+                >
+                  {isOverdue ? "\u26A0 " : isUrgent ? "\u25CF " : ""}
+                  {formatted}
+                </Typography>
+              );
+            })()}
+          </Box>
+
+          {/* Coût maintenance — pour les actifs : maintenanceCost annuel (serviceOffering2Pct).
+              Pour les interventions (user_assets, isManual=true) : grossRevenue = coût réel. */}
+          <Box sx={{ textAlign: "right", overflow: "hidden" }}>
+            {(() => {
+              const value = Number(row.serviceOffering2Pct) || (row.isManual ? Number(row.grossRevenue) : 0);
+              return (
+                <Typography variant="body2" fontWeight={500} sx={{ whiteSpace: "nowrap", fontSize: "0.8rem" }}>
+                  {value ? formatCurrency(value) : "—"}
+                </Typography>
+              );
+            })()}
+          </Box>
+
+          {/* Valeur d'achat (= grossRevenue dans le mapping GAIF) */}
+          <Box sx={{ textAlign: "right", overflow: "hidden" }}>
+            <Typography variant="body2" fontWeight={400} sx={{ whiteSpace: "nowrap", fontSize: "0.8rem" }}>
+              {row.grossRevenue ? formatCurrency(row.grossRevenue) : "—"}
             </Typography>
           </Box>
 
-          {/* Revenue */}
+          {/* Valeur résiduelle (= netRevenue dans le mapping GAIF) */}
           <Box sx={{ textAlign: "right", overflow: "hidden" }}>
-            {row.isManual && editingField === "revenue" ? (
-              <TextField
-                type="number"
-                size="small"
-                autoFocus
-                value={editValue}
-                onChange={(e) => setEditValue(e.target.value)}
-                onBlur={handleSaveEdit}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSaveEdit();
-                  if (e.key === "Escape") setEditingField(null);
-                }}
-                onClick={(e) => e.stopPropagation()}
-                sx={{ width: 120 }}
-                inputProps={{ style: { textAlign: "right", fontSize: "0.875rem", padding: "4px 8px" } }}
-              />
-            ) : (
-              <Typography
-                variant="body2"
-                fontWeight={500}
-                onClick={
-                  row.isManual
-                    ? (e) => {
-                        e.stopPropagation();
-                        setEditingField("revenue");
-                        setEditValue(String(row.grossRevenue || 0));
-                      }
-                    : undefined
-                }
-                sx={row.isManual ? { cursor: "pointer", "&:hover": { textDecoration: "underline dotted" } } : undefined}
-              >
-                {formatCurrency(
-                  shouldShowIO
-                    ? calculatedRevenue
-                    : shouldShowAllocated
-                      ? showNetRevenue
-                        ? row.allocatedNetRevenue
-                        : row.allocatedGrossRevenue
-                      : showNetRevenue
-                        ? row.netRevenue
-                        : row.grossRevenue
-                )}
-              </Typography>
-            )}
-            {/* Always show allocation info when filtered, regardless of display mode */}
-            {row.isAllocated && !shouldShowIO && (
-              <Typography variant="caption" color="text.secondary" display="block">
-                {row.allocatedServiceLine}: {row.allocationPercentage}%
-              </Typography>
-            )}
-            {showIO && (
-              <Typography variant="caption" color="text.secondary" display="block">
-                I&O: {ioPercentage.toFixed(0)}%
-              </Typography>
-            )}
+            <Typography variant="body2" fontWeight={400} sx={{ whiteSpace: "nowrap", fontSize: "0.8rem" }}>
+              {row.netRevenue ? formatCurrency(row.netRevenue) : "—"}
+            </Typography>
           </Box>
 
           {/* Opportunity Name */}
@@ -587,37 +588,60 @@ const OpportunityRow = memo(
                 const overrideComment = useUserDataStore.getState().statusOverrides[row.opportunityId]?.comment;
                 const lostComment = row.lostComment || overrideComment;
                 return lostComment ? (
-                  <Tooltip title={`Lost: ${lostComment}`}>
+                  <Tooltip title={`Déclassement : ${lostComment}`}>
                     <CommentIcon fontSize="small" color="error" sx={{ ml: 0.5, verticalAlign: "middle" }} />
                   </Tooltip>
                 ) : null;
               })()}
           </Box>
 
-          {/* Technology */}
-          <Box sx={{ display: "flex", justifyContent: "center" }}>
-            {/* Display technology partner tags only if they exist */}
-            {technologyPartners.length > 0 && (
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, justifyContent: "center" }}>
-                {technologyPartners.map((partner) => (
+          {/* Criticité + Prestataire (+ État ABE pour l'immobilier) */}
+          <Box sx={{ textAlign: "center", overflow: "hidden" }}>
+            {row.engagementType && (
+              <Chip
+                size="small"
+                label={row.engagementType.replace("Criticité ", "")}
+                sx={{
+                  fontSize: "0.65rem",
+                  height: 20,
+                  bgcolor: row.engagementType.includes("Critique")
+                    ? "#FECACA"
+                    : row.engagementType.includes("Modérée")
+                      ? "#FEF3C7"
+                      : "#D1FAE5",
+                  color: row.engagementType.includes("Critique")
+                    ? "#991B1B"
+                    : row.engagementType.includes("Modérée")
+                      ? "#92400E"
+                      : "#065F46",
+                  fontWeight: 700,
+                }}
+              />
+            )}
+            {(() => {
+              if (row.subSegmentCode !== "Immobilier") return null;
+              const metrics = parseAssetMetrics(row);
+              if (!metrics.etatAbe) return null;
+              const abeColor = ETAT_ABE_COLORS[metrics.etatAbe] || "#94A3B8";
+              return (
+                <Tooltip title={`État ABE : ${metrics.etatAbe}`} arrow>
                   <Chip
-                    key={partner}
-                    label={partner}
                     size="small"
+                    label={metrics.etatAbe}
                     sx={{
-                      height: 20,
-                      fontSize: "0.65rem",
+                      mt: 0.25,
+                      fontSize: "0.6rem",
+                      height: 18,
+                      bgcolor: alpha(abeColor, 0.15),
+                      color: abeColor,
                       fontWeight: 600,
-                      backgroundColor: alpha(theme.palette.info.main, 0.15),
-                      color: theme.palette.info.main,
-                      "& .MuiChip-label": {
-                        px: 1,
-                      },
+                      display: "block",
+                      maxWidth: "100%",
                     }}
                   />
-                ))}
-              </Box>
-            )}
+                </Tooltip>
+              );
+            })()}
           </Box>
 
           {/* Staffing Need Button */}
@@ -732,7 +756,7 @@ const OpportunityRow = memo(
           </DialogTitle>
           <DialogContent>
             <DatePicker
-              label={pendingStatus === 14 ? "Booking date" : "Loss date"}
+              label={pendingStatus === 14 ? "Date exploitation" : "Date fin de vie"}
               value={bookingDate}
               onChange={(value) => {
                 if (value) setBookingDate(value);

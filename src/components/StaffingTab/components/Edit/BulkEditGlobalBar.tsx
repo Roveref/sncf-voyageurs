@@ -33,13 +33,13 @@ function describeAction(a: EditAction): string {
     a.produced.length > 0 ? `${a.produced[0].startDate} -> ${a.produced[a.produced.length - 1].endDate}` : "";
   const utilInfo = a.produced.length > 0 ? ` ${a.produced[0].utilization}%` : "";
   const labels: Record<string, string> = {
-    create: "Create",
-    delete: "Delete",
-    split_delete: "Truncate",
-    reduce_util: "Adjust %",
-    reduce_days: "Reduce days",
-    reduce_util_multi: "Adjust %",
-    update_field: "Edit",
+    create: "CrÃ©er",
+    delete: "Supprimer",
+    split_delete: "Tronquer",
+    reduce_util: "Ajuster %",
+    reduce_days: "RÃ©duire jours",
+    reduce_util_multi: "Ajuster %",
+    update_field: "Modifier",
   };
   return `${labels[a.type] || a.type} ${name}${dates ? ` (${dates}${utilInfo})` : ""}`;
 }
@@ -89,7 +89,7 @@ export const BulkEditGlobalBar = memo(
                     : { color: brand.primaryDark, "&:hover": { bgcolor: "#fef2f2" } }),
                 }}
               >
-                Revert All
+                Tout annuler
               </Button>
 
               <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
@@ -139,7 +139,7 @@ export const BulkEditGlobalBar = memo(
           {!readOnly && (
             <>
               <Button size="small" onClick={onClose} sx={barBtnInactive}>
-                Cancel
+                Annuler
               </Button>
               <Button
                 size="small"
@@ -151,7 +151,7 @@ export const BulkEditGlobalBar = memo(
                   "&.Mui-disabled": { bgcolor: brand.secondaryLightest, color: brand.secondaryLight },
                 }}
               >
-                Apply
+                Appliquer
               </Button>
             </>
           )}

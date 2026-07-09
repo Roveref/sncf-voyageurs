@@ -8,16 +8,14 @@
  *      OR a jobcode is selected. Flat or grouped depending on the toggle.
  *   4. BCS simulator (only for a single selected jobcode)
  */
-import { useEffect, useMemo, memo, useState } from "react";
+import { useEffect, useMemo, memo } from "react";
 import { useAppStore } from "../../stores/useAppStore";
 import { useCrmData } from "../../queries/useCrmData";
 import Grid from "@mui/material/Grid2";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Fade from "@mui/material/Fade";
-import AddIcon from "@mui/icons-material/Add";
 
 import { useJobcodeData, useTimelineData } from "./hooks";
 import { useJobcodeFilterState } from "./hooks/useJobcodeFilterState";
@@ -26,9 +24,11 @@ import { usePersonJobcodeIndex } from "./hooks/usePersonJobcodeIndex";
 import { useJobcodeOpportunities } from "./hooks/useJobcodeOpportunities";
 import { SkeletonDashboard } from "../common/SkeletonLoaders";
 
-import { JobcodeHeader, BcsSimulator } from "./components";
+import { JobcodeHeader } from "./components";
 import { JobcodeTopFilterBar } from "./components/JobcodeTopFilterBar";
 import { JobcodeGantt } from "./components/JobcodeGantt";
+import LifecyclePhaseFlow from "./components/LifecyclePhaseFlow";
+import InvestmentRequestQueue from "./components/InvestmentRequestQueue";
 
 interface JobcodeTimelineTabProps {
   data: Record<string, unknown>[] | null;
@@ -68,11 +68,8 @@ const JobcodeTimelineTab = ({ data, loading }: JobcodeTimelineTabProps) => {
     personIndex
   );
 
-  const [showBlankBcs, setShowBlankBcs] = useState(false);
-
   useEffect(() => {
     resetExpandedCards();
-    if (selectedJobcode) setShowBlankBcs(false);
   }, [selectedJobcode, resetExpandedCards]);
 
   // Cascade: clear jobcode selection when it's no longer in the filtered options
@@ -84,18 +81,27 @@ const JobcodeTimelineTab = ({ data, loading }: JobcodeTimelineTabProps) => {
 
   const showContent = filterState.hasActiveFilter && totalOpportunities > 0;
   const showHeader = selectedJobcode != null;
-  const showBcs = selectedJobcode != null;
 
-  const emptyTitle = !filterState.hasActiveFilter ? "Aucun filtre actif" : "Aucun résultat";
+  const emptyTitle = !filterState.hasActiveFilter ? "Sélectionnez un site ou un projet" : "Aucun résultat";
   const emptyBody = !filterState.hasActiveFilter
-    ? "Sélectionne un compte, un jobcode, une personne ou tape une recherche pour afficher les opportunités."
-    : "Aucune opportunité ne correspond aux filtres.";
+    ? "Utilisez les filtres ci-dessus pour visualiser le cycle de vie des actifs et les projets d'investissement."
+    : "Aucun actif ne correspond aux filtres sélectionnés.";
 
   if (loading) return <SkeletonDashboard />;
 
   return (
     <Fade in={!loading} timeout={500}>
       <Grid container spacing={3}>
+        {/* 4 phases PSGA — carte synthétique du cycle de vie des actifs filtrés */}
+        <Grid size={12}>
+          <LifecyclePhaseFlow filterSite={filterState.filters.accountFilter} />
+        </Grid>
+
+        {/* File d'attente des demandes d'investissement (phase Émergence) */}
+        <Grid size={12}>
+          <InvestmentRequestQueue />
+        </Grid>
+
         {/* Gantt — always rendered, contains the filter bar inside Paper #1 */}
         <Grid size={12}>
           <JobcodeGantt
@@ -108,17 +114,6 @@ const JobcodeTimelineTab = ({ data, loading }: JobcodeTimelineTabProps) => {
                 selectedJobcode={selectedJobcode}
                 onSelectJobcode={handleJobcodeSelection}
               />
-            }
-            filterBarRightSlot={
-              <Button
-                variant={showBlankBcs ? "contained" : "outlined"}
-                size="small"
-                startIcon={<AddIcon />}
-                onClick={() => setShowBlankBcs((v) => !v)}
-                sx={{ textTransform: "none", fontSize: "0.8rem", fontWeight: 600, whiteSpace: "nowrap" }}
-              >
-                New BCS
-              </Button>
             }
             groups={filterState.filters.groupByJobcode ? groupedOpportunities : undefined}
             flatOpportunities={filterState.filters.groupByJobcode ? undefined : flatOpportunities}
@@ -135,20 +130,6 @@ const JobcodeTimelineTab = ({ data, loading }: JobcodeTimelineTabProps) => {
             <Paper elevation={0} sx={{ p: 3, borderRadius: 3 }}>
               <JobcodeHeader selectedJobcode={selectedJobcode} opportunityStreams={opportunityStreams} />
             </Paper>
-          </Grid>
-        )}
-
-        {/* BCS simulator */}
-        {showBcs && (
-          <Grid size={12}>
-            <BcsSimulator jobcode={selectedJobcode.jobcode} />
-          </Grid>
-        )}
-
-        {/* Blank BCS (no jobcode) */}
-        {showBlankBcs && !selectedJobcode && (
-          <Grid size={12}>
-            <BcsSimulator />
           </Grid>
         )}
       </Grid>

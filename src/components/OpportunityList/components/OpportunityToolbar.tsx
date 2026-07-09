@@ -44,6 +44,7 @@ import { easing, keyframes } from "../../../styles/animations";
 import ImportActionsDialog from "./ImportActionsDialog";
 import ImportOpportunitiesDialog from "./ImportOpportunitiesDialog";
 import StatusFilterDialog from "./StatusFilterDialog";
+import { STATUS_OPTIONS } from "../../../utils/statusOptions";
 
 /**
  * Memoized toolbar component for opportunity list
@@ -97,16 +98,17 @@ const OpportunityToolbar = memo(
     // Count how many manual opportunities are selected
     const manualSelectedCount = selectedOpportunities.filter((opp: any) => opp.isManual === true).length;
 
-    // Available status options (filtered by excludeStatuses)
-    const allStatusOptions = [
-      { value: 1, label: "Lead Identified", color: "primary" },
-      { value: 4, label: "Go Approved", color: "primary" },
-      { value: 6, label: "Proposal Submitted", color: "primary" },
-      { value: 11, label: "Client Won", color: "primary" },
-      { value: 13, label: "AEL", color: "primary" },
-      { value: 14, label: "Booked", color: "success" },
-      { value: 15, label: "Lost", color: "error" },
-    ];
+    // Available status options — source de vérité : STATUS_OPTIONS (labels GAIF en français,
+    // mis à jour depuis les OptionSets CRM à l'hydratation) pour rester cohérent avec la liste.
+    const STATUS_COLOR: Record<number, string> = {
+      14: "success",
+      15: "error",
+    };
+    const allStatusOptions = STATUS_OPTIONS.map((opt) => ({
+      value: opt.status,
+      label: opt.label,
+      color: STATUS_COLOR[opt.status] || "primary",
+    }));
     const statusOptions =
       excludeStatuses.length > 0
         ? allStatusOptions.filter((opt) => !excludeStatuses.includes(opt.value))
@@ -310,7 +312,7 @@ const OpportunityToolbar = memo(
               >
                 <PercentIcon fontSize="small" sx={{ fontSize: "1rem" }} />
                 <Typography variant="body2" fontWeight={500} sx={{ fontSize: "0.8rem" }}>
-                  Win
+                  Dispo
                 </Typography>
               </Box>
 
@@ -402,8 +404,8 @@ const OpportunityToolbar = memo(
               }}
             >
               {statusFilter.length === 0
-                ? "All Statuses"
-                : `${statusFilter.length} Status${statusFilter.length > 1 ? "es" : ""}`}
+                ? "Tous les statuts"
+                : `${statusFilter.length} statut${statusFilter.length > 1 ? "s" : ""}`}
             </Button>
           )}
 

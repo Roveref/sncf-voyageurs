@@ -16,11 +16,13 @@ import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
 import HubRoundedIcon from "@mui/icons-material/HubRounded";
 import PersonAddAltRoundedIcon from "@mui/icons-material/PersonAddAltRounded";
 import { brand } from "../../config/brandConfig";
+import { alpha } from "@mui/material/styles";
 import { timing, easing } from "../../styles/animations";
 import { useAppStore } from "../../stores/useAppStore";
 import YearWheel from "../common/YearWheel";
+import type { GaifSitesSelection } from "../GaifSitesMap";
 
-const RegionMap = lazy(() => import("../RegionMap/RegionMap"));
+const GaifSitesMap = lazy(() => import("../GaifSitesMap/GaifSitesMap"));
 
 interface LandingPageProps {
   darkMode: boolean;
@@ -34,43 +36,40 @@ interface LandingPageProps {
 }
 
 const TABS = [
-  { value: 0, label: "Pipeline", icon: <TrendingUpRoundedIcon /> },
-  { value: 1, label: "Bookings", icon: <TaskAltRoundedIcon /> },
-  { value: 2, label: "Staffing", icon: <GroupsRoundedIcon /> },
-  { value: 3, label: "Project", icon: <HubRoundedIcon /> },
-  { value: 4, label: "Recruitment", icon: <PersonAddAltRoundedIcon /> },
+  { value: 0, label: "Parc d'actifs", icon: <TrendingUpRoundedIcon /> },
+  { value: 1, label: "Maintenance", icon: <TaskAltRoundedIcon /> },
+  { value: 2, label: "Plan de charge", icon: <GroupsRoundedIcon /> },
+  { value: 3, label: "Cycle de vie", icon: <HubRoundedIcon /> },
+  { value: 4, label: "Conformité", icon: <PersonAddAltRoundedIcon /> },
 ] as const;
 
 const LandingPage = memo(
   ({
     darkMode,
     backendAvailable,
-    regions,
+    regions: _regions,
     hydrating,
     hydrationPercent,
     landingTab,
     setLandingTab,
     startHydration,
   }: LandingPageProps) => {
-    const [selectedRegion, setSelectedRegion] = useState<string | null>("WST");
-    const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+    // Sélection sur la carte France — BU ou site. Par défaut : toute la France.
+    const [mapSelection, setMapSelection] = useState<GaifSitesSelection>({ kind: "all" });
     const sinceYear = useAppStore((s) => s.sinceYear);
     const setSinceYear = useAppStore((s) => s.setSinceYear);
 
-    const hasSelection = !!(selectedRegion || selectedCountry);
-    const enabled = backendAvailable && hasSelection && !hydrating;
+    const enabled = backendAvailable && !hydrating;
 
     const handleStart = useCallback(() => {
-      if (!backendAvailable || !hasSelection || hydrating) return;
+      if (!backendAvailable || hydrating) return;
       const since = sinceYear ? `${sinceYear}-01-01` : undefined;
-      if (selectedCountry) {
-        useAppStore.getState().setHydrationFilter({ country: selectedCountry });
-        startHydration({ country: selectedCountry, since });
-      } else if (selectedRegion) {
-        useAppStore.getState().setHydrationFilter({ region: selectedRegion });
-        startHydration({ region: selectedRegion, since });
-      }
-    }, [backendAvailable, hasSelection, hydrating, sinceYear, selectedCountry, selectedRegion, startHydration]);
+      // Hydratation : on charge tout le périmètre (region=IDF est la valeur historique
+      // qui couvre l'ensemble des sites GAIF, TN + TER + IC). La sélection BU/site
+      // sert à pré-filtrer côté dashboard une fois les données chargées.
+      useAppStore.getState().setHydrationFilter({ region: "IDF" });
+      startHydration({ region: "IDF", since });
+    }, [backendAvailable, hydrating, sinceYear, startHydration]);
 
     // Enter key → start hydration
     useEffect(() => {
@@ -97,7 +96,7 @@ const LandingPage = memo(
             borderRadius: 3,
             p: { xs: 3, md: 4 },
             background: darkMode
-              ? "linear-gradient(to bottom right, #241E1B, #1A1210)"
+              ? `linear-gradient(to bottom right, ${brand.darkPaper}, ${brand.darkBg})`
               : "linear-gradient(to bottom right, #ffffff, #f8fafc)",
             textAlign: "center",
             border: "1px solid",
@@ -105,8 +104,14 @@ const LandingPage = memo(
             overflow: "auto",
           }}
         >
-          <Typography variant="h4" gutterBottom sx={{ fontWeight: 700, mb: 6 }}>
-            <span style={{ color: brand.primary }}>B°</span> Dashboard
+          <Box
+            component="img"
+            src="/sncf-voyageurs-logo.png"
+            alt="SNCF Voyageurs"
+            sx={{ height: 70, width: "auto", mb: 2 }}
+          />
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: 500 }}>
+            Plateforme de pilotage des installations fixes — SNCF Voyageurs
           </Typography>
 
           {/* Tab selector */}
@@ -129,8 +134,8 @@ const LandingPage = memo(
                     cursor: "pointer",
                     background: selected
                       ? darkMode
-                        ? "rgba(255,61,71,0.18)"
-                        : "rgba(255,61,71,0.10)"
+                        ? alpha(brand.primary, 0.18)
+                        : alpha(brand.primary, 0.1)
                       : darkMode
                         ? "rgba(255,255,255,0.05)"
                         : "rgba(0,0,0,0.04)",
@@ -138,8 +143,8 @@ const LandingPage = memo(
                     "&:hover": {
                       background: selected
                         ? darkMode
-                          ? "rgba(255,61,71,0.24)"
-                          : "rgba(255,61,71,0.14)"
+                          ? alpha(brand.primary, 0.24)
+                          : alpha(brand.primary, 0.14)
                         : darkMode
                           ? "rgba(255,255,255,0.10)"
                           : "rgba(0,0,0,0.08)",
@@ -171,23 +176,15 @@ const LandingPage = memo(
             })}
           </Box>
 
-          {/* Region Map */}
-          {backendAvailable && regions.length > 0 && (
-            <Box sx={{ mt: 0, width: "100%", maxWidth: 800, mx: "auto" }}>
+          {/* Sites GAIF Map — carte France avec les 18 sites opérationnels */}
+          {backendAvailable && (
+            <Box sx={{ mt: 0, width: "100%", maxWidth: 720, mx: "auto" }}>
               <Suspense fallback={null}>
-                <RegionMap
-                  regions={regions}
-                  selectedRegion={selectedRegion}
-                  selectedCountry={selectedCountry}
-                  onRegionSelect={(r: string | null) => {
-                    setSelectedRegion(r);
-                    setSelectedCountry(null);
-                  }}
-                  onCountrySelect={(c: string | null) => {
-                    setSelectedCountry(c);
-                    setSelectedRegion(null);
-                  }}
+                <GaifSitesMap
+                  selection={mapSelection}
+                  onSelectionChange={setMapSelection}
                   darkMode={darkMode}
+                  height={320}
                 />
               </Suspense>
             </Box>
@@ -213,15 +210,15 @@ const LandingPage = memo(
                 opacity: enabled ? 1 : 0.4,
                 background: enabled
                   ? darkMode
-                    ? "rgba(255,61,71,0.18)"
-                    : "rgba(255,61,71,0.10)"
+                    ? alpha(brand.primary, 0.18)
+                    : alpha(brand.primary, 0.1)
                   : darkMode
                     ? "rgba(255,255,255,0.05)"
                     : "rgba(0,0,0,0.04)",
                 transition: `background-color ${timing.normal} ${easing.elegant}, opacity ${timing.normal} ${easing.elegant}, transform ${timing.normal} ${easing.elegant}`,
                 "&:hover": enabled
                   ? {
-                      background: darkMode ? "rgba(255,61,71,0.28)" : "rgba(255,61,71,0.18)",
+                      background: darkMode ? alpha(brand.primary, 0.28) : alpha(brand.primary, 0.18),
                       transform: "translateY(-2px)",
                     }
                   : {},
@@ -259,7 +256,7 @@ const LandingPage = memo(
                     lineHeight: 1.2,
                   }}
                 >
-                  Open
+                  Accéder au tableau de bord
                 </Typography>
               )}
             </Box>

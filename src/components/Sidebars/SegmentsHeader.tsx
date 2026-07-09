@@ -34,7 +34,7 @@ const SegmentsHeader = memo(
         >
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Typography variant="h6" fontWeight={600} color={theme.palette.primary.dark}>
-              Segments
+              Patrimoines
             </Typography>
 
             {/* Expand/Collapse level buttons */}

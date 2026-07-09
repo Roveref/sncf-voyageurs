@@ -1,36 +1,32 @@
 /**
- * Service Line Groups and Colors
- * Extracted from App.js for better organization
+ * BU Groups (sidebar « Unit ») : 3 grandes entités de SNCF Voyageurs.
+ * Chaque BU englobe ses sites (technicentres, SMR, SMGL).
+ * Le match se fait par sous-chaîne dans le nom du site (serviceLine1).
+ *   - TER : sites contenant "Technicentre TER"
+ *   - IC  : sites contenant "Technicentre IC"
+ *   - Transilien : tout le reste (exclude TER et IC)
  */
 
-import { serviceLineColors } from "../../config/brandConfig";
+import { brand } from "../../config/brandConfig";
 
 export const SERVICE_LINE_GROUPS: Record<
   string,
   { name: string; color: string; include?: string[]; exclude?: string[] }
 > = {
-  BTU: {
-    name: "BTU",
-    color: serviceLineColors.BTU, // Bearing Red (R50)
-    // BTU includes everything EXCEPT: "Arcwide Services", "Be Products", "Enterprise SAP Transformation"
-    exclude: ["Arcwide Services", "Be Products", "Enterprise SAP Transformation"],
+  Transilien: {
+    name: "Transilien",
+    color: brand.primary,
+    // Exclude TER and IC sites — everything else belongs to Transilien
+    exclude: ["Technicentre TER", "Technicentre IC"],
   },
-  ETU: {
-    name: "ETU",
-    color: serviceLineColors.ETU, // Warm Grey (G60)
-    // ETU includes only "Enterprise SAP Transformation"
-    include: ["Enterprise SAP Transformation"],
+  TER: {
+    name: "TER",
+    color: "#0EA5E9",
+    include: ["Technicentre TER"],
   },
-  Products: {
-    name: "Products",
-    color: serviceLineColors.Products, // Dark Red (R60)
-    // Products includes only "Be Products"
-    include: ["Be Products"],
-  },
-  Arcwide: {
-    name: "Arcwide",
-    color: serviceLineColors.Arcwide, // Light Grey (G50)
-    // Arcwide includes only "Arcwide Services"
-    include: ["Arcwide Services"],
+  Intercites: {
+    name: "Intercités",
+    color: "#F59E0B",
+    include: ["Technicentre IC"],
   },
 };

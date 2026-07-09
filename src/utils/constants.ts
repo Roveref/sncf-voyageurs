@@ -3,25 +3,25 @@
  * Centralizes status mappings, colors, and other reusable constants
  */
 
-// Status colors mapping for MUI Chip/Badge components
+// Status colors — GAIF cycle de vie des actifs
 export const STATUS_COLORS: Record<number, string> = {
-  1: "primary", // New Lead
-  4: "primary", // Go Approved
-  6: "primary", // Proposal Delivered
-  11: "primary", // Final Negotiation
-  14: "success", // Booked
-  15: "error", // Lost
+  1: "primary", // Émergence
+  4: "primary", // Investissement / CEB
+  6: "primary", // Étude en cours
+  11: "warning", // Maintenance lourde
+  14: "success", // En exploitation
+  15: "error", // Déclassé
 };
 
-// Status text labels (based on Status Long column)
+// Status text labels — GAIF phases du cycle de vie
 export const STATUS_TEXT: Record<number, string> = {
-  1: "Lead Identified",
-  4: "Go Approved",
-  6: "Proposal Submitted",
-  11: "Client Tells Us We Have Won",
-  13: "Authorized Engagement Letter",
-  14: "Booked",
-  15: "Lost",
+  1: "Émergence",
+  4: "Investissement / CEB",
+  6: "Étude en cours",
+  11: "Maintenance lourde",
+  13: "Conventionné",
+  14: "En exploitation",
+  15: "Déclassé",
 };
 
 // Special segment codes: sub-segments whose parent differs (e.g. AUTO→AMD)

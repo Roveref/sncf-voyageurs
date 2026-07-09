@@ -44,9 +44,9 @@ const GradeDistributionChart = React.memo(({ data }: Props) => {
             }}
           />
           <Legend wrapperStyle={{ fontSize: 12 }} />
-          <Bar dataKey="rejected" name="Rejected" stackId="a" fill={theme.palette.error.main} radius={[0, 0, 0, 0]} />
-          <Bar dataKey="active" name="Active" stackId="a" fill={theme.palette.primary.main} />
-          <Bar dataKey="hired" name="Hired" stackId="a" fill={theme.palette.success.main} radius={[4, 4, 0, 0]} />
+          <Bar dataKey="rejected" name="Détectées" stackId="a" fill={theme.palette.error.main} radius={[0, 0, 0, 0]} />
+          <Bar dataKey="active" name="En traitement" stackId="a" fill={theme.palette.primary.main} />
+          <Bar dataKey="hired" name="Résolues" stackId="a" fill={theme.palette.success.main} radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </Paper>

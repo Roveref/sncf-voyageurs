@@ -65,3 +65,8 @@ scripts/.token_cache*.json
 
 # CRM delta sync state (changes on every sync)
 scripts/.crm_delta_state.json
+# Données client et exports - jamais dans le repo
+Inputs/
+_bp_data_backup/
+# Doublons de conflit iCloud
+* 2.*

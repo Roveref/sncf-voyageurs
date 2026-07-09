@@ -431,7 +431,7 @@ export const ToolBar = memo((props: ToolBarProps) => {
     if (!pipelineJobcodes) return [];
     const opts: { jobNo: string; jobName: string; account: string }[] = [];
     pipelineJobcodes.forEach((info: any, key: string) => {
-      if (info.opportunityName && info.status !== "Lost")
+      if (info.opportunityName && info.status !== "Déclassé")
         opts.push({ jobNo: key, jobName: info.opportunityName, account: info.account || "" });
     });
     return opts;
@@ -652,7 +652,7 @@ export const ToolBar = memo((props: ToolBarProps) => {
                     value={clientFilter || null}
                     onChange={(_e: any, val: any) => setClientFilter(val || "")}
                     popupIcon={null}
-                    renderInput={(params) => <TextField {...params} placeholder="Client" sx={barInputSx} />}
+                    renderInput={(params) => <TextField {...params} placeholder="Site" sx={barInputSx} />}
                     renderOption={(p, opt: any) => (
                       <li {...p} key={opt}>
                         <Typography sx={{ fontSize: "0.7rem" }}>{opt}</Typography>

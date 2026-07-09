@@ -55,7 +55,7 @@ function loadMutableOpps(): DemoOpp[] {
   return db
     .prepare(
       `SELECT opportunityId, opportunity, account, status, grossRevenue, netRevenue, winPct
-       FROM crm_opportunities
+       FROM assets
        WHERE status NOT IN (5, 8)
        ORDER BY RANDOM()
        LIMIT 20`
@@ -98,13 +98,13 @@ function mutateOpp(opp: DemoOpp): Record<string, unknown> | null {
   // Persist to demo DB
   const now = new Date().toISOString();
   db.prepare(
-    `UPDATE crm_opportunities
+    `UPDATE assets
      SET grossRevenue = ?, netRevenue = ?, winPct = ?, status = ?, lastStatusChangeDate = ?, updatedAt = ?
      WHERE opportunityId = ?`
   ).run(opp.grossRevenue, opp.netRevenue, opp.winPct, opp.status, now, now, opp.opportunityId);
 
   // Read back full row for broadcast
-  const full = db.prepare("SELECT * FROM crm_opportunities WHERE opportunityId = ?").get(opp.opportunityId) as Record<
+  const full = db.prepare("SELECT * FROM assets WHERE opportunityId = ?").get(opp.opportunityId) as Record<
     string,
     unknown
   >;
@@ -143,7 +143,7 @@ function tick() {
       for (const opp of mutated) {
         const name = String(opp.opportunity || opp.opportunityId || "?");
         const account = String(opp.account || "");
-        createNotification("crm_update", `CRM update: ${name}`, account, String(opp.opportunityId || ""));
+        createNotification("crm_update", `Mise à jour actif : ${name}`, account, String(opp.opportunityId || ""));
       }
 
       log("demo-sim", `Broadcast ${mutated.length} opp update(s)`);

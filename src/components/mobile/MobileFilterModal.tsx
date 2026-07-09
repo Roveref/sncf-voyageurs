@@ -76,11 +76,11 @@ const MobileFilterModal = memo(({ open, onClose, activeTab }: MobileFilterModalP
           flexShrink: 0,
         }}
       >
-        <IconButton edge="start" size="small" onClick={onClose} aria-label="close" sx={{ color: "white" }}>
+        <IconButton edge="start" size="small" onClick={onClose} aria-label="Fermer" sx={{ color: "white" }}>
           <CloseIcon fontSize="small" />
         </IconButton>
         <FilterListIcon sx={{ ml: 1, mr: 1, fontSize: 20, color: "rgba(255,255,255,0.7)" }} />
-        <Typography sx={{ flex: 1, fontWeight: 700, fontSize: "1rem", color: "white" }}>Filters</Typography>
+        <Typography sx={{ flex: 1, fontWeight: 700, fontSize: "1rem", color: "white" }}>Filtres</Typography>
         <Badge badgeContent={activeFilterCount} color="error" sx={{ mr: 2 }}>
           <Box />
         </Badge>
@@ -91,7 +91,7 @@ const MobileFilterModal = memo(({ open, onClose, activeTab }: MobileFilterModalP
             onClick={handleClearAllFilters}
             sx={{ color: "white", fontSize: "0.75rem", textTransform: "none" }}
           >
-            Clear all
+            Tout effacer
           </Button>
         )}
       </Box>
@@ -114,8 +114,8 @@ const MobileFilterModal = memo(({ open, onClose, activeTab }: MobileFilterModalP
           "& .MuiTabs-indicator": { backgroundColor: brand.primary, height: 3 },
         }}
       >
-        <Tab label="Segments & Grades" />
-        <Tab label="Units & Offerings" />
+        <Tab label="Patrimoines & Grades" />
+        <Tab label="UnitÃ©s & Offres" />
       </Tabs>
 
       {/* Scrollable filter content */}
@@ -158,7 +158,7 @@ const MobileFilterModal = memo(({ open, onClose, activeTab }: MobileFilterModalP
             "&:hover": { bgcolor: "#4a0000" },
           }}
         >
-          Apply filters {activeFilterCount > 0 ? `(${activeFilterCount})` : ""}
+          Appliquer les filtres {activeFilterCount > 0 ? `(${activeFilterCount})` : ""}
         </Button>
       </Box>
     </SwipeableDrawer>

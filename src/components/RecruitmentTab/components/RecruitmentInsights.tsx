@@ -31,12 +31,12 @@ const RecruitmentInsights = React.memo(({ funnel, activeCount, avgActiveDays, mu
   const interviewRate = funnel.total > 0 ? (funnel.interviewed / funnel.total) * 100 : 0;
 
   const kpis = [
-    { title: "Total Applications", value: funnel.total, color: "primary.main" },
-    { title: "Active", value: activeCount, color: "info.main" },
-    { title: "Hired", value: funnel.hired, color: "success.main" },
-    { title: "Conversion Rate", value: conversionRate, color: "warning.main", suffix: "%", decimals: 1 },
-    { title: "Interview Rate", value: interviewRate, color: "primary.dark", suffix: "%", decimals: 1 },
-    { title: "Avg. Active Age", value: avgActiveDays, color: "text.secondary", suffix: "d" },
+    { title: "Total NC", value: funnel.total, color: "primary.main" },
+    { title: "En traitement", value: activeCount, color: "info.main" },
+    { title: "Résolues", value: funnel.hired, color: "success.main" },
+    { title: "Taux de résolution", value: conversionRate, color: "warning.main", suffix: "%", decimals: 1 },
+    { title: "Taux d'analyse", value: interviewRate, color: "primary.dark", suffix: "%", decimals: 1 },
+    { title: "Durée moy. traitement", value: avgActiveDays, color: "text.secondary", suffix: "j" },
   ];
 
   return (

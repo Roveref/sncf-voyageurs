@@ -100,7 +100,7 @@ const PipelineStockTooltip = React.memo(
                     {/* Left: Flow (entries or exits) */}
                     <Box sx={{ flex: 1, p: 1.5 }}>
                       <Typography variant="caption" color="text.secondary" sx={{ letterSpacing: 0.5 }}>
-                        {showExits ? "Exits" : "Entries"}
+                        {showExits ? "Sorties" : "Entrées"}
                       </Typography>
                       <Typography variant="body2" fontWeight={600} sx={{ mt: 0.5, whiteSpace: "nowrap" }}>
                         {formatCurrency(showExits ? exitsVal : entriesVal, showNetRevenue)}

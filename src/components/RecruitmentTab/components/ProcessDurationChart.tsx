@@ -7,9 +7,15 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LabelL
 import type { DurationByStatus } from "../utils/calculations";
 
 const STATUS_LABELS: Record<string, string> = {
-  rejected: "Rejected",
-  active: "Active",
-  hired: "Hired",
+  rejected: "Détectées",
+  active: "En traitement",
+  hired: "Résolues",
+  detectee: "Détectées",
+  en_analyse: "En analyse",
+  plan_action: "Plan d'action",
+  en_traitement: "En traitement",
+  resolue: "Résolues",
+  fermee: "Fermées",
 };
 
 const STATUS_COLORS: Record<string, string> = {

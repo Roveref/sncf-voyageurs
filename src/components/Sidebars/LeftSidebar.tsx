@@ -10,8 +10,6 @@ import { useUIStore } from "../../stores/useUIStore";
 import SegmentsHeader from "./SegmentsHeader";
 import AmdGroupSection from "./AmdGroupSection";
 import SegmentCodeItem from "./SegmentCodeItem";
-import GradesSection from "./GradesSection";
-import CategoriesSection from "./CategoriesSection";
 
 /**
  * LeftSidebar Component
@@ -67,12 +65,6 @@ const LeftSidebar = ({ activeTab }: { activeTab: number }) => {
   const setExpandedSegmentCodes = useUIStore((s) => s.setExpandedSegmentCodes);
   const theme = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [expandedStaffingGroups, setExpandedStaffingGroups] = useState({
-    grades: true,
-    teams: true,
-    categories: false,
-  });
-  const [expandedCatGroups, setExpandedCatGroups] = useState<Record<string, boolean>>({});
   const isDraggingRef = useRef(false);
 
   useEffect(() => {
@@ -118,24 +110,6 @@ const LeftSidebar = ({ activeTab }: { activeTab: number }) => {
       setExpandedSegmentGroups({});
     }
   }, [expandedSegmentCodes, setExpandedSegmentCodes, setExpandedSegmentGroups]);
-
-  // Staffing filter computations (used when activeTab === 2)
-  const excludedMacroGrades = useMemo(
-    () => normalizeFilterValue(filters.macroGrades).excluded || [],
-    [filters.macroGrades]
-  );
-  const includedMacroGrades = useMemo(
-    () => normalizeFilterValue(filters.macroGrades).included || [],
-    [filters.macroGrades]
-  );
-  const excludedMacroCategories = useMemo(
-    () => normalizeFilterValue(filters.macroCategories).excluded || [],
-    [filters.macroCategories]
-  );
-  const includedMacroCategories = useMemo(
-    () => normalizeFilterValue(filters.macroCategories).included || [],
-    [filters.macroCategories]
-  );
 
   // Individual segment codes (not in AMD group)
   const individualCodes = useMemo(
@@ -227,27 +201,8 @@ const LeftSidebar = ({ activeTab }: { activeTab: number }) => {
           </Box>
         )}
 
-        {/* Staffing filters (only when Staffing tab is active) */}
-        {activeTab === 2 && (
-          <>
-            <GradesSection
-              filters={filters}
-              setFilters={setFilters}
-              includedMacroGrades={includedMacroGrades}
-              excludedMacroGrades={excludedMacroGrades}
-              expandedStaffingGroups={expandedStaffingGroups}
-              setExpandedStaffingGroups={setExpandedStaffingGroups}
-            />
-            <CategoriesSection
-              filters={filters}
-              setFilters={setFilters}
-              includedMacroCategories={includedMacroCategories}
-              excludedMacroCategories={excludedMacroCategories}
-              expandedCatGroups={expandedCatGroups}
-              setExpandedCatGroups={setExpandedCatGroups}
-            />
-          </>
-        )}
+        {/* GAIF — les filtres « Niveaux » et « Catégories » (hérités du dashboard conseil)
+            sont masqués : ils ne correspondent pas aux besoins du plan de charge GAIF. */}
       </Box>
     </Box>
   );

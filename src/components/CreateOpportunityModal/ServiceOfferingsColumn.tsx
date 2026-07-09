@@ -60,7 +60,7 @@ const ServiceOfferingsColumn = ({
         renderInput={(params) => (
           <TextField
             {...params}
-            placeholder="Service Line"
+            placeholder="Patrimoine"
             error={index === 1 ? !!errors.serviceLine1 : false}
             helperText={index === 1 ? errors.serviceLine1 : undefined}
             size="small"
@@ -81,7 +81,7 @@ const ServiceOfferingsColumn = ({
             renderInput={(params) => (
               <TextField
                 {...params}
-                placeholder="Service Offering"
+                placeholder="Mission socle"
                 size="small"
                 margin="dense"
                 sx={isSecondary ? dashedFieldSx : undefined}
@@ -129,14 +129,12 @@ const ServiceOfferingsColumn = ({
             mr: 1,
           }}
         />
-        Service Offerings
+        Missions socles
       </Typography>
 
       <Box data-mandatory>
-        {renderServiceLineGroup(1, "Primary Service", "serviceLine1", "serviceOffering1", "allocation1", false)}
+        {renderServiceLineGroup(1, "Mission socle", "serviceLine1", "serviceOffering1", "allocation1", false)}
       </Box>
-      {renderServiceLineGroup(2, "Secondary Service", "serviceLine2", "serviceOffering2", "allocation2", true)}
-      {renderServiceLineGroup(3, "Tertiary Service", "serviceLine3", "serviceOffering3", "allocation3", true)}
     </Grid>
   );
 };

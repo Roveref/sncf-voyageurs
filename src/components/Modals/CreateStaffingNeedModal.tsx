@@ -551,7 +551,7 @@ const CreateStaffingNeedModal = ({ open, onClose, opportunityData = [] as any[],
               setSelectedOpportunity(null);
             }}
             renderInput={(p) => (
-              <TextField {...p} label="Account" size="small" placeholder="Search..." variant="filled" sx={filledSx} />
+              <TextField {...p} label="Site" size="small" placeholder="Search..." variant="filled" sx={filledSx} />
             )}
             sx={{ flex: 1 }}
             slotProps={{ listbox: { sx: { maxHeight: 240 } } }}
@@ -575,14 +575,7 @@ const CreateStaffingNeedModal = ({ open, onClose, opportunityData = [] as any[],
             )}
             isOptionEqualToValue={(o, v) => o.opportunityId === v.opportunityId}
             renderInput={(p) => (
-              <TextField
-                {...p}
-                label="Opportunity *"
-                size="small"
-                placeholder="Search..."
-                variant="filled"
-                sx={filledSx}
-              />
+              <TextField {...p} label="Actif *" size="small" placeholder="Search..." variant="filled" sx={filledSx} />
             )}
             sx={{ flex: 1.5 }}
             slotProps={{ listbox: { sx: { maxHeight: 240 } } }}
@@ -883,7 +876,7 @@ const CreateStaffingNeedModal = ({ open, onClose, opportunityData = [] as any[],
                     </Box>
                   )}
                   renderInput={(p) => (
-                    <TextField {...p} size="small" placeholder="Person" variant="filled" sx={filledSmallSx} />
+                    <TextField {...p} size="small" placeholder="Personne" variant="filled" sx={filledSmallSx} />
                   )}
                   sx={{ flex: 1, minWidth: 140 }}
                   slotProps={{ listbox: { sx: { maxHeight: 200 } } }}
@@ -895,7 +888,7 @@ const CreateStaffingNeedModal = ({ open, onClose, opportunityData = [] as any[],
                     value={editForm.skills}
                     onChange={(skills) => setEditForm((p) => ({ ...p, skills }))}
                     label=""
-                    placeholder="Skills..."
+                    placeholder="CompÃ©tences..."
                     size="small"
                   />
                 </Box>
@@ -920,7 +913,7 @@ const CreateStaffingNeedModal = ({ open, onClose, opportunityData = [] as any[],
                     "&.Mui-disabled": { bgcolor: alpha(theme.palette.primary.main, 0.2), color: alpha("#fff", 0.5) },
                   }}
                 >
-                  {editingNeedId ? "Update" : "Add"}
+                  {editingNeedId ? "Modifier" : "Ajouter"}
                 </Button>
                 {/* Reset */}
                 <Chip
@@ -980,7 +973,7 @@ const CreateStaffingNeedModal = ({ open, onClose, opportunityData = [] as any[],
 
       <DialogActions sx={{ px: 3, pb: 1.5, pt: 0.5, bgcolor: "background.default" }}>
         <Button onClick={handleClose} size="small" sx={{ fontWeight: 600 }}>
-          Cancel
+          Annuler
         </Button>
         <Button
           variant="contained"
@@ -990,7 +983,7 @@ const CreateStaffingNeedModal = ({ open, onClose, opportunityData = [] as any[],
           disabled={!canSave}
           sx={{ fontWeight: 600 }}
         >
-          Create{addedNeeds.length > 0 ? ` (${addedNeeds.length})` : ""}
+          Créer{addedNeeds.length > 0 ? ` (${addedNeeds.length})` : ""}
         </Button>
       </DialogActions>
     </Dialog>

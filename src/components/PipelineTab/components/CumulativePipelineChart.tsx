@@ -176,7 +176,7 @@ const CumulativePipelineChart = memo(
           {/* Header */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap" }}>
             <Typography variant="h6" fontWeight={700}>
-              Cumulative Pipeline
+              Évolution cumulative du parc
             </Typography>
 
             {/* Year selector chips (left, same as BookingsTab) */}
@@ -268,7 +268,7 @@ const CumulativePipelineChart = memo(
                     userSelect: "none",
                   }}
                 >
-                  Entries
+                  Entrées
                 </Typography>
               </Box>
 
@@ -311,7 +311,7 @@ const CumulativePipelineChart = memo(
                     userSelect: "none",
                   }}
                 >
-                  Exits
+                  Sorties
                 </Typography>
               </Box>
             </Box>

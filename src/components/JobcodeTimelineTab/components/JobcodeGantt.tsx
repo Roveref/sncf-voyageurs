@@ -13,7 +13,7 @@
  * Always renders — empty / no-results states are handled inline so that
  * the filter bar (passed via `filterBarSlot`) stays visible at all times.
  */
-import { memo, useEffect, useMemo, useCallback, useRef, useState, type ReactNode } from "react";
+import { memo, useEffect, useMemo, useCallback, type ReactNode } from "react";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
@@ -21,17 +21,10 @@ import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
 import ZoomInIcon from "@mui/icons-material/ZoomIn";
 import ZoomOutIcon from "@mui/icons-material/ZoomOut";
-import SortIcon from "@mui/icons-material/Sort";
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import { useTimeline } from "../../../hooks/useTimeline";
-import { GanttMonthAxis } from "../../common/Gantt/GanttMonthAxis";
 import { GanttTodayLine } from "../../common/Gantt/GanttTodayLine";
-import { CellStrip } from "../../common/Gantt/CellStrip";
 import { JobcodeGanttRow } from "./JobcodeGanttRow";
 import { JobcodeGroup } from "./JobcodeGroup";
 import type { JobcodeGroup as JobcodeGroupData } from "../hooks/useJobcodeOpportunities";
@@ -39,11 +32,8 @@ import { GANTT_LEFT_COL_WIDTH } from "../../../constants/gantt";
 
 const LEFT_COLUMN_WIDTH = GANTT_LEFT_COL_WIDTH;
 const ROW_HEIGHT = 52;
-const MONTH_AXIS_HEIGHT = 28;
-const AGGREGATE_STRIP_HEIGHT = 16;
 const ROW_GAP = 12;
 const MS_PER_DAY = 86_400_000;
-const TODAY_PADDING_DAYS = 30;
 
 type ZoomPreset = "all" | "2y" | "1y" | "6m" | "3m" | "1m";
 
@@ -58,13 +48,6 @@ const PRESETS: { value: ZoomPreset; label: string; days: number | "all" }[] = [
 
 type SortBy = "date" | "revenue" | "status" | "name";
 type SortOrder = "asc" | "desc";
-
-const SORT_LABELS: Record<SortBy, string> = {
-  date: "Date",
-  revenue: "Revenue",
-  status: "Status",
-  name: "Nom",
-};
 
 const fmtLocalDate = (d: Date): string => {
   const y = d.getFullYear();
@@ -158,10 +141,9 @@ const JobcodeGantt = memo(
 
     const totalOpps = allVisibleOpportunities.length;
 
-    // ── Sort state (mirror of staffing's MonthHeaderBar sort controls) ──
-    const [sortBy, setSortBy] = useState<SortBy>("date");
-    const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
-    const [sortMenuAnchor, setSortMenuAnchor] = useState<HTMLElement | null>(null);
+    // ── Sort: fixed default (date desc) since the sort toolbar was removed ──
+    const sortBy: SortBy = "date";
+    const sortOrder: SortOrder = "desc";
 
     const sortedFlat = useMemo(() => {
       if (!flatOpportunities) return undefined;
@@ -223,97 +205,6 @@ const JobcodeGantt = memo(
       [allVisibleOpportunities, setCustomDateRangeDirect]
     );
 
-    // ── Aggregate density strip (mirror of staffing's AggregateHeatmapStrip) ──
-    const oppRanges = useMemo(() => {
-      const todayMs = (() => {
-        const d = new Date();
-        d.setHours(0, 0, 0, 0);
-        return d.getTime();
-      })();
-      return allVisibleOpportunities
-        .map((opp) => {
-          const o = opp as {
-            creationDate?: string;
-            bookingDate?: string;
-            lastStatusChangeDate?: string;
-          };
-          const c = parseMs(o.creationDate);
-          const b = parseMs(o.bookingDate);
-          const sc = parseMs(o.lastStatusChangeDate);
-          let s = c;
-          let e = b;
-          if (!Number.isFinite(s)) {
-            if (Number.isFinite(sc)) s = sc;
-            else if (Number.isFinite(e)) s = e - TODAY_PADDING_DAYS * MS_PER_DAY;
-          }
-          if (!Number.isFinite(e)) {
-            e = Number.isFinite(sc)
-              ? Math.max(sc, todayMs + TODAY_PADDING_DAYS * MS_PER_DAY)
-              : todayMs + TODAY_PADDING_DAYS * MS_PER_DAY;
-          }
-          if (!Number.isFinite(s) || !Number.isFinite(e)) return null;
-          if (s > e) {
-            const tmp = s;
-            s = e;
-            e = tmp;
-          }
-          return [s, e] as [number, number];
-        })
-        .filter((r): r is [number, number] => r != null);
-    }, [allVisibleOpportunities]);
-
-    const aggregateFill = useCallback(
-      (cellStart: Date, cellEnd: Date): string | null => {
-        const cs = cellStart.getTime();
-        const ce = cellEnd.getTime();
-        let count = 0;
-        for (const [s, e] of oppRanges) {
-          if (s <= ce && e >= cs) count++;
-        }
-        if (count === 0) return null;
-        const intensity = Math.min(1, count / 6);
-        const alpha = 0.18 + intensity * 0.62;
-        return `rgba(37, 99, 235, ${alpha.toFixed(3)})`;
-      },
-      [oppRanges]
-    );
-
-    const aggregateTooltip = useCallback(
-      (cellStart: Date, cellEnd: Date): string | null => {
-        const cs = cellStart.getTime();
-        const ce = cellEnd.getTime();
-        let count = 0;
-        for (const [s, e] of oppRanges) {
-          if (s <= ce && e >= cs) count++;
-        }
-        if (count === 0) return null;
-        return `${count} opp${count > 1 ? "s" : ""} actives`;
-      },
-      [oppRanges]
-    );
-
-    // ── Sticky header "stuck" detection ──
-    const sentinelRef = useRef<HTMLDivElement | null>(null);
-    const [isStuck, setIsStuck] = useState(false);
-    useEffect(() => {
-      const sentinel = sentinelRef.current;
-      if (!sentinel) return;
-      const obs = new IntersectionObserver(([entry]) => setIsStuck(!entry.isIntersecting), {
-        threshold: 0,
-        rootMargin: "-1px 0px 0px 0px",
-      });
-      obs.observe(sentinel);
-      return () => obs.disconnect();
-    }, []);
-
-    const handleSortMenuOpen = (e: React.MouseEvent<HTMLElement>) => setSortMenuAnchor(e.currentTarget);
-    const handleSortMenuClose = () => setSortMenuAnchor(null);
-    const handleSortByPick = (v: SortBy) => {
-      setSortBy(v);
-      setSortMenuAnchor(null);
-    };
-    const toggleSortOrder = () => setSortOrder((o) => (o === "asc" ? "desc" : "asc"));
-
     return (
       <Box
         sx={{
@@ -326,12 +217,11 @@ const JobcodeGantt = memo(
       >
         {/* Paper #1 — filter bar + zoom toolbar (mirrors staffing FilterHeader paper) */}
         <Paper
-          variant="outlined"
+          elevation={0}
           sx={{
-            borderRadius: "24px 24px 0 0",
+            borderRadius: showContent ? "24px 24px 0 0" : 3,
             bgcolor: "background.paper",
             overflow: "hidden",
-            borderBottom: "none",
             p: 3,
             display: "flex",
             flexDirection: "column",
@@ -354,20 +244,33 @@ const JobcodeGantt = memo(
             }}
           >
             <Typography sx={{ fontSize: "0.75rem", fontWeight: 600, color: "text.secondary", mr: 1 }}>
-              {totalOpps} opportunité{totalOpps > 1 ? "s" : ""}
-              {sortedGroups ? ` · ${sortedGroups.length} jobcode${sortedGroups.length > 1 ? "s" : ""}` : ""}
+              {totalOpps} actif{totalOpps > 1 ? "s" : ""}
+              {sortedGroups ? ` · ${sortedGroups.length} projet${sortedGroups.length > 1 ? "s" : ""}` : ""}
             </Typography>
             <ToggleButtonGroup
               size="small"
               exclusive
               onChange={(_, v: ZoomPreset | null) => v && applyPreset(v)}
               sx={{
+                bgcolor: "action.hover",
+                borderRadius: 2,
+                p: 0.25,
+                gap: 0.25,
                 "& .MuiToggleButton-root": {
                   fontSize: 11,
                   fontWeight: 600,
                   textTransform: "none",
                   px: 1.25,
-                  py: 0.25,
+                  py: 0.5,
+                  border: "none",
+                  borderRadius: 1.5,
+                  color: "text.secondary",
+                  "&.Mui-selected": {
+                    bgcolor: "background.paper",
+                    color: "text.primary",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+                    "&:hover": { bgcolor: "background.paper" },
+                  },
                 },
               }}
             >
@@ -391,162 +294,17 @@ const JobcodeGantt = memo(
           </Box>
         </Paper>
 
-        {/* Sentinel for sticky-stuck detection */}
-        <Box ref={sentinelRef} sx={{ height: 0, visibility: "hidden" }} />
-
-        {/* Sticky timeline header — month axis + density strip + left-col controls */}
-        <Box
-          sx={{
-            position: "sticky",
-            top: 0,
-            zIndex: 9,
-            isolation: "isolate",
-          }}
-        >
-          <Box
-            sx={{
-              position: "relative",
-              zIndex: 1,
-              bgcolor: "background.paper",
-              px: 3,
-              py: 1,
-              borderRadius: isStuck ? "0 0 24px 24px" : 0,
-              transition: "box-shadow 0.3s ease, border-radius 0.3s ease",
-              boxShadow: isStuck ? "0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04)" : "none",
-              borderLeft: isStuck ? "none" : "1px solid",
-              borderRight: isStuck ? "none" : "1px solid",
-              borderColor: "divider",
-            }}
-          >
-            {/* Month axis row */}
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              {/* Left col — sort controls (mirrors staffing's MonthHeaderBar left col) */}
-              <Box
-                sx={{
-                  width: LEFT_COLUMN_WIDTH,
-                  minWidth: LEFT_COLUMN_WIDTH,
-                  flexShrink: 0,
-                  height: MONTH_AXIS_HEIGHT,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 0.25,
-                  px: 1.25,
-                }}
-              >
-                <Tooltip title={`Trier par : ${SORT_LABELS[sortBy]}`} arrow>
-                  <IconButton
-                    size="small"
-                    onClick={handleSortMenuOpen}
-                    sx={{
-                      p: 0.25,
-                      borderRadius: 0.5,
-                      color: "text.secondary",
-                    }}
-                  >
-                    <SortIcon sx={{ fontSize: 16 }} />
-                  </IconButton>
-                </Tooltip>
-                <Menu
-                  anchorEl={sortMenuAnchor}
-                  open={Boolean(sortMenuAnchor)}
-                  onClose={handleSortMenuClose}
-                  MenuListProps={{ dense: true }}
-                >
-                  {(["date", "revenue", "status", "name"] as SortBy[]).map((opt) => (
-                    <MenuItem
-                      key={opt}
-                      selected={sortBy === opt}
-                      onClick={() => handleSortByPick(opt)}
-                      sx={{ fontSize: "0.8125rem" }}
-                    >
-                      {SORT_LABELS[opt]}
-                    </MenuItem>
-                  ))}
-                </Menu>
-                <Tooltip title={sortOrder === "asc" ? "Croissant" : "Décroissant"} arrow>
-                  <IconButton
-                    size="small"
-                    onClick={toggleSortOrder}
-                    sx={{ p: 0.25, borderRadius: 0.5, color: "text.secondary" }}
-                  >
-                    {sortOrder === "asc" ? (
-                      <ArrowUpwardIcon sx={{ fontSize: 14 }} />
-                    ) : (
-                      <ArrowDownwardIcon sx={{ fontSize: 14 }} />
-                    )}
-                  </IconButton>
-                </Tooltip>
-                <Box sx={{ width: 1, height: 16, bgcolor: "divider", mx: 0.5 }} />
-                <Typography
-                  sx={{
-                    fontSize: "0.7rem",
-                    fontWeight: 600,
-                    color: "text.disabled",
-                    textTransform: "uppercase",
-                    letterSpacing: 0.5,
-                  }}
-                >
-                  {SORT_LABELS[sortBy]} {sortOrder === "asc" ? "↑" : "↓"}
-                </Typography>
-              </Box>
-              <Box sx={{ flex: 1, minWidth: 0, pr: 1.5 }}>
-                <GanttMonthAxis
-                  timelineStart={timelineStart}
-                  timelineEnd={timelineEnd}
-                  timeframe="quarter"
-                  height={MONTH_AXIS_HEIGHT}
-                />
-              </Box>
-            </Box>
-
-            {/* Aggregate density strip row */}
-            <Box sx={{ display: "flex", alignItems: "center", mt: 0.5 }}>
-              <Box
-                sx={{
-                  width: LEFT_COLUMN_WIDTH,
-                  minWidth: LEFT_COLUMN_WIDTH,
-                  flexShrink: 0,
-                  pl: 2,
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <Typography
-                  sx={{
-                    fontSize: "0.7rem",
-                    fontWeight: 600,
-                    color: "text.secondary",
-                    textTransform: "uppercase",
-                    letterSpacing: 0.5,
-                  }}
-                >
-                  Densité
-                </Typography>
-              </Box>
-              <Box sx={{ flex: 1, minWidth: 0, pr: 1.5, py: 0.25 }}>
-                <CellStrip
-                  timelineStart={timelineStart}
-                  timelineEnd={timelineEnd}
-                  getCellFill={aggregateFill}
-                  getCellTooltip={aggregateTooltip}
-                  height={AGGREGATE_STRIP_HEIGHT}
-                />
-              </Box>
-            </Box>
-          </Box>
-        </Box>
-
         {/* Paper #2 — content (rows OR empty state) */}
         <Paper
-          variant="outlined"
+          elevation={0}
           sx={{
-            borderRadius: "0 0 24px 24px",
+            borderRadius: showContent ? "0 0 24px 24px" : 3,
             p: 3,
-            pt: 1,
+            pt: showContent ? 1 : 3,
+            mt: showContent ? 0 : 2,
             bgcolor: "background.paper",
             position: "relative",
             overflow: "hidden",
-            borderTop: "none",
           }}
         >
           {showContent ? (

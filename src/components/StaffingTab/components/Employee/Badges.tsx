@@ -1,6 +1,6 @@
 import React, { memo } from "react";
 import Box from "@mui/material/Box";
-import { getGradeColor, SUB_TEAM_COLORS } from "../../constants";
+import { getGradeColor, getGradeUILabel, SUB_TEAM_COLORS } from "../../constants";
 
 interface GradeBadgeProps {
   grade: string | null;
@@ -24,7 +24,7 @@ export const GradeBadge = memo(({ grade }: GradeBadgeProps) => {
         display: "inline-block",
       }}
     >
-      {grade}
+      {getGradeUILabel(grade)}
     </Box>
   );
 });

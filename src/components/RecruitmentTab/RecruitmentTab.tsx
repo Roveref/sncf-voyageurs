@@ -1,6 +1,6 @@
 /**
  * RecruitmentTab — KPIs recrutement depuis les données candidates ATS.
- * 5e onglet du dashboard BearingPoint.
+ * 5e onglet du dashboard GAIF Pilot.
  */
 
 import { useMemo, useState, useCallback } from "react";
@@ -108,10 +108,14 @@ export default function RecruitmentTab() {
 
   // ── Funnel filter on top ──
   const filtered = useMemo(() => {
+    // GAIF: NC funnel — filtrage par étape de résolution
+    const NC_ANALYSED = new Set(["en_analyse", "plan_action", "en_traitement", "resolue", "fermee"]);
+    const NC_PLAN_ACTION = new Set(["plan_action", "en_traitement", "resolue", "fermee"]);
+    const NC_RESOLVED = new Set(["resolue", "fermee"]);
     if (funnelStage === "all") return datePosteFiltered;
-    if (funnelStage === "evaluated") return datePosteFiltered.filter((c) => c.note != null || c.evaluatedBy);
-    if (funnelStage === "interviewed") return datePosteFiltered.filter((c) => c.hrInterview);
-    if (funnelStage === "hired") return datePosteFiltered.filter((c) => c.status === "hired");
+    if (funnelStage === "evaluated") return datePosteFiltered.filter((c) => NC_ANALYSED.has(c.status || ""));
+    if (funnelStage === "interviewed") return datePosteFiltered.filter((c) => NC_PLAN_ACTION.has(c.status || ""));
+    if (funnelStage === "hired") return datePosteFiltered.filter((c) => NC_RESOLVED.has(c.status || ""));
     return datePosteFiltered;
   }, [datePosteFiltered, funnelStage]);
 
@@ -124,7 +128,11 @@ export default function RecruitmentTab() {
   const durationByStatus = useMemo(() => computeDurationByStatus(filtered), [filtered]);
   const recruiterCounts = useMemo(() => computeRecruiterCounts(filtered), [filtered]);
 
-  const activeCandidates = useMemo(() => filtered.filter((c) => c.status === "active"), [filtered]);
+  const activeCandidates = useMemo(
+    () =>
+      filtered.filter((c) => c.status === "en_analyse" || c.status === "plan_action" || c.status === "en_traitement"),
+    [filtered]
+  );
 
   const avgActiveDays = useMemo(() => {
     const now = Date.now();
@@ -156,10 +164,10 @@ export default function RecruitmentTab() {
         }}
       >
         <Typography variant="h6" color="text.secondary">
-          No recruitment data available
+          Aucune donnée de conformité disponible
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Import a candidates.csv file in the data/ folder
+          Importez les données NC pour commencer
         </Typography>
       </Box>
     );
@@ -265,12 +273,12 @@ export default function RecruitmentTab() {
         />
 
         {/* ── Funnel (full width) ── */}
-        <DetachableCard storageKey="recruit_funnel" title="Recruitment Funnel" group="Recruitment">
+        <DetachableCard storageKey="recruit_funnel" title="Résolution des NC" group="Conformité">
           <FunnelChart funnel={funnel} activeStage={funnelStage} onStageClick={handleFunnelClick} />
         </DetachableCard>
 
         {/* ── Timeline year overlay (full width) ── */}
-        <DetachableCard storageKey="recruit_timeline" title="Recruitment Timeline" group="Recruitment">
+        <DetachableCard storageKey="recruit_timeline" title="Chronologie des NC" group="Conformité">
           <TimelineChart candidates={filtered} />
         </DetachableCard>
 
@@ -278,17 +286,17 @@ export default function RecruitmentTab() {
         <ScrollReveal>
           <Grid container spacing={3} sx={{ mt: 3, overflow: "visible" }}>
             <Grid size={{ xs: 12, md: 4 }} sx={{ overflow: "visible" }}>
-              <DetachableCard storageKey="recruit_grade_dist" title="Grade Distribution" group="Recruitment">
+              <DetachableCard storageKey="recruit_grade_dist" title="Distribution par sévérité" group="Conformité">
                 <GradeDistributionChart data={gradeDistribution} />
               </DetachableCard>
             </Grid>
             <Grid size={{ xs: 12, md: 4 }} sx={{ overflow: "visible" }}>
-              <DetachableCard storageKey="recruit_service_line" title="Service Lines" group="Recruitment">
+              <DetachableCard storageKey="recruit_service_line" title="Patrimoines" group="Conformité">
                 <ServiceLineChart data={serviceLines} />
               </DetachableCard>
             </Grid>
             <Grid size={{ xs: 12, md: 4 }} sx={{ overflow: "visible" }}>
-              <DetachableCard storageKey="recruit_sourcing" title="Sourcing Channels" group="Recruitment">
+              <DetachableCard storageKey="recruit_sourcing" title="Types de NC" group="Conformité">
                 <SourcingChart data={channels} />
               </DetachableCard>
             </Grid>
@@ -299,12 +307,12 @@ export default function RecruitmentTab() {
         <ScrollReveal>
           <Grid container spacing={3} sx={{ mt: 3, overflow: "visible" }}>
             <Grid size={{ xs: 12, md: 6 }} sx={{ overflow: "visible" }}>
-              <DetachableCard storageKey="recruit_conversion" title="Conversion Rates" group="Recruitment">
+              <DetachableCard storageKey="recruit_conversion" title="Taux de résolution" group="Conformité">
                 <ConversionRateChart data={conversionByPosteYear} />
               </DetachableCard>
             </Grid>
             <Grid size={{ xs: 12, md: 6 }} sx={{ overflow: "visible" }}>
-              <DetachableCard storageKey="recruit_duration" title="Process Duration" group="Recruitment">
+              <DetachableCard storageKey="recruit_duration" title="Durée de résolution" group="Conformité">
                 <ProcessDurationChart data={durationByStatus} />
               </DetachableCard>
             </Grid>
@@ -315,7 +323,7 @@ export default function RecruitmentTab() {
         {recruiterCounts.length >= 2 && (
           <ScrollReveal>
             <Grid size={12} sx={{ mt: 3, overflow: "visible" }}>
-              <DetachableCard storageKey="recruit_recruiter" title="Recruiter Activity" group="Recruitment">
+              <DetachableCard storageKey="recruit_recruiter" title="Activité par responsable" group="Conformité">
                 <RecruiterChart data={recruiterCounts} />
               </DetachableCard>
             </Grid>
@@ -325,13 +333,13 @@ export default function RecruitmentTab() {
         {/* ── CandidateList (full width) ── */}
         <Grid size={12} sx={{ mt: 3, overflow: "visible" }}>
           <DetachableCard
-            group="Recruitment"
+            group="Conformité"
             storageKey="recruit-candidate-list"
-            title="Candidates"
+            title="Non-conformités"
             defaultWidth={1100}
             defaultHeight={700}
           >
-            <CandidateList data={filtered} title="Candidats" />
+            <CandidateList data={filtered} title="Non-conformités" />
           </DetachableCard>
         </Grid>
       </Box>

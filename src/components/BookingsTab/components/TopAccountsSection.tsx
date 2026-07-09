@@ -169,12 +169,12 @@ const TopAccountsSection = ({
           fontWeight: 400,
         }}
       >
-        <ColHeader label="Account" field="account" flex={1} />
-        <ColHeader label="Amount" field="mainAmount" align="right" flex={1} />
-        <ColHeader label="Opps" field="opportunityCount" align="right" flex={1} />
+        <ColHeader label="Site" field="account" flex={1} />
+        <ColHeader label="Montant" field="mainAmount" align="right" flex={1} />
+        <ColHeader label="Actifs" field="opportunityCount" align="right" flex={1} />
         <ColHeader label="Min" field="minDeal" align="right" flex={1} />
         <ColHeader label="Max" field="maxDeal" align="right" flex={1} />
-        <ColHeader label="Average" field="avgDeal" align="right" flex={1} />
+        <ColHeader label="Moyenne" field="avgDeal" align="right" flex={1} />
         <ColHeader label="% Total" field="percentOfTotal" align="right" flex={1} />
       </Box>
 

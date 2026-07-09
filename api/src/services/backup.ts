@@ -31,13 +31,13 @@ function getLabel(): string {
 // used in dynamic SQL. Never derive table names from user input.
 const USER_TABLES = [
   "user_overrides",
-  "user_opportunities",
+  "user_assets",
   "user_employees",
   "user_actions",
   "user_staffing_needs",
   "user_assignments",
   "user_accounts",
-  "user_revenue_team",
+  "user_asset_team",
   "user_scenarios",
 ] as const;
 

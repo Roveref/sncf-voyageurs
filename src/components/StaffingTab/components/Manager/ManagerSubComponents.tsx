@@ -11,7 +11,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import PersonIcon from "@mui/icons-material/Person";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
-import { getGradeColor, SUB_TEAM_COLORS } from "../../constants";
+import { getGradeColor, SUB_TEAM_COLORS, getGradeUILabel } from "../../constants";
 import { easing } from "../../../../styles/animations";
 
 // ─── TeamStatsCard ──────────────────────────────────────────────────────────
@@ -135,7 +135,7 @@ export const HierarchyNode = memo(({ employee, managers, level = 0, employees, o
                 component="span"
                 sx={{ px: 0.75, py: 0.25, borderRadius: 1, bgcolor: gradeColors.bg, color: gradeColors.text }}
               >
-                {employee.grade}
+                {getGradeUILabel(employee.grade)}
               </Box>
               <Box component="span" sx={{ color: "text.secondary" }}>
                 {employee.subTeam}
@@ -228,7 +228,7 @@ export const EmployeeDetailPanel = memo(({ employee, onClose }: any) => {
                   color: gradeColors.text,
                 }}
               >
-                {employee.grade}
+                {getGradeUILabel(employee.grade)}
               </Box>
               <Box
                 component="span"
@@ -262,7 +262,7 @@ export const EmployeeDetailPanel = memo(({ employee, onClose }: any) => {
 
       <Box sx={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 1.5 }}>
         <Box sx={{ p: 1.5, bgcolor: "background.default", borderRadius: 2 }}>
-          <Typography sx={{ fontSize: "0.75rem", color: "text.secondary" }}>Utilization</Typography>
+          <Typography sx={{ fontSize: "0.75rem", color: "text.secondary" }}>Charge</Typography>
           <Typography
             sx={{
               fontSize: "1.25rem",
@@ -278,13 +278,13 @@ export const EmployeeDetailPanel = memo(({ employee, onClose }: any) => {
           </Typography>
         </Box>
         <Box sx={{ p: 1.5, bgcolor: "background.default", borderRadius: 2 }}>
-          <Typography sx={{ fontSize: "0.75rem", color: "text.secondary" }}>Availability</Typography>
+          <Typography sx={{ fontSize: "0.75rem", color: "text.secondary" }}>Disponibilité</Typography>
           <Typography sx={{ fontSize: "1.25rem", fontWeight: 700, color: "#16a34a" }}>
             {employee.availableCapacityHours.toFixed(1)}h/d
           </Typography>
         </Box>
         <Box sx={{ p: 1.5, bgcolor: "background.default", borderRadius: 2 }}>
-          <Typography sx={{ fontSize: "0.75rem", color: "text.secondary" }}>Projects</Typography>
+          <Typography sx={{ fontSize: "0.75rem", color: "text.secondary" }}>Projets</Typography>
           <Typography sx={{ fontSize: "1.25rem", fontWeight: 700, color: "text.primary" }}>
             {employee.projectCount}
           </Typography>

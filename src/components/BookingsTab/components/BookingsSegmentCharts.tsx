@@ -46,7 +46,7 @@ const BookingsSegmentCharts = memo(
 
     // Calculate filtered segment data based on date filter and drill-down state
     const filteredBookingsBySegment = useMemo(() => {
-      let filteredBooked = chartFilteredData.filter((item) => item.status === 14);
+      let filteredBooked = chartFilteredData.filter((item) => item.isManual === true && item.status !== 15);
       if (!filteredBooked || filteredBooked.length === 0) return [];
 
       // If drilling down, filter by the selected segment
@@ -97,7 +97,7 @@ const BookingsSegmentCharts = memo(
     }, [chartFilteredData, drillDownSegment, showNetRevenue, calculateIORevenue]);
 
     const filteredLossesBySegment = useMemo(() => {
-      let filteredLost = chartFilteredData.filter((item) => item.status === 15);
+      let filteredLost = chartFilteredData.filter((item) => item.isManual === true && item.status === 15);
       if (!filteredLost || filteredLost.length === 0) return [];
 
       // If drilling down, filter by the selected segment
@@ -148,7 +148,7 @@ const BookingsSegmentCharts = memo(
 
     // Calculate filtered bookings by Account (for Account mode toggle)
     const filteredBookingsByAccount = useMemo(() => {
-      const filteredBooked = chartFilteredData.filter((item) => item.status === 14);
+      const filteredBooked = chartFilteredData.filter((item) => item.isManual === true && item.status !== 15);
       if (!filteredBooked || filteredBooked.length === 0) return [];
 
       const byAccount: any[] = [];
@@ -174,7 +174,7 @@ const BookingsSegmentCharts = memo(
     }, [chartFilteredData, showNetRevenue]);
 
     const filteredLossesByAccount = useMemo(() => {
-      const filteredLost = chartFilteredData.filter((item) => item.status === 15);
+      const filteredLost = chartFilteredData.filter((item) => item.isManual === true && item.status === 15);
       if (!filteredLost || filteredLost.length === 0) return [];
 
       const byAccount: any[] = [];
@@ -234,9 +234,9 @@ const BookingsSegmentCharts = memo(
     return (
       <Grid size={{ xs: 12, lg: 6 }} sx={{ overflow: "visible", minHeight: 450 }}>
         <DetachableCard
-          group="Bookings"
+          group="Maintenance"
           storageKey="pip-bookings-segment"
-          title="Bookings by Segment"
+          title="Maintenance par patrimoine"
           defaultWidth={600}
           defaultHeight={500}
         >
@@ -254,12 +254,12 @@ const BookingsSegmentCharts = memo(
               showAccountMode
                 ? showLost
                   ? "Lost by Account"
-                  : "Bookings by Account"
+                  : "Maintenance par site"
                 : drillDownSegment
                   ? `Sub-Segments - ${drillDownSegment}`
                   : showLost
                     ? "Lost by Segment"
-                    : "Bookings by Segment"
+                    : "Maintenance par patrimoine"
             }
             showIO={showIO}
             onChartClick={showAccountMode ? undefined : handleSegmentChartClick}

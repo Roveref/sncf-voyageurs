@@ -150,27 +150,27 @@ export const ExportButton = memo(
           imageBase64?: string;
           svgBase64?: string;
         }> = [
-          { layout: "title", title: "Staffing Dashboard", subtitle: `Report — ${today}` },
+          { layout: "title", title: "Staffing Dashboard", subtitle: `Rapport — ${today}` },
           {
             layout: "content",
-            title: "Key Performance Indicators",
+            title: "Indicateurs clés de performance",
             body: [
-              `**Team Utilization:** ${tuPct}`,
-              `**Headcount:** ${headcount} employees`,
-              `**Active Alerts:** ${alertCount}`,
+              `**Utilisation équipe :** ${tuPct}`,
+              `**Effectif :** ${headcount} collaborateurs`,
+              `**Alertes actives :** ${alertCount}`,
               "",
-              "Overview of team staffing, utilization rates, and capacity allocation.",
+              "Vue d'ensemble du staffing, taux d'utilisation et allocation de capacité.",
             ].join("\n"),
           },
         ];
 
         // Create a slide per chart with SVG (primary) + PNG (fallback)
         const chartLabels = [
-          "Utilization Overview",
-          "Grade Distribution",
-          "Team Breakdown",
-          "Trend Analysis",
-          "Capacity Heatmap",
+          "Vue d'ensemble utilisation",
+          "Distribution par niveau",
+          "Répartition par pôle",
+          "Analyse de tendance",
+          "Heatmap de charge",
         ];
         for (let i = 0; i < Math.min(svgEls.length, 5); i++) {
           const svg = svgEls[i];
@@ -188,7 +188,7 @@ export const ExportButton = memo(
           slides.push({
             layout: "content",
             title: name,
-            body: `${name} for the current staffing period.`,
+            body: `${name} pour la période de staffing en cours.`,
             svgBase64: svgB64,
             imageBase64: pngB64,
           });
@@ -199,13 +199,13 @@ export const ExportButton = memo(
           const pngB64 = await capturePng(mainEl);
           slides.push({
             layout: "content",
-            title: "Dashboard View",
-            body: "Full dashboard capture for the current staffing period.",
+            title: "Vue du tableau de bord",
+            body: "Capture complète du tableau de bord pour la période de staffing en cours.",
             imageBase64: pngB64,
           });
         }
 
-        slides.push({ layout: "end", body: "BearingPoint — Confidential" });
+        slides.push({ layout: "end", body: "GAIF Pilot — SNCF Voyageurs — Confidentiel" });
 
         await exportPptxViaApi(slides, `staffing_${today}`);
       } catch (err) {
@@ -220,7 +220,7 @@ export const ExportButton = memo(
         <Button
           onClick={() => setIsOpen(!isOpen)}
           variant={compact ? "text" : "contained"}
-          title="Export"
+          title="Exporter"
           sx={
             compact
               ? {
@@ -245,7 +245,7 @@ export const ExportButton = memo(
           }
           startIcon={<DownloadIcon sx={{ fontSize: 16 }} />}
         >
-          {compact ? <Typography noWrap>Export</Typography> : "Export"}
+          {compact ? <Typography noWrap>Exporter</Typography> : "Exporter"}
         </Button>
 
         {isOpen && (
@@ -273,36 +273,36 @@ export const ExportButton = memo(
                   display: "block",
                 }}
               >
-                Export to Excel
+                Export Excel
               </Typography>
             </Box>
 
             <Box sx={{ p: 1 }}>
               <ExportMenuItem
                 icon={GroupIcon}
-                label="Employees"
-                description="Employee summary and assignments"
+                label="Équipe"
+                description="Synthèse de l'équipe et affectations"
                 onClick={handleExportEmployees}
               />
 
               <ExportMenuItem
                 icon={WorkIcon}
-                label="Projects"
-                description="Project list and assignments"
+                label="Projets"
+                description="Liste des projets et affectations"
                 onClick={handleExportProjects}
               />
 
               <ExportMenuItem
                 icon={WarningIcon}
-                label="Alerts"
-                description="All active alerts"
+                label="Alertes"
+                description="Toutes les alertes actives"
                 onClick={handleExportAlerts}
               />
 
               <ExportMenuItem
                 icon={DownloadIcon}
-                label="KPI Report"
-                description="KPIs, distribution, by grade and team"
+                label="Rapport KPI"
+                description="KPIs, distribution par niveau et pôle"
                 onClick={() => {
                   exportKPISummaryToExcel(employees, teamTuStats, alerts, generateFilename("kpi_report"));
                   setIsOpen(false);
@@ -322,29 +322,29 @@ export const ExportButton = memo(
                   display: "block",
                 }}
               >
-                Other Formats
+                Autres formats
               </Typography>
             </Box>
 
             <Box sx={{ p: 1 }}>
               <ExportMenuItem
                 icon={TableChartIcon}
-                label="Employees CSV"
-                description="Employee summary as CSV file"
+                label="Équipe CSV"
+                description="Synthèse de l'équipe en fichier CSV"
                 onClick={handleExportEmployeesCsv}
               />
 
               <ExportMenuItem
                 icon={PrintIcon}
-                label="Print / PDF"
-                description="Print current view or save as PDF"
+                label="Imprimer / PDF"
+                description="Imprimer la vue actuelle ou sauvegarder en PDF"
                 onClick={handleExportPrint}
               />
 
               <ExportMenuItem
                 icon={SlideshowIcon}
-                label="Export PowerPoint"
-                description="PNG 3x + charts SVG for presentations"
+                label="Exporter PowerPoint"
+                description="PNG 3x + graphiques SVG pour présentations"
                 onClick={handleExportPpt}
                 iconColor="#D24726"
               />
@@ -361,7 +361,7 @@ export const ExportButton = memo(
               }}
             >
               <Typography variant="caption" sx={{ color: "grey.500", px: 1.5, display: "block" }}>
-                Excel files in .xlsx, CSV as .csv
+                Fichiers Excel en .xlsx, CSV en .csv
               </Typography>
             </Box>
           </Paper>

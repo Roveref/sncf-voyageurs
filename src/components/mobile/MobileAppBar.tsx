@@ -19,7 +19,7 @@ interface MobileAppBarProps {
   dataReady: boolean;
 }
 
-const TAB_LABELS = ["Pipeline", "Bookings", "Staffing", "Project"];
+const TAB_LABELS = ["Parc", "Maint.", "Plan", "Cycle"];
 
 const MobileAppBar = memo(
   ({

@@ -3,7 +3,7 @@
  *
  * Features:
  * - Two-column layout: need slot ↔ assigned person
- * - Grouped by BearingPoint grade (Partner → Intern)
+ * - Grouped by consulting grade (Partner → Intern)
  * - Inline need creation & editing
  * - TU impact display
  * - Multi-instance: one board per scenario
@@ -600,7 +600,7 @@ const StaffingNeedsPiP = memo(
               <Box sx={{ textAlign: "center", py: 5, px: 3 }}>
                 <AssignmentIndIcon sx={{ fontSize: 36, color: alpha(accent, 0.1), mb: 1 }} />
                 <Typography sx={{ color: "text.secondary", fontWeight: 500, fontSize: "0.8rem" }}>
-                  {allNeeds.length === 0 ? "No needs" : "No results"}
+                  {allNeeds.length === 0 ? "Aucun besoin" : "Aucun résultat"}
                 </Typography>
               </Box>
             )}

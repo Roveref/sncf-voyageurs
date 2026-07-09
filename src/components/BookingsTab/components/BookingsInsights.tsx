@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useMemo } from "react";
 import Grid from "@mui/material/Grid2";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
@@ -39,11 +39,42 @@ interface BookingsInsightsProps {
   showIO: boolean;
   bookingTargets?: { annualGross: number; annualNet: number; ioGross: number };
   showNetRevenue?: boolean;
+  annualMaintenanceCost?: number;
 }
 
 const BookingsInsights = memo(
-  ({ insightsData, showLost, showIO, bookingTargets, showNetRevenue }: BookingsInsightsProps) => {
+  ({
+    insightsData,
+    showLost,
+    showIO,
+    bookingTargets,
+    showNetRevenue,
+    annualMaintenanceCost = 0,
+  }: BookingsInsightsProps) => {
     const theme = useTheme();
+
+    // Compute GAIF maintenance KPIs from the bookings/losses arrays
+    const maintenanceKpis = useMemo(() => {
+      const items = showLost ? insightsData.losses : insightsData.bookings;
+
+      // Taux de conformite VR: VR interventions with winPct===100 / total VR interventions
+      const vrInterventions = items.filter((item: any) => item.engagementType === "VR");
+      const vrConformes = vrInterventions.filter((item: any) => item.winPct === 100);
+      const tauxConformiteVR = vrInterventions.length > 0 ? (vrConformes.length / vrInterventions.length) * 100 : 0;
+
+      // Taux de realisation: interventions with status=14 / total
+      const realisees = items.filter((item: any) => Number(item.status) === 14);
+      const tauxRealisation = items.length > 0 ? (realisees.length / items.length) * 100 : 0;
+
+      return {
+        vrTotal: vrInterventions.length,
+        vrConformes: vrConformes.length,
+        tauxConformiteVR,
+        realisees: realisees.length,
+        totalItems: items.length,
+        tauxRealisation,
+      };
+    }, [insightsData.bookings, insightsData.losses, showLost]);
 
     return (
       <Paper
@@ -71,15 +102,48 @@ const BookingsInsights = memo(
           }}
         >
           <Typography variant="h6" gutterBottom fontWeight={600}>
-            {showLost ? "Lost Insights" : "Booking Insights"}
+            {showLost ? "Interventions annulees" : "Indicateurs maintenance"}
           </Typography>
         </Box>
 
         <Divider sx={{ mb: 3 }} />
 
+        {/* Coût annuel maintenance — vue d'ensemble du parc */}
+        {!showLost && (
+          <Grid container spacing={3} sx={{ px: 2, pt: 1, pb: 2 }}>
+            <Grid size={12}>
+              <Box
+                sx={{
+                  p: 2,
+                  borderRadius: 2,
+                  textAlign: "center",
+                  bgcolor: alpha(theme.palette.success.main, 0.08),
+                  transition:
+                    "background-color 0.3s cubic-bezier(0.23, 1, 0.32, 1), transform 0.3s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.3s cubic-bezier(0.23, 1, 0.32, 1)",
+                  "&:hover": {
+                    transform: "translateY(-4px)",
+                    boxShadow: "0 12px 48px rgba(0, 0, 0, 0.15)",
+                  },
+                  ...animations.cardEntrance(0),
+                }}
+              >
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  gutterBottom
+                  sx={{ display: "block", fontSize: "0.7rem" }}
+                >
+                  Coût annuel maintenance
+                </Typography>
+                <AnimatedCurrency value={annualMaintenanceCost} variant="h5" fontWeight={700} color="success.main" />
+              </Box>
+            </Grid>
+          </Grid>
+        )}
+
         <Grid container spacing={3} sx={{ px: 2, py: 1 }}>
-          {/* Total Bookings / Total Lost */}
-          <Grid size={{ xs: 12, sm: 6, md: 4 }} sx={{ overflow: "visible" }}>
+          {/* Cout total interventions / Cout total annulees */}
+          <Grid size={{ xs: 12, sm: 6, md: 3 }} sx={{ overflow: "visible" }}>
             <Box
               sx={{
                 p: 2,
@@ -97,7 +161,7 @@ const BookingsInsights = memo(
               }}
             >
               <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
-                {showLost ? "Total Lost" : "Total Bookings"}
+                {showLost ? "Cout total annulees" : "Cout total interventions"}
               </Typography>
 
               <Box
@@ -110,60 +174,10 @@ const BookingsInsights = memo(
                 }}
               >
                 <Box sx={{ flex: 1 }}>
-                  <Box sx={{ display: "flex", alignItems: "baseline", gap: 1, flexWrap: "wrap" }}>
-                    <AnimatedCurrency
-                      value={showLost ? insightsData.lossesTotalRevenue : insightsData.bookingsTotalRevenue}
-                      color={showLost ? "error.main" : "success.main"}
-                    />
-                    {/* Show allocation arrow when there's a difference (independent of showIO) */}
-                    {insightsData.hasAllocation &&
-                      (showLost ? insightsData.lossesAllocatedRevenue : insightsData.bookingsAllocatedRevenue) !==
-                        (showLost ? insightsData.lossesTotalRevenue : insightsData.bookingsTotalRevenue) && (
-                        <>
-                          <Typography variant="body2" color="text.secondary">
-                            {"\u2192"}
-                          </Typography>
-                          <AnimatedCurrency
-                            value={
-                              showLost ? insightsData.lossesAllocatedRevenue : insightsData.bookingsAllocatedRevenue
-                            }
-                            variant="h5"
-                            fontWeight={600}
-                            color="secondary.main"
-                          />
-                        </>
-                      )}
-                  </Box>
-                  {/* Show % of annual target when configured */}
-                  {!showLost &&
-                    bookingTargets &&
-                    (() => {
-                      const target = showNetRevenue ? bookingTargets.annualNet : bookingTargets.annualGross;
-                      if (target <= 0) return null;
-                      const pct = (insightsData.bookingsTotalRevenue / target) * 100;
-                      const color = pct >= 100 ? "#047857" : pct >= 75 ? "#b45309" : "#dc2626";
-                      return (
-                        <Typography variant="caption" sx={{ mt: 0.5, fontWeight: 600, color, display: "block" }}>
-                          {pct.toFixed(0)}% of annual target
-                        </Typography>
-                      );
-                    })()}
-                  {/* Show I&O when showIO is enabled */}
-                  {showIO &&
-                    (showLost ? insightsData.lossesCalculatedRevenue : insightsData.bookingsCalculatedRevenue) > 0 && (
-                      <Typography variant="body2" color="primary.main" sx={{ mt: 0.5 }}>
-                        (I&O:{" "}
-                        <AnimatedCurrency
-                          value={
-                            showLost ? insightsData.lossesCalculatedRevenue : insightsData.bookingsCalculatedRevenue
-                          }
-                          variant="body2"
-                          fontWeight={400}
-                          color="primary.main"
-                        />
-                        )
-                      </Typography>
-                    )}
+                  <AnimatedCurrency
+                    value={showLost ? insightsData.lossesTotalRevenue : insightsData.bookingsTotalRevenue}
+                    color={showLost ? "error.main" : "success.main"}
+                  />
                 </Box>
                 <AnimatedCount
                   value={showLost ? insightsData.losses.length : insightsData.bookings.length}
@@ -176,8 +190,8 @@ const BookingsInsights = memo(
             </Box>
           </Grid>
 
-          {/* Average Booking Size / Average Lost Size */}
-          <Grid size={{ xs: 12, sm: 6, md: 4 }} sx={{ overflow: "visible" }}>
+          {/* Cout moyen par intervention */}
+          <Grid size={{ xs: 12, sm: 6, md: 3 }} sx={{ overflow: "visible" }}>
             <Box
               sx={{
                 p: 2,
@@ -195,7 +209,7 @@ const BookingsInsights = memo(
               }}
             >
               <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
-                {showLost ? "Avg. Lost Size" : "Avg. Booking Size"}
+                {showLost ? "Cout moyen annulee" : "Cout moyen par intervention"}
               </Typography>
 
               <Box
@@ -206,47 +220,16 @@ const BookingsInsights = memo(
                   justifyContent: "center",
                 }}
               >
-                <Box sx={{ display: "flex", alignItems: "baseline", gap: 1, flexWrap: "wrap" }}>
-                  <AnimatedCurrency
-                    value={showLost ? insightsData.avgLossSize : insightsData.avgBookingSize}
-                    color="info.main"
-                  />
-                  {/* Show allocation arrow when there's a difference (independent of showIO) */}
-                  {insightsData.hasAllocation &&
-                    (showLost ? insightsData.avgLossAllocated : insightsData.avgBookingAllocated) !==
-                      (showLost ? insightsData.avgLossSize : insightsData.avgBookingSize) && (
-                      <>
-                        <Typography variant="body2" color="text.secondary">
-                          {"\u2192"}
-                        </Typography>
-                        <AnimatedCurrency
-                          value={showLost ? insightsData.avgLossAllocated : insightsData.avgBookingAllocated}
-                          variant="h5"
-                          fontWeight={600}
-                          color="secondary.main"
-                        />
-                      </>
-                    )}
-                </Box>
-                {/* Show I&O when showIO is enabled */}
-                {showIO && (showLost ? insightsData.avgLossCalculated : insightsData.avgBookingCalculated) > 0 && (
-                  <Typography variant="body2" color="primary.main" sx={{ mt: 0.5 }}>
-                    (I&O:{" "}
-                    <AnimatedCurrency
-                      value={showLost ? insightsData.avgLossCalculated : insightsData.avgBookingCalculated}
-                      variant="body2"
-                      fontWeight={400}
-                      color="primary.main"
-                    />
-                    )
-                  </Typography>
-                )}
+                <AnimatedCurrency
+                  value={showLost ? insightsData.avgLossSize : insightsData.avgBookingSize}
+                  color="info.main"
+                />
               </Box>
             </Box>
           </Grid>
 
-          {/* Win Rates */}
-          <Grid size={{ xs: 12, sm: 6, md: 4 }} sx={{ overflow: "visible" }}>
+          {/* Taux de conformite VR */}
+          <Grid size={{ xs: 12, sm: 6, md: 3 }} sx={{ overflow: "visible" }}>
             <Box
               sx={{
                 p: 2,
@@ -263,56 +246,70 @@ const BookingsInsights = memo(
                 ...animations.cardEntrance(300),
               }}
             >
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  justifyContent: "space-between",
-                  mb: 1,
-                }}
-              >
-                <Typography variant="subtitle2" color="text.secondary">
-                  Win Rate
-                </Typography>
-              </Box>
+              <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+                Taux de conformite VR
+              </Typography>
 
               <Box
                 sx={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: 1.5,
                   minHeight: 70,
+                  justifyContent: "center",
                 }}
               >
-                {/* New Contract Win Rate */}
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <Box>
-                    <Typography variant="body2" color="text.secondary">
-                      New Contract
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
-                    <AnimatedPercent value={insightsData.winRateNewContract} variant="h5" color="warning.main" />
-                    <Typography variant="body2" color="text.secondary">
-                      ({insightsData.newContractWins}/{insightsData.newContractTotal})
-                    </Typography>
-                  </Box>
-                </Box>
+                <AnimatedPercent
+                  value={maintenanceKpis.tauxConformiteVR}
+                  variant="h5"
+                  fontWeight={700}
+                  color={maintenanceKpis.tauxConformiteVR >= 80 ? "success.main" : "warning.main"}
+                />
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                  ({maintenanceKpis.vrConformes}/{maintenanceKpis.vrTotal} VR conformes)
+                </Typography>
+              </Box>
+            </Box>
+          </Grid>
 
-                {/* Extension / Sell-on Win Rate */}
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <Box>
-                    <Typography variant="body2" color="text.secondary">
-                      Extension / Sell-on
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
-                    <AnimatedPercent value={insightsData.winRateExtension} variant="h5" color="warning.main" />
-                    <Typography variant="body2" color="text.secondary">
-                      ({insightsData.extensionWins}/{insightsData.extensionTotal})
-                    </Typography>
-                  </Box>
-                </Box>
+          {/* Taux de realisation */}
+          <Grid size={{ xs: 12, sm: 6, md: 3 }} sx={{ overflow: "visible" }}>
+            <Box
+              sx={{
+                p: 2,
+                borderRadius: 2,
+                bgcolor: alpha(theme.palette.text.primary, 0.04),
+                height: "100%",
+                transition:
+                  "background-color 0.3s cubic-bezier(0.23, 1, 0.32, 1), transform 0.3s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.3s cubic-bezier(0.23, 1, 0.32, 1)",
+                "&:hover": {
+                  bgcolor: alpha(theme.palette.text.primary, 0.08),
+                  transform: "translateY(-4px)",
+                  boxShadow: "0 12px 48px rgba(0, 0, 0, 0.15)",
+                },
+                ...animations.cardEntrance(400),
+              }}
+            >
+              <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+                Taux de realisation
+              </Typography>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  minHeight: 70,
+                  justifyContent: "center",
+                }}
+              >
+                <AnimatedPercent
+                  value={maintenanceKpis.tauxRealisation}
+                  variant="h5"
+                  fontWeight={700}
+                  color={maintenanceKpis.tauxRealisation >= 80 ? "success.main" : "warning.main"}
+                />
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                  ({maintenanceKpis.realisees}/{maintenanceKpis.totalItems} realisees)
+                </Typography>
               </Box>
             </Box>
           </Grid>

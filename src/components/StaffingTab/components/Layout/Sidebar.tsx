@@ -24,8 +24,8 @@ const EXPANDED_WIDTH = 224;
 
 /** Navigation items for the sidebar */
 export const NAV_ITEMS = [
-  { id: "employees", label: "Employ\u00e9s", icon: GroupIcon },
-  { id: "skills", label: "Comp\u00e9tences", icon: EmojiEventsIcon },
+  { id: "employees", label: "EmployÃ©s", icon: GroupIcon },
+  { id: "skills", label: "CompÃ©tences", icon: EmojiEventsIcon },
   { id: "simulation", label: "Simulation", icon: ScienceIcon },
   { id: "debug", label: "Debug", icon: BugReportIcon },
 ];

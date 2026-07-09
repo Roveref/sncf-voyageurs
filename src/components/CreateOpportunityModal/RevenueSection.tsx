@@ -31,7 +31,7 @@ const RevenueSection = ({ formData, errors, onChange, onBlurField }: RevenueSect
           <TextField
             fullWidth
             type="text"
-            label="Gross Revenue (€)"
+            label="Coût total annuel (€)"
             value={formatNumberWithSpaces(formData.grossRevenue)}
             onChange={(e) => onChange("grossRevenue", parseNumberFromFormatted(e.target.value))}
             onBlur={(e) => onBlurField?.("grossRevenue", parseNumberFromFormatted(e.target.value))}
@@ -48,7 +48,7 @@ const RevenueSection = ({ formData, errors, onChange, onBlurField }: RevenueSect
           <TextField
             fullWidth
             type="text"
-            label="Net Revenue (€)"
+            label="Coût maintenance (€)"
             value={formatNumberWithSpaces(formData.netRevenue)}
             onChange={(e) => onChange("netRevenue", parseNumberFromFormatted(e.target.value))}
             error={!!errors.netRevenue}

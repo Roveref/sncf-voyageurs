@@ -29,7 +29,7 @@ import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { easing } from "../../../../styles/animations";
-import { getGradeColor } from "../../constants";
+import { getGradeColor, getGradeUILabel } from "../../constants";
 
 const GRADE_COLORS: Record<string, string> = {
   Intern: "#9ca3af",
@@ -170,10 +170,10 @@ const StaffingNeedsOverview = ({
       <Paper variant="outlined" sx={{ borderRadius: 3, p: 4, textAlign: "center", bgcolor: "background.paper" }}>
         <GroupsIcon sx={{ fontSize: 48, color: "text.disabled", mb: 1.5 }} />
         <Typography variant="h6" color="text.secondary" gutterBottom>
-          No staffing needs defined
+          Aucun besoin d'intervention défini
         </Typography>
         <Typography variant="body2" color="text.disabled">
-          Define your needs in the "Staffing" tab of each opportunity (Pipeline)
+          Définissez vos besoins dans l'onglet « Plan de charge » de chaque actif
         </Typography>
       </Paper>
     );
@@ -193,10 +193,10 @@ const StaffingNeedsOverview = ({
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
             <GroupsIcon sx={{ fontSize: 22, color: theme.palette.info.main }} />
             <Typography variant="h6" fontWeight={700} sx={{ fontSize: "1rem" }}>
-              Staffing needs
+              Besoins d'intervention
             </Typography>
             <Chip
-              label={`${stats.totalPeople} person${stats.totalPeople > 1 ? "s" : ""}`}
+              label={`${stats.totalPeople} personne${stats.totalPeople > 1 ? "s" : ""}`}
               size="small"
               color="info"
               sx={{ fontWeight: 600, fontSize: "0.75rem", height: 24 }}
@@ -218,7 +218,7 @@ const StaffingNeedsOverview = ({
                 <Chip
                   key={grade}
                   icon={<PersonIcon sx={{ fontSize: 14 }} />}
-                  label={`${grade} x${count}`}
+                  label={`${getGradeUILabel(grade)} x${count}`}
                   size="small"
                   sx={{
                     fontSize: "0.7rem",
@@ -343,7 +343,7 @@ const StaffingNeedsOverview = ({
                       />
                     </Tooltip>
                     {opp && onNavigateToTab && (
-                      <Tooltip title="View in Pipeline">
+                      <Tooltip title="Voir dans le Parc d'actifs">
                         <IconButton
                           size="small"
                           onClick={(e) => {

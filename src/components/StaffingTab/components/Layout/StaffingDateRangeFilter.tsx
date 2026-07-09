@@ -38,17 +38,17 @@ import { StableControls, FilterRow as FilterRowComp } from "./StaffingFilterCont
 // Isolated so the stable controls (search, granularity, etc.) can memo bail-out.
 
 const SCOPE_PLACEHOLDERS: Record<string, string> = {
-  "": "Search…",
-  person: "Person…",
-  project: "Project…",
-  skill: "Skill…",
-  account: "Account…",
+  "": "Rechercher\u2026",
+  person: "Personne\u2026",
+  project: "Projet\u2026",
+  skill: "CompÃ©tence\u2026",
+  account: "Site\u2026",
 };
 const SCOPE_BUTTONS = [
-  { key: "person", icon: PersonIcon, tip: "Search persons" },
-  { key: "project", icon: WorkIcon, tip: "Search projects" },
-  { key: "account", icon: BusinessIcon, tip: "Search accounts" },
-  { key: "skill", icon: PsychologyIcon, tip: "Search skills" },
+  { key: "person", icon: PersonIcon, tip: "Chercher des personnes" },
+  { key: "project", icon: WorkIcon, tip: "Chercher des projets" },
+  { key: "account", icon: BusinessIcon, tip: "Chercher des sites" },
+  { key: "skill", icon: PsychologyIcon, tip: "Chercher des compÃ©tences" },
 ] as const;
 const MAX_SUGGESTIONS = 8;
 
@@ -119,7 +119,7 @@ const DateRangeSection = memo(
             if (items.length >= MAX_SUGGESTIONS) break;
           }
         }
-        if (items.length) groups.push({ type: "person", label: "Persons", icon: PersonIcon, items });
+        if (items.length) groups.push({ type: "person", label: "Personnes", icon: PersonIcon, items });
       }
 
       // Projects (MDS assignments + SAP projects)
@@ -182,7 +182,7 @@ const DateRangeSection = memo(
             if (items.length >= MAX_SUGGESTIONS) break;
           }
         }
-        if (items.length) groups.push({ type: "account", label: "Accounts", icon: BusinessIcon, items });
+        if (items.length) groups.push({ type: "account", label: "Sites", icon: BusinessIcon, items });
       }
 
       return groups;

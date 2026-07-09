@@ -38,7 +38,7 @@ const LostCommentSection = ({ value, onChange }: LostCommentSectionProps) => {
           fullWidth
           multiline
           rows={2}
-          placeholder="Enter reason for loss..."
+          placeholder="Raison de la mise en fin de vie..."
           value={value}
           onChange={(e) => onChange("lostComment", e.target.value)}
           variant="outlined"

@@ -21,7 +21,7 @@ import UnfoldLessIcon from "@mui/icons-material/UnfoldLess";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import IconButton from "@mui/material/IconButton";
 import { useUserDataStore } from "../../../../stores/useUserDataStore";
-import { GRADE_ORDER, getGradeColor, getGradeAbbr } from "../../constants";
+import { GRADE_ORDER, getGradeColor, getGradeAbbr, getGradeUILabel } from "../../constants";
 import { getAssignmentsForNeed, getAssignmentsFromEditorStates } from "../../utils/needStatusUtils";
 import { formatLocalDate } from "../../utils/dateUtils";
 import type { StaffingNeedItem, StaffingAssignment } from "../../../../types";
@@ -281,7 +281,7 @@ const NeedsTimeline = memo(
     if (!gradeGroups.length || !range) {
       return (
         <Box sx={{ py: 1.5, textAlign: "center" }}>
-          <Typography sx={{ fontSize: "0.78rem", color: "#9ca3af" }}>No needs to display</Typography>
+          <Typography sx={{ fontSize: "0.78rem", color: "#9ca3af" }}>Aucun besoin à afficher</Typography>
         </Box>
       );
     }
@@ -339,7 +339,9 @@ const NeedsTimeline = memo(
                     {getGradeAbbr(grade)}
                   </Typography>
                 </Box>
-                <Typography sx={{ fontSize: "0.8rem", fontWeight: 600, color: "#374151", flex: 1 }}>{grade}</Typography>
+                <Typography sx={{ fontSize: "0.8rem", fontWeight: 600, color: "#374151", flex: 1 }}>
+                  {getGradeUILabel(grade)}
+                </Typography>
                 <Typography
                   sx={{
                     fontSize: "0.72rem",

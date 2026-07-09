@@ -43,7 +43,7 @@ export function getAllStatuses(): StatusOption[] {
   }));
 }
 
-// BearingPoint brand colors for charts (from brandConfig)
+// GAIF brand colors for charts (from brandConfig)
 export const COLORS: string[] = [...chartPalette];
 
 // Status categories for stacked chart

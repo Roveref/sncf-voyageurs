@@ -2,15 +2,13 @@
  * JobcodeTopFilterBar — top filter bar for the JobcodeTimelineTab.
  *
  * Four controls in a row:
- *   1. Free text search (matches opportunity name, account, jobcode)
- *   2. Account picker (autocomplete)
- *   3. Jobcode picker (autocomplete, cascades on account+person)
- *   4. Person picker (autocomplete — sources: manager/partner/em/ep,
- *      staffing assignees, revenue team, MDS consultants)
+ *   1. Free text search (matches asset name, site, project)
+ *   2. Site picker (autocomplete)
+ *   3. Project picker (autocomplete, cascades on site+person)
+ *   4. Référent picker (autocomplete)
  *
- * The bar is purely presentational: it reads the filter state passed
- * in from the parent and calls setters on user interaction. The
- * parent owns the filter state via useJobcodeFilterState.
+ * Visual style: borderless filled inputs on `action.hover` background —
+ * consistent with the rest of the dashboard (OpportunityToolbar, etc.).
  */
 import { memo, useMemo } from "react";
 import Box from "@mui/material/Box";
@@ -23,20 +21,16 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
+import type { SxProps, Theme } from "@mui/material/styles";
 import type { Jobcode } from "../hooks/useJobcodeData";
 import type { UseJobcodeFilterStateResult } from "../hooks/useJobcodeFilterState";
 
 interface JobcodeTopFilterBarProps {
   filterState: UseJobcodeFilterStateResult;
-  /** Sorted list of all account names. */
   accountOptions: string[];
-  /** All people (sorted, unique) — output of useAllPeople. */
   peopleOptions: string[];
-  /** Jobcodes that match the current account/person/text filters (NOT the jobcode filter). */
   jobcodeOptions: Jobcode[];
-  /** Currently selected jobcode object — used to render the jobcode value. */
   selectedJobcode: Jobcode | null;
-  /** Called when the user picks (or clears) a jobcode in the autocomplete. */
   onSelectJobcode: (jobcode: Jobcode | null) => void;
 }
 
@@ -44,6 +38,22 @@ const formatRevenue = (n: number): string => {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M€`;
   if (n >= 1_000) return `${Math.round(n / 1_000)}k€`;
   return `${Math.round(n)}€`;
+};
+
+/** Shared style — borderless filled field matching the dashboard pattern. */
+const fieldSx: SxProps<Theme> = {
+  "& .MuiOutlinedInput-root": {
+    bgcolor: "action.hover",
+    borderRadius: 2,
+    fontSize: "0.85rem",
+    "& .MuiOutlinedInput-notchedOutline": { border: "none" },
+    "&:hover .MuiOutlinedInput-notchedOutline": { border: "none" },
+    "&.Mui-focused .MuiOutlinedInput-notchedOutline": { border: "none" },
+  },
+  "& .MuiInputLabel-root": {
+    fontSize: "0.85rem",
+    color: "text.secondary",
+  },
 };
 
 const JobcodeTopFilterBar = memo(
@@ -74,10 +84,10 @@ const JobcodeTopFilterBar = memo(
         {/* Search */}
         <TextField
           size="small"
-          placeholder="Rechercher (opportunité, compte, jobcode)…"
+          placeholder="Rechercher (actif, site, projet)…"
           value={filters.searchText}
           onChange={(e) => setSearchText(e.target.value)}
-          sx={{ flex: "1 1 220px", minWidth: 200 }}
+          sx={{ ...fieldSx, flex: "1 1 220px", minWidth: 200 }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -94,17 +104,17 @@ const JobcodeTopFilterBar = memo(
           }}
         />
 
-        {/* Account */}
+        {/* Site */}
         <Autocomplete<string, false, false, false>
           size="small"
           options={accountOptions}
           value={filters.accountFilter}
           onChange={(_, v) => setAccountFilter(v)}
-          sx={{ flex: "1 1 200px", minWidth: 180 }}
-          renderInput={(params) => <TextField {...params} label="Compte" placeholder="Tous les comptes" />}
+          sx={{ ...fieldSx, flex: "1 1 200px", minWidth: 180 }}
+          renderInput={(params) => <TextField {...params} label="Site" placeholder="Tous les sites" />}
         />
 
-        {/* Jobcode (cascades on account + person) */}
+        {/* Projet */}
         <Autocomplete<Jobcode, false, false, false>
           size="small"
           options={jobcodeOptions}
@@ -117,23 +127,24 @@ const JobcodeTopFilterBar = memo(
               <Box sx={{ display: "flex", flexDirection: "column", flex: 1, minWidth: 0 }}>
                 <Box sx={{ fontSize: 13, fontWeight: 600, lineHeight: 1.3 }}>{opt.jobcode}</Box>
                 <Box sx={{ fontSize: 11, color: "text.secondary", lineHeight: 1.3 }}>
-                  {opt.account} · {opt.opportunityCount} opp · {formatRevenue(opt.totalRevenue)}
+                  {opt.account} · {opt.opportunityCount} actif{opt.opportunityCount > 1 ? "s" : ""} ·{" "}
+                  {formatRevenue(opt.totalRevenue)}
                 </Box>
               </Box>
             </Box>
           )}
-          sx={{ flex: "2 1 280px", minWidth: 260 }}
-          renderInput={(params) => <TextField {...params} label="Jobcode" placeholder="Sélectionner un jobcode" />}
+          sx={{ ...fieldSx, flex: "2 1 280px", minWidth: 260 }}
+          renderInput={(params) => <TextField {...params} label="Projet" placeholder="Sélectionner un projet" />}
         />
 
-        {/* Person */}
+        {/* Référent */}
         <Autocomplete<string, false, false, false>
           size="small"
           options={peopleOptions}
           value={filters.personFilter}
           onChange={(_, v) => setPersonFilter(v)}
-          sx={{ flex: "1 1 200px", minWidth: 180 }}
-          renderInput={(params) => <TextField {...params} label="Personne" placeholder="Toute personne" />}
+          sx={{ ...fieldSx, flex: "1 1 200px", minWidth: 180 }}
+          renderInput={(params) => <TextField {...params} label="Référent" placeholder="Tout référent" />}
         />
 
         {/* Grouping toggle */}
@@ -145,7 +156,7 @@ const JobcodeTopFilterBar = memo(
               onChange={(e) => setGroupByJobcode(e.target.checked)}
             />
           }
-          label="Grouper par jobcode"
+          label="Grouper par projet"
           sx={{
             ml: 0.5,
             mr: 0,

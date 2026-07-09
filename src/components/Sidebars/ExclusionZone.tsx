@@ -192,8 +192,8 @@ const ExclusionZone = memo(
             maxHeight: "35vh",
             overflowY: "auto",
             borderRadius: 2,
-            border: dragOverExcludeZone ? `2px solid #FF3D47` : "none",
-            backgroundColor: dragOverExcludeZone ? alpha(brand.primary, 0.12) : alpha("#330000", 0.06),
+            border: dragOverExcludeZone ? `2px solid ${brand.primary}` : "none",
+            backgroundColor: dragOverExcludeZone ? alpha(brand.primary, 0.12) : alpha(brand.primaryDeepest, 0.06),
             backdropFilter: "blur(8px)",
             transition:
               "background-color 0.25s ease-in-out, border-color 0.25s ease-in-out, box-shadow 0.25s ease-in-out, transform 0.25s ease-in-out",
@@ -283,7 +283,7 @@ const ExclusionZone = memo(
 
               <SimpleExclusionSection
                 theme={theme}
-                label="Accounts"
+                label="Sites"
                 items={excludedAccounts}
                 filterKey="accounts"
                 filters={filters}
@@ -292,7 +292,7 @@ const ExclusionZone = memo(
 
               <SimpleExclusionSection
                 theme={theme}
-                label="Technology Partners"
+                label="Prestataires"
                 items={excludedTechnologyPartners}
                 filterKey="technologyPartners"
                 filters={filters}
@@ -310,7 +310,7 @@ const ExclusionZone = memo(
 
               <SimpleExclusionSection
                 theme={theme}
-                label="Sub-Segments"
+                label="Familles d'actifs"
                 items={excludedSubSegments}
                 filterKey="subSegments"
                 filters={filters}
@@ -320,7 +320,7 @@ const ExclusionZone = memo(
 
               <SimpleExclusionSection
                 theme={theme}
-                label="Grades"
+                label="Niveaux"
                 items={excludedMacroGrades}
                 filterKey="macroGrades"
                 filters={filters}
@@ -329,7 +329,7 @@ const ExclusionZone = memo(
 
               <SimpleExclusionSection
                 theme={theme}
-                label="Categories"
+                label="Catégories"
                 items={excludedMacroCategories}
                 filterKey="macroCategories"
                 filters={filters}

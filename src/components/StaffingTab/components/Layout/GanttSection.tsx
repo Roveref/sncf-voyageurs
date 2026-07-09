@@ -504,7 +504,7 @@ const GanttSection = memo(
                 {displayedEmployees.length === 0 ? (
                   <Box sx={{ textAlign: "center", py: 4, color: "grey.500" }}>
                     <GroupIcon sx={{ fontSize: 48, color: "grey.300", mb: 1.5, mx: "auto", display: "block" }} />
-                    <Typography>No employees match the filters</Typography>
+                    <Typography>Aucun collaborateur ne correspond aux filtres</Typography>
                   </Box>
                 ) : (
                   <TimelineGeometryProvider value={timelineGeometryValue}>

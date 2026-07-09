@@ -75,7 +75,7 @@ const PipelineStageCard = React.memo(
       >
         <CardContent sx={{ p: 3, height: "100%" }}>
           <Typography variant="h6" fontWeight={700}>
-            Pipeline by Status
+            Parc par phase de vie
           </Typography>
 
           <Divider sx={{ my: 2 }} />
@@ -120,7 +120,7 @@ const PipelineStageCard = React.memo(
                         color={COLORS[index % COLORS.length]}
                       />
                       <Chip
-                        label={`${item.count} opps`}
+                        label={`${item.count} actifs`}
                         size="small"
                         sx={{
                           height: "20px",

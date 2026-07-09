@@ -187,7 +187,7 @@ const FilterSummaryDialog = memo(
                 addSection(modeLabels[m], byMode[m].inc, byMode[m].exc, segRemove);
               });
             }
-            addSection("Sub-Segments", subSegs.included, subSegs.excluded, (v: string) => {
+            addSection("Familles d'actifs", subSegs.included, subSegs.excluded, (v: string) => {
               setFilters((prev: Filters) => {
                 const updatedSubSegments = removeValue(prev.subSegments, v);
                 const remainingSubs = new Set([
@@ -292,13 +292,13 @@ const FilterSummaryDialog = memo(
                 };
               });
             });
-            addSection("Accounts", accts.included, accts.excluded, (v: string) => {
+            addSection("Sites", accts.included, accts.excluded, (v: string) => {
               setFilters((prev: Filters) => ({
                 ...prev,
                 accounts: removeValue(prev.accounts, v),
               }));
             });
-            addSection("Technology Partners", techP.included, techP.excluded, (v: string) => {
+            addSection("Prestataires", techP.included, techP.excluded, (v: string) => {
               setFilters((prev: Filters) => ({
                 ...prev,
                 technologyPartners: removeValue(prev.technologyPartners, v),

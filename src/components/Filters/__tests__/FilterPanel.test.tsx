@@ -29,16 +29,12 @@ describe("FilterPanel", () => {
     expect(accountsInput).toBeInTheDocument();
   });
 
-  it("renders Technology Partners filter field", () => {
-    renderFilterPanel();
-    const techInput = screen.getByLabelText("Filter by technology partner");
-    expect(techInput).toBeInTheDocument();
+  it.skip("renders Technology Partners filter field — supprimé Chantier B (purge features BP)", () => {
+    // Filtre retiré : TechnologyPartnerFilterModal n'a pas de sens GAIF
   });
 
-  it("renders People filter field", () => {
-    renderFilterPanel();
-    const peopleInput = screen.getByLabelText("Filter by person");
-    expect(peopleInput).toBeInTheDocument();
+  it.skip("renders People filter field — supprimé Chantier B (purge features BP)", () => {
+    // Filtre retiré : PeopleFilterModal (Engagement Manager/Partner) n'a pas de sens GAIF
   });
 
   it("renders search field when onSearchTextChange is provided", () => {

@@ -77,15 +77,13 @@ describe("AppBarActions", () => {
     expect(container.firstChild).not.toBeNull();
   });
 
-  it("renders I&O toggle switch when dataReady", () => {
-    renderActions({ dataReady: true });
-    const ioSwitch = screen.getByLabelText("Toggle I&O display");
-    expect(ioSwitch).toBeInTheDocument();
+  it.skip("renders I&O toggle switch when dataReady — masqué pour GAIF Pilot (Chantier B)", () => {
+    // Le toggle I&O est désactivé définitivement pour GAIF Pilot (wrapped in {false && ...})
   });
 
   it("renders Net Revenue toggle switch when dataReady", () => {
     renderActions({ dataReady: true });
-    const netRevSwitch = screen.getByLabelText(/Switch to (Net|Gross) Revenue/);
+    const netRevSwitch = screen.getByLabelText(/Afficher valeur (d'achat|résiduelle)/i);
     expect(netRevSwitch).toBeInTheDocument();
   });
 
@@ -97,20 +95,20 @@ describe("AppBarActions", () => {
 
   it("shows Lost toggle only on Bookings tab (activeTab 1)", () => {
     renderActions({ activeTab: 1 });
-    const lostSwitch = screen.getByLabelText(/Switch to (Bookings|Lost) view/);
+    const lostSwitch = screen.getByLabelText(/Afficher (maintenance|fin de vie)/i);
     expect(lostSwitch).toBeInTheDocument();
   });
 
   it("does not show Lost toggle on Pipeline tab (activeTab 0)", () => {
     renderActions({ activeTab: 0 });
-    const lostSwitch = screen.queryByLabelText(/Switch to (Bookings|Lost) view/);
+    const lostSwitch = screen.queryByLabelText(/Afficher (maintenance|fin de vie)/i);
     expect(lostSwitch).not.toBeInTheDocument();
   });
 
   it("renders nothing visible when dataReady is false", () => {
     renderActions({ dataReady: false });
     // With visibility:hidden, element is in DOM but switches won't be accessible
-    const ioSwitch = screen.queryByLabelText("Toggle I&O display");
-    expect(ioSwitch).not.toBeInTheDocument();
+    const netRevSwitch = screen.queryByLabelText(/Afficher valeur (d'achat|résiduelle)/i);
+    expect(netRevSwitch).not.toBeInTheDocument();
   });
 });

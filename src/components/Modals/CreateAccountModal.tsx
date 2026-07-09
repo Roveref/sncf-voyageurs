@@ -231,7 +231,7 @@ const CreateAccountModal = ({
                 {...params}
                 label="Parent Account (optional)"
                 size="small"
-                placeholder="Type to search parent accounts..."
+                placeholder="Rechercher des sites parents..."
                 sx={{
                   "& .MuiOutlinedInput-root": {
                     "& fieldset": { border: "none" },

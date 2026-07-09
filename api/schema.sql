@@ -31,26 +31,33 @@ CREATE TABLE IF NOT EXISTS mds_assignments (
   updatedAt TEXT
 );
 
-CREATE TABLE IF NOT EXISTS crm_opportunities (
-  opportunityId TEXT PRIMARY KEY,
+-- ═══════════════════════════════════════════════════════════════════════════
+-- GAIF native tables (refonte v2 — tables renommées depuis crm_* hérité BP)
+-- assets (ex-crm_opportunities) → actifs du parc installations fixes
+-- sites (ex-crm_accounts) → sites & technicentres
+-- user_assets (ex-user_opportunities) → actifs créés par l'utilisateur
+-- nonconformities (ex-hr_candidates) → non-conformités ISO 55001
+-- ═══════════════════════════════════════════════════════════════════════════
+CREATE TABLE IF NOT EXISTS assets (
+  opportunityId TEXT PRIMARY KEY,         -- identifiant de l'actif (conservé pour compat React Query/filtres existants)
   crmGuid TEXT,
-  opportunity TEXT NOT NULL,
+  opportunity TEXT NOT NULL,              -- nom de l'actif
   accountId TEXT,
   account TEXT,
-  status INTEGER,
-  grossRevenue REAL,
-  netRevenue REAL,
-  winPct REAL,
-  cm1Pct REAL,
-  jobCode TEXT,
-  engagementType TEXT,
-  weightedBooking REAL,
-  creationDate TEXT,
-  bookingDate TEXT,
-  estimatedBookingDate TEXT,
+  status INTEGER,                          -- phase cycle de vie (1=Émergence ... 15=Déclassé)
+  grossRevenue REAL,                       -- valeur d'achat (€)
+  netRevenue REAL,                         -- valeur résiduelle (€)
+  winPct REAL,                             -- taux de disponibilité (%)
+  cm1Pct REAL,                             -- taux de conformité (%)
+  jobCode TEXT,                            -- code projet / WO
+  engagementType TEXT,                     -- criticité (Critique/Modérée/Non critique)
+  weightedBooking REAL,                    -- [legacy BP, usage résiduel frontend]
+  creationDate TEXT,                       -- date d'acquisition
+  bookingDate TEXT,                        -- dernière VR
+  estimatedBookingDate TEXT,               -- prochaine VR planifiée
   lastStatusChangeDate TEXT,
   manager TEXT,
-  partner TEXT,
+  partner TEXT,                            -- prestataire de maintenance
   em TEXT,
   ep TEXT,
   managerId TEXT,
@@ -64,23 +71,33 @@ CREATE TABLE IF NOT EXISTS crm_opportunities (
   country TEXT,
   region TEXT,
   segmentCode TEXT,
-  subSegmentCode TEXT,
-  subSegment TEXT,
-  serviceLine1 TEXT,
+  subSegmentCode TEXT,                     -- patrimoine (Ferroviaire, Immobilier, IO, ...)
+  subSegment TEXT,                         -- famille d'actif
+  serviceLine1 TEXT,                       -- site/technicentre
   serviceLine2 TEXT,
   serviceLine3 TEXT,
-  serviceOffering1 TEXT,
+  serviceOffering1 TEXT,                   -- mission socle GAIF
   serviceOffering2 TEXT,
   serviceOffering3 TEXT,
   serviceOffering1Pct REAL,
-  serviceOffering2Pct REAL,
+  serviceOffering2Pct REAL,                -- coût maintenance annuel
   serviceOffering3Pct REAL,
-  technologyPartner1 TEXT,
-  technologyPartner2 TEXT,
-  technologyPartner3 TEXT,
-  lostComment TEXT,
-  primaryContactId TEXT,
-  primaryContact TEXT,
+  technologyPartner1 TEXT,                 -- [legacy BP, peut être null en GAIF]
+  technologyPartner2 TEXT,                 -- [legacy BP]
+  technologyPartner3 TEXT,                 -- [legacy BP]
+  lostComment TEXT,                        -- commentaire actif (fin de vie, NC, etc.)
+  primaryContactId TEXT,                   -- [legacy CRM]
+  primaryContact TEXT,                     -- [legacy CRM]
+  -- GAIF native metrics
+  utilizationPct REAL,
+  incidents12m INTEGER DEFAULT 0,
+  consoEau REAL DEFAULT 0,
+  consoElec REAL DEFAULT 0,
+  consoGaz REAL DEFAULT 0,
+  surfaceM2 REAL DEFAULT 0,
+  mtbf REAL DEFAULT 0,
+  mttr REAL DEFAULT 0,
+  etatAbe TEXT,
   updatedAt TEXT
 );
 
@@ -107,10 +124,10 @@ CREATE TABLE IF NOT EXISTS hr_skills (
   category TEXT
 );
 
-CREATE TABLE IF NOT EXISTS crm_accounts (
-  accountId TEXT PRIMARY KEY,
-  account TEXT NOT NULL,
-  segmentCode TEXT,
+CREATE TABLE IF NOT EXISTS sites (
+  accountId TEXT PRIMARY KEY,              -- identifiant du site
+  account TEXT NOT NULL,                   -- nom du site
+  segmentCode TEXT,                         -- BU (TN, TER, IC)
   subSegmentCode TEXT,
   subSegment TEXT,
   country TEXT,
@@ -120,6 +137,7 @@ CREATE TABLE IF NOT EXISTS crm_accounts (
   updatedAt TEXT
 );
 
+-- Contacts CRM (commercial) — conservée pour refresh Dynamics, faible usage GAIF
 CREATE TABLE IF NOT EXISTS crm_contacts (
   contactId TEXT PRIMARY KEY,
   fullName TEXT,
@@ -139,10 +157,11 @@ CREATE TABLE IF NOT EXISTS crm_contacts (
   updatedAt TEXT
 );
 
-CREATE TABLE IF NOT EXISTS hr_candidates (
+-- Renommée depuis hr_candidates — stocke les non-conformités ISO 55001
+CREATE TABLE IF NOT EXISTS nonconformities (
   id TEXT PRIMARY KEY,
-  firstName TEXT NOT NULL,
-  lastName TEXT NOT NULL,
+  firstName TEXT NOT NULL,                 -- référence NC (ex: NC-2026-0042)
+  lastName TEXT NOT NULL,                  -- titre / libellé NC
   email TEXT,
   phone TEXT,
   status TEXT,
@@ -177,21 +196,21 @@ CREATE TABLE IF NOT EXISTS hr_candidates (
   updatedAt TEXT
 );
 
-CREATE INDEX IF NOT EXISTS idx_recruit_status ON hr_candidates(status);
-CREATE INDEX IF NOT EXISTS idx_recruit_date ON hr_candidates(creationDate);
+CREATE INDEX IF NOT EXISTS idx_nc_status ON nonconformities(status);
+CREATE INDEX IF NOT EXISTS idx_nc_date ON nonconformities(creationDate);
 
--- Each candidate can have multiple job applications (one per posting)
-CREATE TABLE IF NOT EXISTS hr_applications (
+-- Une NC peut avoir plusieurs rattachements (sites, patrimoines impactés) — renommée depuis hr_applications
+CREATE TABLE IF NOT EXISTS nc_scopes (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  candidateId TEXT NOT NULL REFERENCES hr_candidates(id) ON DELETE CASCADE,
+  candidateId TEXT NOT NULL REFERENCES nonconformities(id) ON DELETE CASCADE,
   jobPosting TEXT NOT NULL,
   segment TEXT,
   offering TEXT,
   UNIQUE(candidateId, jobPosting)
 );
-CREATE INDEX IF NOT EXISTS idx_recruit_app_candidate ON hr_applications(candidateId);
-CREATE INDEX IF NOT EXISTS idx_recruit_app_segment ON hr_applications(segment);
-CREATE INDEX IF NOT EXISTS idx_recruit_app_offering ON hr_applications(offering);
+CREATE INDEX IF NOT EXISTS idx_nc_scope_candidate ON nc_scopes(candidateId);
+CREATE INDEX IF NOT EXISTS idx_nc_scope_segment ON nc_scopes(segment);
+CREATE INDEX IF NOT EXISTS idx_nc_scope_offering ON nc_scopes(offering);
 
 CREATE TABLE IF NOT EXISTS var_country_region (
   country TEXT PRIMARY KEY,
@@ -231,7 +250,7 @@ CREATE TABLE IF NOT EXISTS var_holidays (
 -- USER MODIFICATIONS
 -- Architecture: EAV table for overrides + dedicated tables for manual creations.
 -- user_overrides: 1 row per modified field (entityType + entityId + field + old/new value)
--- user_opportunities: full user-created opportunities (CRM-like schema)
+-- user_assets: actifs créés manuellement par l'utilisateur (cible GAIF v2)
 -- user_employees: user-created employees (minimal)
 
 CREATE TABLE IF NOT EXISTS user_accounts (
@@ -262,8 +281,8 @@ CREATE TABLE IF NOT EXISTS user_overrides (
 CREATE INDEX IF NOT EXISTS idx_user_overrides_entity ON user_overrides(entityType, entityId);
 CREATE INDEX IF NOT EXISTS idx_user_overrides_modified ON user_overrides(modifiedAt);
 
--- Manual opportunities: full user-created opportunities (no overrides here)
-CREATE TABLE IF NOT EXISTS user_opportunities (
+-- Actifs créés manuellement par l'utilisateur (mirror de assets)
+CREATE TABLE IF NOT EXISTS user_assets (
   opportunityId TEXT PRIMARY KEY,
   opportunity TEXT,
   accountId TEXT,
@@ -275,7 +294,6 @@ CREATE TABLE IF NOT EXISTS user_opportunities (
   cm1Pct REAL,
   jobCode TEXT,
   engagementType TEXT,
-  weightedBooking REAL,
   creationDate TEXT,
   bookingDate TEXT,
   estimatedBookingDate TEXT,
@@ -312,6 +330,17 @@ CREATE TABLE IF NOT EXISTS user_opportunities (
   lostComment TEXT,
   primaryContactId TEXT,
   primaryContact TEXT,
+  weightedBooking REAL,
+  -- GAIF native metrics (mirror of assets)
+  utilizationPct REAL,
+  incidents12m INTEGER DEFAULT 0,
+  consoEau REAL DEFAULT 0,
+  consoElec REAL DEFAULT 0,
+  consoGaz REAL DEFAULT 0,
+  surfaceM2 REAL DEFAULT 0,
+  mtbf REAL DEFAULT 0,
+  mttr REAL DEFAULT 0,
+  etatAbe TEXT,
   createdAt TEXT,
   updatedAt TEXT
 );
@@ -344,7 +373,7 @@ CREATE TABLE IF NOT EXISTS user_assignments (
 
 CREATE TABLE IF NOT EXISTS user_actions (
   id TEXT PRIMARY KEY,
-  opportunityId TEXT NOT NULL REFERENCES crm_opportunities(opportunityId) ON DELETE CASCADE,
+  opportunityId TEXT NOT NULL REFERENCES assets(opportunityId) ON DELETE CASCADE,
   description TEXT,
   owner TEXT,
   dueDate TEXT,
@@ -356,7 +385,7 @@ CREATE TABLE IF NOT EXISTS user_actions (
 
 CREATE TABLE IF NOT EXISTS user_staffing_needs (
   id TEXT PRIMARY KEY,
-  opportunityId TEXT NOT NULL REFERENCES crm_opportunities(opportunityId) ON DELETE CASCADE,
+  opportunityId TEXT NOT NULL REFERENCES assets(opportunityId) ON DELETE CASCADE,
   grade TEXT,
   quantity INTEGER,
   utilization INTEGER,
@@ -372,9 +401,10 @@ CREATE TABLE IF NOT EXISTS user_staffing_needs (
   modifiedBy TEXT
 );
 
-CREATE TABLE IF NOT EXISTS user_revenue_team (
+-- Équipe projet par actif (ex-user_revenue_team — nom BP commercial)
+CREATE TABLE IF NOT EXISTS user_asset_team (
   id TEXT PRIMARY KEY,
-  opportunityId TEXT NOT NULL REFERENCES crm_opportunities(opportunityId) ON DELETE CASCADE,
+  opportunityId TEXT NOT NULL REFERENCES assets(opportunityId) ON DELETE CASCADE,
   name TEXT NOT NULL,
   gradeBucket TEXT NOT NULL,
   percentage REAL NOT NULL DEFAULT 100,
@@ -485,16 +515,14 @@ CREATE INDEX IF NOT EXISTS idx_hr_skills_empId ON hr_skills(empId);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_hr_skills_unique ON hr_skills(empId, name);
 CREATE INDEX IF NOT EXISTS idx_user_actions_opportunityId ON user_actions(opportunityId);
 CREATE INDEX IF NOT EXISTS idx_user_staffing_needs_opportunityId ON user_staffing_needs(opportunityId);
-CREATE INDEX IF NOT EXISTS idx_user_revenue_team_opportunityId ON user_revenue_team(opportunityId);
+CREATE INDEX IF NOT EXISTS idx_user_asset_team_opportunityId ON user_asset_team(opportunityId);
 CREATE INDEX IF NOT EXISTS idx_var_aihistory_session ON var_aihistory(session);
 CREATE INDEX IF NOT EXISTS idx_var_importlog_file ON var_importlog(fileName);
-CREATE INDEX IF NOT EXISTS idx_crm_contacts_account ON crm_contacts(account);
-CREATE INDEX IF NOT EXISTS idx_crm_contacts_accountId ON crm_contacts(accountId);
-CREATE INDEX IF NOT EXISTS idx_crm_opp_status ON crm_opportunities(status);
-CREATE INDEX IF NOT EXISTS idx_crm_opp_accountId ON crm_opportunities(accountId);
-CREATE INDEX IF NOT EXISTS idx_crm_opp_country ON crm_opportunities(country);
-CREATE INDEX IF NOT EXISTS idx_crm_opp_region ON crm_opportunities(region);
-CREATE INDEX IF NOT EXISTS idx_crm_opp_jobCode ON crm_opportunities(jobCode);
+CREATE INDEX IF NOT EXISTS idx_assets_status ON assets(status);
+CREATE INDEX IF NOT EXISTS idx_assets_accountId ON assets(accountId);
+CREATE INDEX IF NOT EXISTS idx_assets_country ON assets(country);
+CREATE INDEX IF NOT EXISTS idx_assets_region ON assets(region);
+CREATE INDEX IF NOT EXISTS idx_assets_jobCode ON assets(jobCode);
 CREATE INDEX IF NOT EXISTS idx_sap_records_salesOrder ON sap_records(salesOrder);
 CREATE INDEX IF NOT EXISTS idx_mds_assignments_jobNo ON mds_assignments(jobNo);
 CREATE INDEX IF NOT EXISTS idx_mds_assignments_category ON mds_assignments(category);
@@ -503,15 +531,15 @@ CREATE INDEX IF NOT EXISTS idx_mds_assignments_category ON mds_assignments(categ
 CREATE INDEX IF NOT EXISTS idx_employees_arrival ON employees(arrivalDate);
 CREATE INDEX IF NOT EXISTS idx_employees_departure ON employees(departureDate);
 
--- CRM date filters: pipeline by creation/booking date
-CREATE INDEX IF NOT EXISTS idx_crm_opp_creationDate ON crm_opportunities(creationDate);
-CREATE INDEX IF NOT EXISTS idx_crm_opp_bookingDate ON crm_opportunities(bookingDate);
-CREATE INDEX IF NOT EXISTS idx_crm_opp_estimated_booking ON crm_opportunities(estimatedBookingDate);
-CREATE INDEX IF NOT EXISTS idx_crm_opp_subSegment ON crm_opportunities(subSegmentCode);
+-- Assets date filters: parc par dates d'acquisition/VR
+CREATE INDEX IF NOT EXISTS idx_assets_creationDate ON assets(creationDate);
+CREATE INDEX IF NOT EXISTS idx_assets_bookingDate ON assets(bookingDate);
+CREATE INDEX IF NOT EXISTS idx_assets_estimated_booking ON assets(estimatedBookingDate);
+CREATE INDEX IF NOT EXISTS idx_assets_subSegment ON assets(subSegmentCode);
 
 -- Performance indexes for common query patterns
-CREATE INDEX IF NOT EXISTS idx_crm_opp_managerId ON crm_opportunities(managerId);
-CREATE INDEX IF NOT EXISTS idx_crm_opp_serviceLine ON crm_opportunities(serviceLine1);
+CREATE INDEX IF NOT EXISTS idx_assets_managerId ON assets(managerId);
+CREATE INDEX IF NOT EXISTS idx_assets_serviceLine ON assets(serviceLine1);
 CREATE INDEX IF NOT EXISTS idx_sap_activity_date ON sap_records(activityType, date);
 CREATE INDEX IF NOT EXISTS idx_mds_emp_cat_end ON mds_assignments(empId, category, endDate);
 CREATE INDEX IF NOT EXISTS idx_staffing_needs_period ON user_staffing_needs(startDate, endDate);
@@ -535,20 +563,172 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_opp_history_snap ON opp_history(opportunit
 
 -- CANDIDATE ↔ STAFFING NEEDS
 
-CREATE TABLE IF NOT EXISTS candidate_staffing_match (
+-- NC ↔ STAFFING NEEDS — rapprochement d'une NC avec un besoin en compétences GAIF
+CREATE TABLE IF NOT EXISTS nc_staffing_match (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  candidateId TEXT NOT NULL REFERENCES hr_candidates(id) ON DELETE CASCADE,
+  candidateId TEXT NOT NULL REFERENCES nonconformities(id) ON DELETE CASCADE,
   staffingNeedId TEXT NOT NULL REFERENCES user_staffing_needs(id) ON DELETE CASCADE,
   matchScore REAL,
   matchedAt TEXT,
   matchedBy TEXT,
   UNIQUE(candidateId, staffingNeedId)
 );
-CREATE INDEX IF NOT EXISTS idx_csm_candidate ON candidate_staffing_match(candidateId);
-CREATE INDEX IF NOT EXISTS idx_csm_need ON candidate_staffing_match(staffingNeedId);
+CREATE INDEX IF NOT EXISTS idx_ncsm_candidate ON nc_staffing_match(candidateId);
+CREATE INDEX IF NOT EXISTS idx_ncsm_need ON nc_staffing_match(staffingNeedId);
 
+-- ═══════════════════════════════════════════════════════════════════════════
+-- GAIF — Domain-specific tables (cible opérationnelle Direction GAIF)
+-- Complète assets + sites avec les tables métier EAM propres à la gestion
+-- d'actifs installations fixes.
+-- ═══════════════════════════════════════════════════════════════════════════
 
--- Contact uniqueness (prevent duplicate imports)
-CREATE UNIQUE INDEX IF NOT EXISTS idx_crm_contacts_email_account ON crm_contacts(email, accountId) WHERE email IS NOT NULL AND email != '';
+-- Contrats prestataires (TSO, SFERIS, E2MT Equans, Engie, SPIE, etc.)
+CREATE TABLE IF NOT EXISTS gaif_contracts (
+  id TEXT PRIMARY KEY,
+  prestataire TEXT NOT NULL,
+  patrimoine TEXT NOT NULL,
+  scope TEXT,
+  sites TEXT,                     -- JSON array of accountId
+  startDate TEXT,
+  endDate TEXT,
+  amount REAL,
+  perfScore INTEGER,
+  managerId TEXT,                 -- empId (pas de FK : peut cibler un user_employees)
+  status TEXT DEFAULT 'actif',
+  createdAt TEXT,
+  updatedAt TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_gaif_contracts_patrimoine ON gaif_contracts(patrimoine);
+CREATE INDEX IF NOT EXISTS idx_gaif_contracts_endDate ON gaif_contracts(endDate);
+
+-- Planification des Visites Réglementaires (VR) et maintenances préventives
+CREATE TABLE IF NOT EXISTS gaif_vr_schedule (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  assetId TEXT NOT NULL,          -- opportunityId (assets ou user_assets)
+  plannedDate TEXT NOT NULL,
+  executedDate TEXT,
+  vrType TEXT,                    -- 'reglementaire' | 'preventive' | 'corrective' | 'audit'
+  status TEXT DEFAULT 'planifiee', -- 'planifiee' | 'en_cours' | 'realisee' | 'retardee'
+  inspector TEXT,
+  result TEXT,                    -- 'conforme' | 'reserve' | 'non_conforme'
+  comment TEXT,
+  createdAt TEXT,
+  updatedAt TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_gaif_vr_assetId ON gaif_vr_schedule(assetId);
+CREATE INDEX IF NOT EXISTS idx_gaif_vr_planned ON gaif_vr_schedule(plannedDate);
+CREATE INDEX IF NOT EXISTS idx_gaif_vr_status ON gaif_vr_schedule(status);
+
+-- Registre des risques & opportunités ISO 55001 §6.1
+CREATE TABLE IF NOT EXISTS gaif_risks (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT,
+  kind TEXT NOT NULL,             -- 'risque' | 'opportunite'
+  severity TEXT NOT NULL,         -- 'critique' | 'majeur' | 'modere' | 'mineur'
+  stage TEXT NOT NULL,            -- 'identifie' | 'evalue' | 'plan_mitigation' | 'cloture'
+  ownerId TEXT,                   -- empId
+  processus TEXT,                 -- chapitre ISO 55001
+  patrimoine TEXT,
+  dueDate TEXT,
+  createdAt TEXT,
+  updatedAt TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_gaif_risks_stage ON gaif_risks(stage);
+CREATE INDEX IF NOT EXISTS idx_gaif_risks_kind ON gaif_risks(kind);
+CREATE INDEX IF NOT EXISTS idx_gaif_risks_severity ON gaif_risks(severity);
+
+-- Audits internes, pré-audits, certifications, revues de direction (ISO §9.2/9.3)
+CREATE TABLE IF NOT EXISTS gaif_audits (
+  id TEXT PRIMARY KEY,
+  kind TEXT NOT NULL,             -- 'audit_interne' | 'revue_direction' | 'pre_audit' | 'certification'
+  label TEXT NOT NULL,
+  scope TEXT,
+  plannedDate TEXT NOT NULL,
+  completedDate TEXT,
+  auditor TEXT,
+  status TEXT DEFAULT 'planifie', -- 'planifie' | 'en_cours' | 'realise'
+  report TEXT,
+  createdAt TEXT,
+  updatedAt TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_gaif_audits_date ON gaif_audits(plannedDate);
+CREATE INDEX IF NOT EXISTS idx_gaif_audits_status ON gaif_audits(status);
+
+-- Référentiel documentaire (PSGA, prescriptions, notes, politique, présentation)
+CREATE TABLE IF NOT EXISTS gaif_doctrinaire_docs (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  category TEXT NOT NULL,         -- 'Stratégie' | 'Prescription' | 'Note' | 'Présentation' | 'Politique'
+  version TEXT,
+  lastUpdate TEXT,
+  owner TEXT,
+  status TEXT DEFAULT 'Publié',   -- 'Publié' | 'Validation' | 'Work in progress'
+  summary TEXT,
+  content TEXT,                   -- full text for knowledge_base_lookup
+  url TEXT,
+  tags TEXT                       -- JSON array of searchable tags
+);
+CREATE INDEX IF NOT EXISTS idx_gaif_docs_category ON gaif_doctrinaire_docs(category);
+
+-- Comitologie GAIF (4 comités officiels TN : COPIL Réseau, COPIL Immo, COTECH IDFM, COPIL RSE)
+CREATE TABLE IF NOT EXISTS gaif_comites (
+  id TEXT PRIMARY KEY,
+  label TEXT NOT NULL,
+  shortLabel TEXT,
+  cadence TEXT NOT NULL,          -- 'mensuel' | 'bimestriel' | 'trimestriel' | 'semestriel'
+  coAnimateur TEXT,
+  themes TEXT,                    -- JSON array
+  raciLeadId TEXT,                -- empId
+  nextOccurrence TEXT NOT NULL,
+  color TEXT,
+  createdAt TEXT,
+  updatedAt TEXT
+);
+
+-- Actions & décisions liées à un comité
+CREATE TABLE IF NOT EXISTS gaif_comite_actions (
+  id TEXT PRIMARY KEY,
+  comiteId TEXT NOT NULL REFERENCES gaif_comites(id) ON DELETE CASCADE,
+  description TEXT NOT NULL,
+  ownerId TEXT,                   -- empId
+  dueDate TEXT,
+  priority TEXT,                  -- 'haute' | 'moyenne' | 'basse'
+  status TEXT DEFAULT 'open',     -- 'open' | 'in_progress' | 'done' | 'cancelled'
+  decisionDate TEXT,
+  outcome TEXT,
+  createdAt TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_gaif_comite_actions_comite ON gaif_comite_actions(comiteId);
+CREATE INDEX IF NOT EXISTS idx_gaif_comite_actions_status ON gaif_comite_actions(status);
+
+-- Projets & initiatives d'industrialisation (PPI 2026-2030)
+CREATE TABLE IF NOT EXISTS gaif_projects (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  patrimoine TEXT,
+  siteId TEXT,                    -- accountId
+  phase INTEGER,                  -- status CRM 1..15 (émergence, CEB, étude, exploitation, fin de vie)
+  marqueur TEXT,                  -- 'Clients' | 'Agilite' | 'JusteBesoin' | 'Innovation'
+  leadId TEXT,                    -- empId
+  startDate TEXT,
+  endDate TEXT,
+  budget REAL,
+  budgetByYear TEXT,              -- JSON { '2026': 150000, '2027': 200000, ... }
+  description TEXT,
+  createdAt TEXT,
+  updatedAt TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_gaif_projects_patrimoine ON gaif_projects(patrimoine);
+CREATE INDEX IF NOT EXISTS idx_gaif_projects_phase ON gaif_projects(phase);
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- GAIF — Migration helpers for existing databases
+-- ═══════════════════════════════════════════════════════════════════════════
+-- Note : SQLite ne supporte pas `ALTER TABLE ... ADD COLUMN IF NOT EXISTS`.
+-- Les colonnes GAIF natives ajoutées dans CREATE TABLE plus haut seront
+-- appliquées automatiquement pour toute nouvelle DB. Pour les DB existantes,
+-- la fonction `ensureGaifColumns` dans api/src/db/initSchema.ts vérifie et
+-- ajoute les colonnes manquantes.
 
 -- CRM GUID uniqueness

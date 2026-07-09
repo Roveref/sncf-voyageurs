@@ -8,7 +8,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import GroupIcon from "@mui/icons-material/Group";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { getGradeColor, compareGrades } from "../../constants";
+import { getGradeColor, compareGrades, getGradeUILabel } from "../../constants";
 import { easing } from "../../../../styles/animations";
 import type { Employee } from "../../types";
 
@@ -69,11 +69,11 @@ const ManagerSelector = memo(({ managers, selectedManager, onSelect, employees }
             <>
               <Box sx={{ fontWeight: 500, color: "text.primary" }}>{selectedManagerData.name}</Box>
               <Box sx={{ fontSize: "0.75rem", color: "text.secondary" }}>
-                {selectedManagerData.grade} • {selectedManagerData.directReports.length} direct reports
+                {getGradeUILabel(selectedManagerData.grade)} • {selectedManagerData.directReports.length} collaborateurs
               </Box>
             </>
           ) : (
-            <Box sx={{ color: "text.secondary" }}>All employees</Box>
+            <Box sx={{ color: "text.secondary" }}>Tous les collaborateurs</Box>
           )}
         </Box>
         <ExpandMoreIcon
@@ -181,7 +181,7 @@ const ManagerSelector = memo(({ managers, selectedManager, onSelect, employees }
                         color: gradeColors.text,
                       }}
                     >
-                      {manager.grade}
+                      {getGradeUILabel(manager.grade)}
                     </Box>
                   </Box>
                   <Box

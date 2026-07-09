@@ -88,7 +88,7 @@ const DemandChart = memo(
     if (rows.length === 0) {
       return (
         <Box sx={{ py: 4, textAlign: "center", color: "text.secondary" }}>
-          <Typography variant="body2">No staffing needs defined</Typography>
+          <Typography variant="body2">Aucun besoin d'expert identifié</Typography>
         </Box>
       );
     }

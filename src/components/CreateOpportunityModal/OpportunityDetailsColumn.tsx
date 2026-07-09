@@ -1,5 +1,5 @@
 /**
- * OpportunityDetailsColumn — Left column: Account, Project Type, CM1%, Dates, Tech Partner
+ * OpportunityDetailsColumn — Left column: Site, Type d'actif, Conformité, Dates VR, Prestataire
  */
 
 import React, { memo } from "react";
@@ -74,7 +74,7 @@ const OpportunityDetailsColumn = ({
             mr: 1,
           }}
         />
-        Opportunity Details
+        Détails de l'actif
       </Typography>
 
       {/* Account */}
@@ -107,7 +107,7 @@ const OpportunityDetailsColumn = ({
                       borderRadius: 1,
                     }}
                   >
-                    New
+                    Nouveau
                   </Box>
                 )}
               </Box>
@@ -116,19 +116,19 @@ const OpportunityDetailsColumn = ({
           renderInput={(params) => (
             <TextField
               {...params}
-              label="Account"
+              label="Site"
               error={!!errors.account}
               helperText={errors.account}
               size="small"
               margin="dense"
-              placeholder="Type to search all CRM accounts..."
+              placeholder="Rechercher dans tous les sites..."
               onBlur={() => onBlurField?.("account", formData.account)}
             />
           )}
         />
         <IconButton
           onClick={onOpenCreateAccount}
-          title="Create new account"
+          title="Créer un nouveau site"
           sx={{
             mt: "12px",
             borderRadius: 1.5,
@@ -154,7 +154,7 @@ const OpportunityDetailsColumn = ({
         renderInput={(params) => (
           <TextField
             {...params}
-            label="Project Type"
+            label="Type d'actif"
             size="small"
             margin="dense"
             sx={{
@@ -172,7 +172,7 @@ const OpportunityDetailsColumn = ({
       <TextField
         fullWidth
         type="number"
-        label="CM1 (%)"
+        label="Conformité (%)"
         value={formData.cm1Pct}
         onChange={(e) => onChange("cm1Pct", e.target.value)}
         size="small"
@@ -188,7 +188,7 @@ const OpportunityDetailsColumn = ({
 
       {/* Booking Dates */}
       <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 2, mb: 1 }}>
-        Booking Dates
+        Dates de visite réglementaire
       </Typography>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <DatePicker
@@ -199,7 +199,7 @@ const OpportunityDetailsColumn = ({
               size: "small",
               fullWidth: true,
               margin: "dense",
-              label: "Estimated Booking Date",
+              label: "Date dernière VR",
               onBlur: () => onBlurField?.("bookingDate", formData.bookingDate),
               sx: {
                 "& .MuiInputBase-root": {
@@ -240,7 +240,7 @@ const OpportunityDetailsColumn = ({
                 size: "small",
                 fullWidth: true,
                 margin: "dense",
-                label: "Actual Booking Date",
+                label: "Date prochaine VR",
                 error: !!errors.estimatedBookingDate,
                 helperText: errors.estimatedBookingDate,
                 onBlur: () => onBlurField?.("estimatedBookingDate", formData.estimatedBookingDate),
@@ -282,7 +282,7 @@ const OpportunityDetailsColumn = ({
         renderInput={(params) => (
           <TextField
             {...params}
-            label="Technology Partner"
+            label="Prestataire"
             size="small"
             margin="dense"
             sx={{

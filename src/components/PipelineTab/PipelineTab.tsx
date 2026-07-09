@@ -28,6 +28,14 @@ import DeleteConfirmDialog from "../CreateOpportunityModal/DeleteConfirmDialog";
 // Custom hooks for data management and calculations
 import { useDateFilter } from "../../hooks/useDateFilter";
 import { usePipelineData, usePipelineCalculations } from "./hooks";
+import {
+  usePipelineByBU,
+  usePipelineBySiteInBU,
+  BU_CODE_FROM_LABEL,
+  BU_LABEL,
+  resolveBU,
+} from "./hooks/usePipelineByBU";
+import { useCrmData } from "../../queries/useCrmData";
 
 // UI Components
 import DateRangeFilter from "../shared/DateRangeFilter";
@@ -125,6 +133,77 @@ const PipelineTab = ({
   const serviceLineChartData = useMemo(() => {
     return drillDownServiceLine ? offeringsData : stackedServiceLineData;
   }, [drillDownServiceLine, offeringsData, stackedServiceLineData]);
+
+  // « Parc par entité » chart — groupé par Business Unit (Transilien / TER / Intercités)
+  // avec drill-down local : clic sur une BU → filtre la liste + affiche les sites de la BU.
+  const { crmAccounts } = useCrmData();
+  const [drillDownBU, setDrillDownBU] = useState<string | null>(null);
+  const [buFilteredData, setBuFilteredData] = useState<any[]>([]);
+  const buChartData = usePipelineByBU(filteredOpportunities, crmAccounts, showNetRevenue);
+  const sitesInBuData = usePipelineBySiteInBU(filteredOpportunities, crmAccounts, showNetRevenue, drillDownBU);
+  const entiteChartData = drillDownBU ? sitesInBuData : buChartData;
+
+  const handleBuChartClick = useCallback(
+    (chartEvent: any) => {
+      const clickedItem = chartEvent?.activePayload?.[0]?.payload;
+      const label = clickedItem?.name;
+      if (!label) return;
+
+      if (!drillDownBU) {
+        // Niveau 0 → 1 : click sur une BU → filtre la liste + drill down chart
+        const code = BU_CODE_FROM_LABEL[label];
+        if (!code) return;
+        const accountByName = new Map<string, string>();
+        const accountById = new Map<string, string>();
+        crmAccounts.forEach((a) => {
+          if (a.parentAccount && a.account) accountByName.set(a.account, a.parentAccount);
+          if (a.parentAccount && a.accountId) accountById.set(a.accountId, a.parentAccount);
+        });
+        const filtered = filteredOpportunities.filter((opp) => resolveBU(opp, accountByName, accountById) === code);
+        if (filtered.length === 0) return;
+        setBuFilteredData([...filteredOpportunities]);
+        setFilteredOpportunities(filtered);
+        setDrillDownBU(code);
+        setActiveFilterType(BU_LABEL[code]);
+      } else {
+        // Niveau 1 : click sur un site → filtre par site
+        const accountName = label;
+        setAccountFilteredData([...filteredOpportunities]);
+        const filtered = filteredOpportunities.filter((opp) => opp.account === accountName);
+        if (filtered.length > 0) {
+          setFilteredAccount(accountName);
+          setFilteredOpportunities(filtered);
+          setActiveFilterType(accountName);
+        }
+      }
+    },
+    [drillDownBU, filteredOpportunities, crmAccounts, setFilteredOpportunities, setActiveFilterType]
+  );
+
+  const handleBackFromBu = useCallback(() => {
+    // Si un filtre site est actif sous la BU, le lever d'abord
+    if (filteredAccount) {
+      setFilteredAccount(null);
+      setFilteredOpportunities([...accountFilteredData]);
+      setAccountFilteredData([]);
+      setActiveFilterType(BU_LABEL[drillDownBU!] ?? null);
+      return;
+    }
+    // Sinon on sort du drill-down BU
+    setDrillDownBU(null);
+    if (buFilteredData.length > 0) {
+      setFilteredOpportunities([...buFilteredData]);
+      setBuFilteredData([]);
+    }
+    setActiveFilterType(null);
+  }, [
+    drillDownBU,
+    filteredAccount,
+    accountFilteredData,
+    buFilteredData,
+    setFilteredOpportunities,
+    setActiveFilterType,
+  ]);
 
   // Get sub-segments data if in segment drill-down mode (memoized for performance)
   const subSegmentsData = useMemo(() => {
@@ -348,9 +427,9 @@ const PipelineTab = ({
           {/* Pipeline Insights */}
           <Grid size={12} sx={{ overflow: "visible" }}>
             <DetachableCard
-              group="Pipeline"
+              group="Parc d'actifs"
               storageKey="pip-pipeline-insights"
-              title="Pipeline Insights"
+              title="Indicateurs du parc"
               defaultWidth={900}
               defaultHeight={400}
             >
@@ -368,9 +447,9 @@ const PipelineTab = ({
           {/* Cumulative Pipeline Chart */}
           <Grid size={12} sx={{ overflow: "visible" }}>
             <DetachableCard
-              group="Pipeline"
+              group="Parc d'actifs"
               storageKey="pip-cumulative"
-              title="Cumulative Pipeline"
+              title="Évolution cumulative"
               defaultWidth={900}
               defaultHeight={500}
             >
@@ -389,9 +468,9 @@ const PipelineTab = ({
           {/* Summary Cards Row */}
           <Grid size={{ xs: 12, md: 4 }} sx={{ overflow: "visible" }}>
             <DetachableCard
-              group="Pipeline"
+              group="Parc d'actifs"
               storageKey="pip-overview-card"
-              title="Pipeline Overview"
+              title="Vue d'ensemble du parc"
               defaultWidth={500}
               defaultHeight={400}
             >
@@ -412,9 +491,9 @@ const PipelineTab = ({
 
           <Grid size={{ xs: 12, md: 4 }} sx={{ overflow: "visible" }}>
             <DetachableCard
-              group="Pipeline"
+              group="Parc d'actifs"
               storageKey="pip-size-card"
-              title="Pipeline Size"
+              title="Volume du parc"
               defaultWidth={500}
               defaultHeight={400}
             >
@@ -433,9 +512,9 @@ const PipelineTab = ({
 
           <Grid size={{ xs: 12, md: 4 }} sx={{ overflow: "visible" }}>
             <DetachableCard
-              group="Pipeline"
+              group="Parc d'actifs"
               storageKey="pip-stage-card"
-              title="Pipeline by Status"
+              title="Parc par phase"
               defaultWidth={500}
               defaultHeight={400}
             >
@@ -454,9 +533,9 @@ const PipelineTab = ({
           <Grid size={{ xs: 12, md: 6 }} sx={{ overflow: "visible", minHeight: 450 }}>
             <ScrollReveal>
               <DetachableCard
-                group="Pipeline"
+                group="Parc d'actifs"
                 storageKey="pip-account-chart"
-                title="Accounts"
+                title="Sites"
                 defaultWidth={650}
                 defaultHeight={500}
               >
@@ -479,20 +558,20 @@ const PipelineTab = ({
           <Grid size={{ xs: 12, md: 6 }} sx={{ overflow: "visible", minHeight: 450 }}>
             <ScrollReveal delay={100}>
               <DetachableCard
-                group="Pipeline"
+                group="Parc d'actifs"
                 storageKey="pip-status-chart"
-                title="Service Lines"
+                title="Sites"
                 defaultWidth={650}
                 defaultHeight={500}
               >
                 <StatusChart
-                  data={serviceLineChartData}
-                  onChartClick={handleChartClick}
+                  data={entiteChartData}
+                  onChartClick={handleBuChartClick}
                   showIO={showIO}
-                  drillDownServiceLine={drillDownServiceLine}
-                  drillDownOffering={drillDownOffering}
-                  onBackClick={handleBackToDrillDown}
-                  onClearAllDrillDown={clearFilters}
+                  drillDownServiceLine={drillDownBU ? BU_LABEL[drillDownBU] : null}
+                  drillDownOffering={null}
+                  onBackClick={handleBackFromBu}
+                  onClearAllDrillDown={handleBackFromBu}
                 />
               </DetachableCard>
             </ScrollReveal>
@@ -502,15 +581,15 @@ const PipelineTab = ({
           <Grid size={12} sx={{ overflow: "visible" }}>
             <ScrollReveal>
               <DetachableCard
-                group="Pipeline"
+                group="Parc d'actifs"
                 storageKey="pip-pipeline-opp-list"
-                title="Pipeline Opportunities"
+                title="Actifs du parc"
                 defaultWidth={1100}
                 defaultHeight={700}
               >
                 <OpportunityList
                   data={filteredOpportunities}
-                  title="Pipeline Opportunities"
+                  title="Actifs du parc"
                   selectedOpportunities={selectedOpportunities}
                   onSelectionChange={onSelection}
                   resetFilterCallback={

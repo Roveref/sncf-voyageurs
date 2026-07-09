@@ -44,8 +44,13 @@ const AppBarOverflowDrawer = memo(
     toggleNetRevenue,
   }: AppBarOverflowDrawerProps) => {
     const ioLabel =
-      { off: "I&O hidden", show: "Show I&O", ioOnly: "I&O only", ioTeam: "I&O Team", ioLead: "I&O Lead" }[showIO] ??
-      "I&O";
+      {
+        off: "GAIF masqué",
+        show: "Afficher GAIF",
+        ioOnly: "GAIF uniquement",
+        ioTeam: "Équipe GAIF",
+        ioLead: "Responsable GAIF",
+      }[showIO] ?? "GAIF";
 
     return (
       <SwipeableDrawer
@@ -117,7 +122,7 @@ const AppBarOverflowDrawer = memo(
                 {showLost ? <CancelOutlinedIcon fontSize="small" /> : <CheckCircleOutlineIcon fontSize="small" />}
               </ListItemIcon>
               <ListItemText
-                primary={showLost ? "Lost" : "Bookings"}
+                primary={showLost ? "Déclassés" : "Maintenance"}
                 primaryTypographyProps={{ fontSize: "0.85rem", fontWeight: 500, color: "white" }}
               />
               <Switch
@@ -150,7 +155,7 @@ const AppBarOverflowDrawer = memo(
               <MonetizationOnIcon fontSize="small" />
             </ListItemIcon>
             <ListItemText
-              primary={showNetRevenue ? "Net Revenue" : "Gross Revenue"}
+              primary={showNetRevenue ? "Coût maintenance" : "Coût total"}
               primaryTypographyProps={{ fontSize: "0.85rem", fontWeight: 500, color: "white" }}
             />
             <Switch

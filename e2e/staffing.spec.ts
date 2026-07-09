@@ -1,11 +1,11 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Staffing Tab — Core Workflows", () => {
+test.describe("Plan de charge — Core Workflows", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/staffing");
     await page.waitForLoadState("domcontentloaded");
-    // Wait for the staffing tab to be active
-    const tab = page.locator('button[role="tab"]', { hasText: "Staffing" });
+    // Wait for the plan de charge tab to be active
+    const tab = page.locator('button[role="tab"]', { hasText: "Plan de charge" });
     await expect(tab).toBeVisible({ timeout: 15_000 });
   });
 
@@ -30,7 +30,7 @@ test.describe("Staffing Tab — Core Workflows", () => {
   test("tab navigation works — all tabs are clickable", async ({ page }) => {
     const tabs = page.locator('button[role="tab"]');
     const count = await tabs.count();
-    expect(count).toBeGreaterThanOrEqual(3); // Pipeline, Bookings, Staffing minimum
+    expect(count).toBeGreaterThanOrEqual(3); // Parc d'actifs, Maintenance, Plan de charge minimum
 
     // Click each tab and verify it becomes active
     for (let i = 0; i < Math.min(count, 4); i++) {
@@ -43,16 +43,16 @@ test.describe("Staffing Tab — Core Workflows", () => {
   });
 
   test("URL routing syncs with tab selection", async ({ page }) => {
-    // Click Pipeline tab
-    const pipelineTab = page.locator('button[role="tab"]', { hasText: "Pipeline" });
+    // Click Parc d'actifs tab
+    const pipelineTab = page.locator('button[role="tab"]', { hasText: "Parc d'actifs" });
     if (await pipelineTab.isVisible()) {
       await pipelineTab.click();
       await page.waitForURL("**/pipeline", { timeout: 5_000 });
       expect(page.url()).toContain("/pipeline");
     }
 
-    // Click Staffing tab
-    const staffingTab = page.locator('button[role="tab"]', { hasText: "Staffing" });
+    // Click Plan de charge tab
+    const staffingTab = page.locator('button[role="tab"]', { hasText: "Plan de charge" });
     if (await staffingTab.isVisible()) {
       await staffingTab.click();
       await page.waitForURL("**/staffing", { timeout: 5_000 });
@@ -61,7 +61,7 @@ test.describe("Staffing Tab — Core Workflows", () => {
   });
 });
 
-test.describe("Staffing Tab — Heatmap Display", () => {
+test.describe("Plan de charge — Heatmap Display", () => {
   test("heatmap mode selector is accessible", async ({ page }) => {
     await page.goto("/staffing");
     await page.waitForLoadState("domcontentloaded");

@@ -38,7 +38,7 @@ const cardSx = (delay: number) => ({
   position: "relative",
 });
 
-// ─── Mode-aware color helper (BearingPoint palette) ─────────────────────────
+// ─── Mode-aware color helper (GAIF palette) ─────────────────────────
 const getModeColor = (_theme: any, heatmapMode: string) => {
   switch (heatmapMode) {
     case "to":
@@ -270,22 +270,20 @@ const TUCurrentCard = memo(
                 const points: { value: number; label: string; color: string; glow?: boolean }[] = [
                   {
                     value: currentTU,
-                    label: "Current",
+                    label: "Actuel",
                     color: exceedsTarget ? "#10b981" : mainColor,
                     glow: exceedsTarget,
                   },
                 ];
 
                 if (firmMergedWithTarget) {
-                  // Merged: show as "Target (75%)"
-                  points.push({ value: theoreticalTU, label: "Target (75%)", color: brand.secondary }); // G60 Brown
+                  points.push({ value: theoreticalTU, label: "Cible (75%)", color: brand.secondary });
                 } else {
-                  // Separate points — add both, will be sorted
-                  points.push({ value: theoreticalTU, label: "Target", color: brand.secondary }); // G60 Brown
-                  points.push({ value: FIRM_TARGET, label: "Cabinet", color: brand.primaryDeep }); // R70 Deep Red
+                  points.push({ value: theoreticalTU, label: "Cible", color: brand.secondary });
+                  points.push({ value: FIRM_TARGET, label: "Direction GAIF", color: brand.primaryDeep });
                 }
 
-                points.push({ value: potentialTU, label: "Potential", color: brand.secondaryLighter }); // G40 Light
+                points.push({ value: potentialTU, label: "Potentiel", color: brand.secondaryLighter });
 
                 // Sort by value (current first is guaranteed since it's usually lowest, but sort all non-current)
                 const [current, ...rest] = points;
@@ -513,13 +511,13 @@ const GradeSplitCard = memo(({ teamTuStats, showIO }: any) => {
       </Typography>
       <Box sx={{ color: "text.secondary", mt: 1 }}>
         <Typography variant="body2">
-          <AnimatedCount value={count} variant="inherit" color="inherit" fontWeight={400} suffix=" Emp." />
+          <AnimatedCount value={count} variant="inherit" color="inherit" fontWeight={400} suffix=" pers." />
         </Typography>
         <Typography variant="body2">
           <AnimatedFmtVal
             value={fte != null ? fte : count}
             color="inherit"
-            unit=" FTE"
+            unit=" ETP"
             variant="inherit"
             fontWeight={400}
             sx={{ fontSize: "inherit" }}
@@ -530,7 +528,7 @@ const GradeSplitCard = memo(({ teamTuStats, showIO }: any) => {
               <AnimatedFmtVal
                 value={realFte}
                 color="inherit"
-                unit=" actual"
+                unit=" réel"
                 variant="inherit"
                 fontWeight={400}
                 sx={{ fontSize: "inherit" }}
@@ -560,12 +558,12 @@ const GradeSplitCard = memo(({ teamTuStats, showIO }: any) => {
     <Card sx={cardSx(100)}>
       <CardContent sx={{ p: 3, height: "100%", display: "flex", flexDirection: "column" }}>
         <Typography variant="h6" fontWeight={700}>
-          Grade Split
+          Répartition des rôles
         </Typography>
         <Divider sx={{ my: 3 }} />
         <Box sx={{ display: "flex", gap: 2, flex: 1 }}>
           <Section
-            label="M−"
+            label="Experts & terrain"
             tu={mminusTU}
             count={mminusCount}
             fte={mminusFTE}
@@ -574,7 +572,7 @@ const GradeSplitCard = memo(({ teamTuStats, showIO }: any) => {
             ioTU={mminusIoTU}
           />
           <Section
-            label="M+"
+            label="Pilotage"
             tu={mplusTU}
             count={mplusCount}
             fte={mplusFTE}
@@ -599,7 +597,7 @@ const SapCard = memo(({ teamTuStats, sapData, projectCount, aggVarianceHours }: 
       <Card sx={cardSx(200)}>
         <CardContent sx={{ p: 3, height: "100%", display: "flex", flexDirection: "column" }}>
           <Typography variant="h6" fontWeight={700}>
-            Projects
+            Projets
           </Typography>
           <Divider sx={{ my: 3 }} />
           <Box
@@ -616,7 +614,7 @@ const SapCard = memo(({ teamTuStats, sapData, projectCount, aggVarianceHours }: 
           >
             <AnimatedCount value={projectCount} variant="h4" color={brand.secondaryLight} fontWeight={700} />
             <Typography variant="body2" sx={{ color: "text.secondary" }}>
-              active projects
+              projets actifs
             </Typography>
           </Box>
         </CardContent>
@@ -641,7 +639,7 @@ const SapCard = memo(({ teamTuStats, sapData, projectCount, aggVarianceHours }: 
     <Card sx={cardSx(200)}>
       <CardContent sx={{ p: 3, height: "100%", display: "flex", flexDirection: "column" }}>
         <Typography variant="h6" fontWeight={700}>
-          SAP
+          Réalisé
         </Typography>
         <Divider sx={{ my: 3 }} />
 
@@ -650,7 +648,7 @@ const SapCard = memo(({ teamTuStats, sapData, projectCount, aggVarianceHours }: 
           <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
             <AnimatedPercent value={sapAvgPct} variant="h5" color={sapColor} fontWeight={700} />
             <Typography variant="body2" sx={{ color: "text.secondary" }}>
-              fill rate
+              taux de remplissage
             </Typography>
             {sapTotalActiveDays > 0 && (
               <Typography variant="body2" sx={{ color: "text.secondary", ml: "auto" }}>
@@ -683,7 +681,7 @@ const SapCard = memo(({ teamTuStats, sapData, projectCount, aggVarianceHours }: 
           <Box sx={{ flex: 1, bgcolor: alpha("#99171D", 0.06), borderRadius: 2, p: 2 }}>
             <AnimatedSignedHours value={sapTotalOverH > 0 ? sapTotalOverH : 0} color="#99171D" />
             <Typography variant="body2" sx={{ color: "text.secondary" }}>
-              overcharged
+              dépassement
             </Typography>
           </Box>
           <Box sx={{ flex: 1, bgcolor: alpha("#99171D", 0.06), borderRadius: 2, p: 2 }}>
@@ -695,7 +693,7 @@ const SapCard = memo(({ teamTuStats, sapData, projectCount, aggVarianceHours }: 
               suffix="h"
             />
             <Typography variant="body2" sx={{ color: "text.secondary" }}>
-              missing
+              manquantes
             </Typography>
           </Box>
         </Box>
@@ -709,7 +707,7 @@ const SapCard = memo(({ teamTuStats, sapData, projectCount, aggVarianceHours }: 
                 color={sapVarianceHours === 0 ? "text.secondary" : varColor}
               />
               <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                variance
+                écart
               </Typography>
             </Box>
           </Box>
@@ -741,7 +739,7 @@ const ChurnCard = memo(({ teamTuStats, timelineStart, timelineEnd }: any) => {
     <Card sx={cardSx(300)}>
       <CardContent sx={{ p: 3, height: "100%", display: "flex", flexDirection: "column" }}>
         <Typography variant="h6" fontWeight={700}>
-          Turnover
+          Rotation
         </Typography>
         <Divider sx={{ my: 3 }} />
 
@@ -776,7 +774,7 @@ const ChurnCard = memo(({ teamTuStats, timelineStart, timelineEnd }: any) => {
         {/* Departures bar */}
         <Box sx={{ mb: 2 }}>
           <Typography variant="body2" sx={{ color: "text.secondary", mb: 0.5, display: "block" }}>
-            Departures
+            Départs
           </Typography>
           {/* Labels aligned above bar segments */}
           <Box sx={{ display: "flex", mb: 0.25 }}>
@@ -823,7 +821,7 @@ const ChurnCard = memo(({ teamTuStats, timelineStart, timelineEnd }: any) => {
                   />
                 </Typography>
                 <Typography sx={{ fontWeight: 500, color: alpha(depColor, 0.4), fontSize: "0.75rem", lineHeight: 1.2 }}>
-                  inc. interns
+                  dont apprentis
                 </Typography>
               </Box>
             )}
@@ -855,7 +853,7 @@ const ChurnCard = memo(({ teamTuStats, timelineStart, timelineEnd }: any) => {
         {/* Arrivals bar */}
         <Box sx={{ mb: 2 }}>
           <Typography variant="body2" sx={{ color: "text.secondary", mb: 0.5, display: "block" }}>
-            Arrivals
+            Arrivées
           </Typography>
           {/* Labels aligned above bar segments */}
           <Box sx={{ display: "flex", mb: 0.25 }}>
@@ -902,7 +900,7 @@ const ChurnCard = memo(({ teamTuStats, timelineStart, timelineEnd }: any) => {
                   />
                 </Typography>
                 <Typography sx={{ fontWeight: 500, color: alpha(arrColor, 0.4), fontSize: "0.75rem", lineHeight: 1.2 }}>
-                  inc. interns
+                  dont apprentis
                 </Typography>
               </Box>
             )}
@@ -1005,7 +1003,7 @@ const TUOverview = memo(
           <DetachableCard
             group="Staffing"
             storageKey="pip-grade-split"
-            title="Grade Split"
+            title="Répartition des rôles"
             defaultWidth={450}
             defaultHeight={400}
           >
@@ -1026,7 +1024,7 @@ const TUOverview = memo(
           <DetachableCard
             group="Staffing"
             storageKey="pip-turnover"
-            title="Turnover"
+            title="Rotation"
             defaultWidth={450}
             defaultHeight={400}
           >
@@ -1040,7 +1038,7 @@ const TUOverview = memo(
             <DetachableCard
               group="Staffing"
               storageKey="pip-pyramid"
-              title="Grade Pyramid"
+              title="Pyramide des rôles"
               defaultWidth={600}
               defaultHeight={650}
             >
@@ -1050,12 +1048,12 @@ const TUOverview = memo(
                     <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
                       {pyramidMode === "grade" ? (
                         <Typography variant="h6" fontWeight={700}>
-                          Grade Pyramid
+                          Pyramide des rôles
                         </Typography>
                       ) : pyramidMode === "project" ? (
                         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                           <Typography variant="h6" fontWeight={700}>
-                            Project Pyramid
+                            Pyramide projets
                           </Typography>
                           <TextField
                             type="number"
@@ -1073,7 +1071,7 @@ const TUOverview = memo(
                       ) : (
                         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                           <Typography variant="h6" fontWeight={700}>
-                            Client Pyramid
+                            Pyramide sites
                           </Typography>
                           <TextField
                             type="number"
@@ -1122,17 +1120,17 @@ const TUOverview = memo(
                                   0
                                 )
                               : hc;
-                          return fte === hc ? `${hc} emp.` : `${hc} emp. · ${fte.toFixed(2)} FTE`;
+                          return fte === hc ? `${hc} pers.` : `${hc} pers. · ${fte.toFixed(2)} ETP`;
                         })()}
                       </Typography>
                     </Box>
                     <Tooltip
                       title={
                         pyramidMode === "grade"
-                          ? "Switch to Project Pyramid"
+                          ? "Basculer sur Pyramide projets"
                           : pyramidMode === "project"
-                            ? "Switch to Client Pyramid"
-                            : "Switch to Grade Pyramid"
+                            ? "Basculer sur Pyramide sites"
+                            : "Basculer sur Pyramide des rôles"
                       }
                     >
                       <IconButton size="small" onClick={cyclePyramid} sx={{ color: "text.secondary" }}>
@@ -1197,7 +1195,13 @@ const TUOverview = memo(
           </Grid>
         )}
         <Grid size={{ xs: 12, md: gradeItems.length > 0 ? 7 : 12 }}>
-          <DetachableCard group="Staffing" storageKey="pip-trend" title="Trend" defaultWidth={900} defaultHeight={550}>
+          <DetachableCard
+            group="Staffing"
+            storageKey="pip-trend"
+            title="Tendance"
+            defaultWidth={900}
+            defaultHeight={550}
+          >
             <Card sx={{ ...cardSx(500), overflow: "hidden" }}>
               <CardContent
                 sx={{

@@ -35,7 +35,7 @@ export interface WidgetDef {
 }
 
 const GRID_COLS = 4;
-const ROW_HEIGHT = 300;
+const ROW_HEIGHT = 380;
 const GAP = 24;
 
 const CustomDashboard = memo(() => {
@@ -167,7 +167,7 @@ const CustomDashboard = memo(() => {
           <Typography variant="h5" fontWeight={700}>
             My Dashboard
           </Typography>
-          <Tooltip title="Add widget">
+          <Tooltip title="Ajouter un widget">
             <IconButton
               onClick={() => setPaletteOpen(!paletteOpen)}
               sx={{ bgcolor: brand.primary, color: "#fff", "&:hover": { bgcolor: brand.primaryDark } }}
@@ -235,7 +235,7 @@ const CustomDashboard = memo(() => {
           sx={{
             display: "grid",
             gridTemplateColumns: `repeat(${GRID_COLS}, 1fr)`,
-            gridAutoRows: "auto",
+            gridAutoRows: `${ROW_HEIGHT}px`,
             gap: `${GAP}px`,
           }}
         >

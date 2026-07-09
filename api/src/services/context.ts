@@ -279,7 +279,7 @@ function executeSearchEmployees(args: Record<string, unknown>): ToolResult {
 
 function executeSearchOpportunities(args: Record<string, unknown>): ToolResult {
   let sql =
-    "SELECT opportunity, account, status, grossRevenue, netRevenue, winPct, segment, manager FROM crm_opportunities WHERE 1=1";
+    "SELECT opportunity, account, status, grossRevenue, netRevenue, winPct, segment, manager FROM assets WHERE 1=1";
   const params: unknown[] = [];
 
   if (args.status) {
@@ -421,21 +421,19 @@ function executeGetGlobalStats(): ToolResult {
       }
     )?.c || 0;
   const oppCount =
-    (db.prepare("SELECT COUNT(*) as c FROM crm_opportunities WHERE status NOT IN (14, 15)").get() as { c: number })
-      ?.c || 0;
-  const bookedCount =
-    (db.prepare("SELECT COUNT(*) as c FROM crm_opportunities WHERE status = 14").get() as { c: number })?.c || 0;
+    (db.prepare("SELECT COUNT(*) as c FROM assets WHERE status NOT IN (14, 15)").get() as { c: number })?.c || 0;
+  const bookedCount = (db.prepare("SELECT COUNT(*) as c FROM assets WHERE status = 14").get() as { c: number })?.c || 0;
   const totalRevenue =
     (
-      db
-        .prepare("SELECT COALESCE(SUM(grossRevenue), 0) as s FROM crm_opportunities WHERE status NOT IN (15)")
-        .get() as { s: number }
+      db.prepare("SELECT COALESCE(SUM(grossRevenue), 0) as s FROM assets WHERE status NOT IN (15)").get() as {
+        s: number;
+      }
     )?.s || 0;
   const avgWinPct =
     (
-      db
-        .prepare("SELECT ROUND(AVG(winPct), 1) as a FROM crm_opportunities WHERE status NOT IN (14, 15) AND winPct > 0")
-        .get() as { a: number }
+      db.prepare("SELECT ROUND(AVG(winPct), 1) as a FROM assets WHERE status NOT IN (14, 15) AND winPct > 0").get() as {
+        a: number;
+      }
     )?.a || 0;
 
   const stats = {
@@ -454,7 +452,7 @@ function executeGetTopAccounts(args: Record<string, unknown>): ToolResult {
     SELECT account, COUNT(*) as oppCount,
            ROUND(SUM(grossRevenue), 0) as totalRevenue,
            ROUND(AVG(winPct), 1) as avgWinPct
-    FROM crm_opportunities
+    FROM assets
     WHERE account IS NOT NULL AND account != ''
   `;
   const params: unknown[] = [];
@@ -535,7 +533,7 @@ function executeGetSapSummary(args: Record<string, unknown>): ToolResult {
 
 // ── System prompt for the final answer ──
 
-export const BASE_SYSTEM_PROMPT = `You are the AI assistant for the BearingPoint Dashboard.
+export const BASE_SYSTEM_PROMPT = `You are the AI assistant for GAIF Pilot — Direction GAIF SNCF Voyageurs.
 You help managers manage staffing, the opportunity pipeline, and bookings for their team.
 
 Rules:

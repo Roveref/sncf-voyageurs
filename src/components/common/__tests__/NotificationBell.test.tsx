@@ -78,7 +78,7 @@ describe("NotificationBell", () => {
     renderBell();
     const bellBtn = screen.getAllByRole("button")[0];
     await userEvent.click(bellBtn);
-    expect(screen.getByText("No notifications")).toBeInTheDocument();
+    expect(screen.getByText("Aucune notification")).toBeInTheDocument();
   });
 
   it("badge starts with zero unread count", () => {

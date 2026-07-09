@@ -1,6 +1,6 @@
 /**
  * NeedsPyramid — Grade pyramid visualization for staffing needs.
- * Shows BearingPoint grades with count badges and click-to-add behavior.
+ * Shows consulting grades with count badges and click-to-add behavior.
  */
 
 import React, { memo } from "react";
@@ -71,8 +71,8 @@ const NeedsPyramid = memo(
                     )
                     .join("\n")
                 : formDatesValid
-                  ? "Click to add"
-                  : "Select to assign";
+                  ? "Cliquer pour ajouter"
+                  : "Sélectionner pour affecter";
 
             return (
               <React.Fragment key={grade}>

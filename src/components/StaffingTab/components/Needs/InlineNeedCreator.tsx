@@ -212,7 +212,7 @@ const InlineNeedCreator = memo(
               renderInput={(p) => (
                 <TextField
                   {...p}
-                  label="Opportunity"
+                  label="Actif"
                   size="small"
                   variant="filled"
                   sx={{

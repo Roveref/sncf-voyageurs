@@ -609,7 +609,7 @@ const CreateOpportunityModal = ({
                 startIcon={<DeleteIcon />}
                 size="small"
               >
-                Delete
+                Supprimer
               </Button>
             )}
             {(formData.allocation1 || formData.allocation2 || formData.allocation3) && totalAllocation !== 100 && (
@@ -620,10 +620,10 @@ const CreateOpportunityModal = ({
           </Box>
           <Box sx={{ display: "flex", gap: 1.5 }}>
             <Button onClick={handleClose} variant="outlined" size="medium">
-              Cancel
+              Annuler
             </Button>
             <Button onClick={handleSave} variant="contained" size="medium" sx={{ minWidth: 100 }}>
-              {isEditMode ? "Update" : "Create"}
+              {isEditMode ? "Modifier" : "Créer"}
             </Button>
           </Box>
         </DialogActions>
@@ -651,19 +651,19 @@ const CreateOpportunityModal = ({
         <DialogContent sx={{ textAlign: "center", pt: 3, pb: 1 }}>
           <GroupIcon sx={{ fontSize: 40, color: "warning.main", mb: 1.5 }} />
           <Typography variant="h6" fontWeight={700} gutterBottom>
-            Create a staffing need?
+            Créer un besoin d'intervention ?
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Would you like to create a staffing need for{" "}
-            <strong>{createdOpportunity?.opportunity || "this opportunity"}</strong>?
+            Souhaitez-vous créer un besoin d'intervention pour{" "}
+            <strong>{createdOpportunity?.opportunity || "cet actif"}</strong> ?
           </Typography>
         </DialogContent>
         <DialogActions sx={{ justifyContent: "center", gap: 1, pb: 2.5 }}>
           <Button onClick={handleStaffingPromptCancel} variant="outlined" size="medium">
-            No thanks
+            Non merci
           </Button>
           <Button onClick={handleStaffingPromptConfirm} variant="contained" color="warning" size="medium">
-            Create staffing need
+            Créer un besoin d'intervention
           </Button>
         </DialogActions>
       </Dialog>

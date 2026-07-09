@@ -9,7 +9,7 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import WarningIcon from "@mui/icons-material/Warning";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import ApartmentIcon from "@mui/icons-material/Apartment";
-import { getGradeColor, compareGrades } from "../../constants";
+import { getGradeColor, compareGrades, getGradeUILabel } from "../../constants";
 import { easing } from "../../../../styles/animations";
 import { generateManagerHierarchy } from "./managerHierarchy";
 import ManagerSelector from "./ManagerSelector";
@@ -392,7 +392,7 @@ export const ManagerView = memo(({ employees, _onNavigateToEmployee }: any) => {
                               color: gradeColors.text,
                             }}
                           >
-                            {emp.grade}
+                            {getGradeUILabel(emp.grade)}
                           </Box>
                           <Box component="span" sx={{ fontSize: "0.75rem", color: "text.secondary" }}>
                             {emp.subTeam}
@@ -442,7 +442,9 @@ export const ManagerView = memo(({ employees, _onNavigateToEmployee }: any) => {
               }}
             >
               <PersonIcon sx={{ fontSize: 48, display: "block", mx: "auto", color: "#d1d5db", mb: 1.5 }} />
-              <Typography sx={{ color: "text.secondary" }}>Select an employee to view details</Typography>
+              <Typography sx={{ color: "text.secondary" }}>
+                Sélectionner un collaborateur pour voir les détails
+              </Typography>
             </Box>
           )}
         </Box>

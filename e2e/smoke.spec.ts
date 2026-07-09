@@ -4,30 +4,29 @@ test.describe("Smoke tests", () => {
   test("app loads without crashing — AppBar is visible", async ({ page }) => {
     await page.goto("/pipeline");
     await page.waitForLoadState("domcontentloaded");
-    // The desktop AppBar is a fixed header with the BearingPoint logo
+    // The desktop AppBar is a fixed header with the GAIF Pilot logo
     const appBar = page.locator(".MuiAppBar-root");
     await expect(appBar).toBeVisible({ timeout: 15_000 });
   });
 
-  test("Pipeline tab renders", async ({ page }) => {
+  test("Parc d'actifs tab renders", async ({ page }) => {
     await page.goto("/pipeline");
     await page.waitForLoadState("domcontentloaded");
-    // The tab with label "Pipeline" should be present
-    const tab = page.locator('button[role="tab"]', { hasText: "Pipeline" });
+    const tab = page.locator('button[role="tab"]', { hasText: "Parc d'actifs" });
     await expect(tab).toBeVisible({ timeout: 15_000 });
   });
 
-  test("Bookings tab renders", async ({ page }) => {
+  test("Maintenance tab renders", async ({ page }) => {
     await page.goto("/bookings");
     await page.waitForLoadState("domcontentloaded");
-    const tab = page.locator('button[role="tab"]', { hasText: "Bookings" });
+    const tab = page.locator('button[role="tab"]', { hasText: "Maintenance" });
     await expect(tab).toBeVisible({ timeout: 15_000 });
   });
 
-  test("Staffing tab renders", async ({ page }) => {
+  test("Plan de charge tab renders", async ({ page }) => {
     await page.goto("/staffing");
     await page.waitForLoadState("domcontentloaded");
-    const tab = page.locator('button[role="tab"]', { hasText: "Staffing" });
+    const tab = page.locator('button[role="tab"]', { hasText: "Plan de charge" });
     await expect(tab).toBeVisible({ timeout: 15_000 });
   });
 

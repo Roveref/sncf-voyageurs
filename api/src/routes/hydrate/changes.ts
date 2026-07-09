@@ -56,8 +56,10 @@ router.get("/changes", (_req: Request, res: Response) => {
               serviceOffering1Pct, serviceOffering2Pct, serviceOffering3Pct,
               technologyPartner1, technologyPartner2, technologyPartner3,
               lostComment, primaryContactId, primaryContact,
+              utilizationPct, incidents12m, consoEau, consoElec, consoGaz,
+              surfaceM2, mtbf, mttr, etatAbe,
               1 as isManual
-       FROM user_opportunities`
+       FROM user_assets`
         )
         .all() as Record<string, unknown>[]
     ).map((r) => ({ ...mapNormalizedToFrontend(r), isManual: true }));
@@ -136,7 +138,7 @@ router.get("/changes", (_req: Request, res: Response) => {
     // Revenue team allocations
     const revenueTeam: Record<string, any[]> = {};
     const rtRows = db
-      .prepare("SELECT id, opportunityId, name, gradeBucket, percentage FROM user_revenue_team")
+      .prepare("SELECT id, opportunityId, name, gradeBucket, percentage FROM user_asset_team")
       .all() as any[];
     for (const r of rtRows) {
       if (!revenueTeam[r.opportunityId]) revenueTeam[r.opportunityId] = [];
@@ -280,15 +282,15 @@ router.get("/changes", (_req: Request, res: Response) => {
   }
 });
 
-// ── Status label mapping (matches frontend STATUS_TEXT) ──
+// ── Status label mapping — GAIF Pilot : phases du cycle de vie des actifs ──
 const STATUS_LABEL: Record<number, string> = {
-  1: "Lead Identified",
-  4: "Go Approved",
-  6: "Proposal Submitted",
-  11: "Client Tells Us We Have Won",
-  13: "Authorized Engagement Letter",
-  14: "Booked",
-  15: "Lost",
+  1: "Émergence",
+  4: "Investissement / CEB",
+  6: "Étude en cours",
+  11: "Maintenance lourde",
+  13: "Conventionné",
+  14: "En exploitation",
+  15: "Déclassé",
 };
 function statusLabel(s: number): string {
   return STATUS_LABEL[s] || `Status ${s}`;
@@ -331,9 +333,9 @@ function buildChangeSummary(data: Record<string, any>, database: typeof db): Cha
     const oppNameCache: Record<string, string> = {};
     const lookupName = (id: string) => {
       if (oppNameCache[id]) return oppNameCache[id];
-      const row = database
-        .prepare("SELECT opportunity FROM crm_opportunities WHERE opportunityId = ? LIMIT 1")
-        .get(id) as { opportunity: string } | undefined;
+      const row = database.prepare("SELECT opportunity FROM assets WHERE opportunityId = ? LIMIT 1").get(id) as
+        | { opportunity: string }
+        | undefined;
       const name = row?.opportunity || id.slice(0, 12);
       oppNameCache[id] = name;
       return name;
@@ -375,7 +377,7 @@ function buildChangeSummary(data: Record<string, any>, database: typeof db): Cha
   // ── Manual opportunities diff ──
   if (Array.isArray(data.manualOpportunities)) {
     const currentOpps: Record<string, number> = {};
-    const dbRows = database.prepare("SELECT opportunityId, grossRevenue FROM user_opportunities").all() as {
+    const dbRows = database.prepare("SELECT opportunityId, grossRevenue FROM user_assets").all() as {
       opportunityId: string;
       grossRevenue: number;
     }[];
@@ -499,8 +501,7 @@ function buildChangeSummary(data: Record<string, any>, database: typeof db): Cha
 
   // ── Revenue team diff ──
   if (data.revenueTeam && typeof data.revenueTeam === "object") {
-    const currentCount =
-      (database.prepare("SELECT COUNT(*) as c FROM user_revenue_team").get() as { c: number })?.c || 0;
+    const currentCount = (database.prepare("SELECT COUNT(*) as c FROM user_asset_team").get() as { c: number })?.c || 0;
     let incomingCount = 0;
     for (const members of Object.values(data.revenueTeam) as any[][]) {
       incomingCount += members.length;
@@ -510,7 +511,7 @@ function buildChangeSummary(data: Record<string, any>, database: typeof db): Cha
       descriptions.push(`${diff} revenue team member${diff > 1 ? "s" : ""} added`);
       // Identify new members per opp
       const currentIds = new Set(
-        (database.prepare("SELECT id FROM user_revenue_team").all() as { id: string }[]).map((r) => r.id)
+        (database.prepare("SELECT id FROM user_asset_team").all() as { id: string }[]).map((r) => r.id)
       );
       for (const [oppId, members] of Object.entries(data.revenueTeam) as [string, any[]][]) {
         for (const m of members) {
@@ -683,7 +684,7 @@ router.post("/changes", (req: Request, res: Response) => {
         }
       }
 
-      // Manual accounts (same schema as crm_accounts)
+      // Manual accounts (same schema as sites)
       if (Array.isArray(data.manualAccounts)) {
         db.prepare("DELETE FROM user_accounts").run();
         const insert = db.prepare(
@@ -707,11 +708,11 @@ router.post("/changes", (req: Request, res: Response) => {
         }
       }
 
-      // Manual opportunities → dedicated table (user_opportunities)
+      // Manual opportunities → dedicated table (user_assets)
       if (Array.isArray(data.manualOpportunities)) {
-        db.prepare("DELETE FROM user_opportunities").run();
+        db.prepare("DELETE FROM user_assets").run();
         const insertOpp = db.prepare(
-          `INSERT INTO user_opportunities (opportunityId, opportunity, accountId, account, status, grossRevenue, netRevenue, winPct, cm1Pct,
+          `INSERT INTO user_assets (opportunityId, opportunity, accountId, account, status, grossRevenue, netRevenue, winPct, cm1Pct,
             jobCode, engagementType, weightedBooking, creationDate, bookingDate, estimatedBookingDate,
             lastStatusChangeDate, manager, partner, em, ep,
             managerId, partnerId, emId, epId,
@@ -852,9 +853,9 @@ router.post("/changes", (req: Request, res: Response) => {
 
       // Revenue team allocations (per opportunity)
       if (data.revenueTeam && typeof data.revenueTeam === "object") {
-        db.prepare("DELETE FROM user_revenue_team").run();
+        db.prepare("DELETE FROM user_asset_team").run();
         const insert = db.prepare(
-          "INSERT INTO user_revenue_team (id, opportunityId, name, gradeBucket, percentage, modifiedBy) VALUES (?, ?, ?, ?, ?, ?)"
+          "INSERT INTO user_asset_team (id, opportunityId, name, gradeBucket, percentage, modifiedBy) VALUES (?, ?, ?, ?, ?, ?)"
         );
         for (const [opportunityId, members] of Object.entries(data.revenueTeam) as [string, any[]][]) {
           for (const m of members) {

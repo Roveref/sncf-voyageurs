@@ -22,4 +22,5 @@ export const queryKeys = {
   skillsCatalog: ["staffing", "skills", "catalog"] as const,
   employees: ["hydrate", "employees"] as const,
   grid: ["hydrate", "grid"] as const,
+  gaif: ["hydrate", "gaif"] as const,
 } as const;

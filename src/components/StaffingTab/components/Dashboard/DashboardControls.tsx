@@ -26,7 +26,7 @@ export const TimeframeSelector = memo(({ timeframe, customDateRange, onTimeframe
       <MenuItem value={TIMEFRAME_OPTIONS.WEEK}>{TIMEFRAME_CONFIG[TIMEFRAME_OPTIONS.WEEK].label}</MenuItem>
       <MenuItem value={TIMEFRAME_OPTIONS.MONTH}>{TIMEFRAME_CONFIG[TIMEFRAME_OPTIONS.MONTH].label}</MenuItem>
       <MenuItem value={TIMEFRAME_OPTIONS.QUARTER}>{TIMEFRAME_CONFIG[TIMEFRAME_OPTIONS.QUARTER].label}</MenuItem>
-      <MenuItem value={TIMEFRAME_OPTIONS.CUSTOM}>Custom Range</MenuItem>
+      <MenuItem value={TIMEFRAME_OPTIONS.CUSTOM}>Personnalisé</MenuItem>
     </Select>
   </Box>
 ));

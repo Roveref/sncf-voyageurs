@@ -1,6 +1,7 @@
 {
-  "name": "dashboard-api",
+  "name": "gaif-pilot-api",
   "version": "1.0.0",
+  "description": "API backend GAIF Pilot — plateforme EAM SNCF Voyageurs",
   "type": "module",
   "license": "UNLICENSED",
   "engines": {

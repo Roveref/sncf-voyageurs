@@ -78,9 +78,7 @@ export async function findStaffingCandidates(
   let techPartners: string[] = [];
   if (params.opportunityId) {
     const opp = db
-      .prepare(
-        "SELECT technologyPartner1, technologyPartner2, technologyPartner3 FROM crm_opportunities WHERE opportunityId = ?"
-      )
+      .prepare("SELECT technologyPartner1, technologyPartner2, technologyPartner3 FROM assets WHERE opportunityId = ?")
       .get(params.opportunityId) as any;
     if (opp) {
       techPartners = [opp.technologyPartner1, opp.technologyPartner2, opp.technologyPartner3].filter(Boolean);
@@ -91,7 +89,7 @@ export async function findStaffingCandidates(
     if (needRow?.opportunityId) {
       const opp = db
         .prepare(
-          "SELECT technologyPartner1, technologyPartner2, technologyPartner3 FROM crm_opportunities WHERE opportunityId = ?"
+          "SELECT technologyPartner1, technologyPartner2, technologyPartner3 FROM assets WHERE opportunityId = ?"
         )
         .get(needRow.opportunityId) as any;
       if (opp) {
@@ -104,7 +102,7 @@ export async function findStaffingCandidates(
   let oppServiceLines: string[] = [];
   if (params.opportunityId) {
     const oppSl = db
-      .prepare("SELECT serviceLine1, serviceLine2, serviceLine3 FROM crm_opportunities WHERE opportunityId = ?")
+      .prepare("SELECT serviceLine1, serviceLine2, serviceLine3 FROM assets WHERE opportunityId = ?")
       .get(params.opportunityId) as any;
     if (oppSl) oppServiceLines = [oppSl.serviceLine1, oppSl.serviceLine2, oppSl.serviceLine3].filter(Boolean);
   } else if (params.needId) {
@@ -114,7 +112,7 @@ export async function findStaffingCandidates(
       .get(params.needId) as any;
     if (needRowSl?.opportunityId) {
       const oppSl = db
-        .prepare("SELECT serviceLine1, serviceLine2, serviceLine3 FROM crm_opportunities WHERE opportunityId = ?")
+        .prepare("SELECT serviceLine1, serviceLine2, serviceLine3 FROM assets WHERE opportunityId = ?")
         .get(needRowSl.opportunityId) as any;
       if (oppSl) oppServiceLines = [oppSl.serviceLine1, oppSl.serviceLine2, oppSl.serviceLine3].filter(Boolean);
     }
@@ -174,15 +172,13 @@ export async function findStaffingCandidates(
           ?.opportunityId
       : null);
   if (oppIdForHistory) {
-    const oppAccount = (db
-      .prepare("SELECT account FROM crm_opportunities WHERE opportunityId = ?")
-      .get(oppIdForHistory) ||
-      db.prepare("SELECT account FROM user_opportunities WHERE opportunityId = ?").get(oppIdForHistory)) as any;
+    const oppAccount = (db.prepare("SELECT account FROM assets WHERE opportunityId = ?").get(oppIdForHistory) ||
+      db.prepare("SELECT account FROM user_assets WHERE opportunityId = ?").get(oppIdForHistory)) as any;
     if (oppAccount?.account) {
       const rows = db
         .prepare(
           `SELECT DISTINCT a.empId FROM mds_assignments a
-         JOIN crm_opportunities o ON a.jobNo = o.jobCode
+         JOIN assets o ON a.jobNo = o.jobCode
          WHERE o.account = ?`
         )
         .all(oppAccount.account) as any[];

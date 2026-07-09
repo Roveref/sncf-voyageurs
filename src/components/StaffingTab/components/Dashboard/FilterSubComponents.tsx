@@ -291,7 +291,7 @@ export const ActiveChips = memo(({ filters, onRemove, onClearAll }: ActiveChipsP
   if (filters.gradeTransitionOnly) chips.push({ key: "gradeTransitionOnly", label: "Grade \u0394" });
   if (filters.churnFilter) {
     const [cType, cMonth] = filters.churnFilter.split("::");
-    const cLabel = cType === "arr" ? "Arrivals" : cType === "dep" ? "Departures" : "Grade \u0394";
+    const cLabel = cType === "arr" ? "Arrivées" : cType === "dep" ? "Départs" : "Niveau \u0394";
     chips.push({ key: "churnFilter", label: `${cLabel} ${cMonth}` });
   }
 

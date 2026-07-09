@@ -15,11 +15,18 @@ export interface FunnelData {
 }
 
 export function computeFunnel(candidates: RecruitmentCandidate[]): FunnelData {
+  // GAIF: NC funnel — detectee → en_analyse → plan_action → en_traitement → resolue
+  // "evaluated" = analysées (passées au-delà de "detectee")
+  // "interviewed" = plan d'action en cours ou plus avancé
+  // "hired" = résolues (fermées)
+  const NC_ANALYSED = new Set(["en_analyse", "plan_action", "en_traitement", "resolue", "fermee"]);
+  const NC_PLAN_ACTION = new Set(["plan_action", "en_traitement", "resolue", "fermee"]);
+  const NC_RESOLVED = new Set(["resolue", "fermee"]);
   return {
     total: candidates.length,
-    evaluated: candidates.filter((c) => c.note != null || c.evaluatedBy).length,
-    interviewed: candidates.filter((c) => c.hrInterview).length,
-    hired: candidates.filter((c) => c.status === "hired").length,
+    evaluated: candidates.filter((c) => NC_ANALYSED.has(c.status || "")).length,
+    interviewed: candidates.filter((c) => NC_PLAN_ACTION.has(c.status || "")).length,
+    hired: candidates.filter((c) => NC_RESOLVED.has(c.status || "")).length,
   };
 }
 
@@ -51,7 +58,7 @@ export function computeConversionByPosteYear(candidates: RecruitmentCandidate[])
     const key = `${year}::${c.poste}`;
     const entry = map.get(key) || { total: 0, hired: 0 };
     entry.total++;
-    if (c.status === "hired") entry.hired++;
+    if (c.status === "resolue" || c.status === "fermee") entry.hired++;
     map.set(key, entry);
   }
   const result: ConversionEntry[] = [];
@@ -95,7 +102,7 @@ export function computeChannelCounts(candidates: RecruitmentCandidate[]): Channe
     for (const ch of channels) {
       const entry = map.get(ch) || { total: 0, hired: 0 };
       entry.total++;
-      if (c.status === "hired") entry.hired++;
+      if (c.status === "resolue" || c.status === "fermee") entry.hired++;
       map.set(ch, entry);
     }
   }
@@ -121,9 +128,9 @@ export function computeMonthlyVolume(candidates: RecruitmentCandidate[]): Monthl
     if (!c.creationDate) continue;
     const month = c.creationDate.slice(0, 7);
     const entry = map.get(month) || { rejected: 0, active: 0, hired: 0 };
-    if (c.status === "rejected") entry.rejected++;
-    else if (c.status === "active") entry.active++;
-    else if (c.status === "hired") entry.hired++;
+    if (c.status === "detectee") entry.rejected++;
+    else if (c.status === "en_analyse" || c.status === "plan_action" || c.status === "en_traitement") entry.active++;
+    else if (c.status === "resolue" || c.status === "fermee") entry.hired++;
     map.set(month, entry);
   }
   const sorted = [...map.entries()].sort((a, b) => a[0].localeCompare(b[0]));
@@ -194,9 +201,9 @@ export function computeGradeDistribution(candidates: RecruitmentCandidate[]): Gr
   for (const c of candidates) {
     const bucket = c.gradeBucket || "Unknown";
     const entry = map.get(bucket) || { rejected: 0, active: 0, hired: 0 };
-    if (c.status === "rejected") entry.rejected++;
-    else if (c.status === "active") entry.active++;
-    else if (c.status === "hired") entry.hired++;
+    if (c.status === "detectee") entry.rejected++;
+    else if (c.status === "en_analyse" || c.status === "plan_action" || c.status === "en_traitement") entry.active++;
+    else if (c.status === "resolue" || c.status === "fermee") entry.hired++;
     map.set(bucket, entry);
   }
   const order = ["Intern", "Analyst", "Consultant+"];

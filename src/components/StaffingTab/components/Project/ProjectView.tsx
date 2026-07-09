@@ -320,21 +320,21 @@ export const ProjectStats = memo(({ projects }: any) => {
   return (
     <Box sx={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 2 }}>
       <Box sx={{ bgcolor: "#eff6ff", borderRadius: 2, p: 1.5, border: 1, borderColor: "#bfdbfe" }}>
-        <Typography sx={{ fontSize: "0.875rem", color: "primary.main" }}>Total Projects</Typography>
+        <Typography sx={{ fontSize: "0.875rem", color: "primary.main" }}>Total projets</Typography>
         <Typography sx={{ fontSize: "1.5rem", fontWeight: 700, color: "#1d4ed8" }}>{stats.totalProjects}</Typography>
       </Box>
       <Box sx={{ bgcolor: "#f0fdf4", borderRadius: 2, p: 1.5, border: 1, borderColor: "#bbf7d0" }}>
-        <Typography sx={{ fontSize: "0.875rem", color: "#16a34a" }}>Chargeable Projects</Typography>
+        <Typography sx={{ fontSize: "0.875rem", color: "#16a34a" }}>Projets facturables</Typography>
         <Typography sx={{ fontSize: "1.5rem", fontWeight: 700, color: "#15803d" }}>
           {stats.chargeableProjects}
         </Typography>
       </Box>
       <Box sx={{ bgcolor: "#faf5ff", borderRadius: 2, p: 1.5, border: 1, borderColor: "#e9d5ff" }}>
-        <Typography sx={{ fontSize: "0.875rem", color: "#9333ea" }}>Assigned Employees</Typography>
+        <Typography sx={{ fontSize: "0.875rem", color: "#9333ea" }}>Collaborateurs affectés</Typography>
         <Typography sx={{ fontSize: "1.5rem", fontWeight: 700, color: "#7e22ce" }}>{stats.totalEmployees}</Typography>
       </Box>
       <Box sx={{ bgcolor: "#fff7ed", borderRadius: 2, p: 1.5, border: 1, borderColor: "#fed7aa" }}>
-        <Typography sx={{ fontSize: "0.875rem", color: "#ea580c" }}>Total Hours</Typography>
+        <Typography sx={{ fontSize: "0.875rem", color: "#ea580c" }}>Heures totales</Typography>
         <Typography sx={{ fontSize: "1.5rem", fontWeight: 700, color: "#c2410c" }}>
           {stats.totalHours.toFixed(0)}h
         </Typography>
@@ -454,7 +454,7 @@ export const ProjectView = memo(
           {filteredProjects.length === 0 ? (
             <Box sx={{ textAlign: "center", py: 4, color: "text.secondary" }}>
               <WorkIcon sx={{ fontSize: 48, display: "block", mx: "auto", mb: 1.5, color: "#d1d5db" }} />
-              <Typography>No projects found</Typography>
+              <Typography>Aucun projet trouvé</Typography>
             </Box>
           ) : (
             filteredProjects.map((project: any) => {

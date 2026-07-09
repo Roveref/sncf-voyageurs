@@ -287,7 +287,7 @@ const ImportResultsPanel = memo(({ importResult }: any) => {
                       item.existing ? (
                         <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25 }}>
                           <HighlightField label="Status" value={item.existing.status} highlighted={statusChanged} />
-                          <HighlightField label="Revenue" value={item.existing.revenue} highlighted={false} />
+                          <HighlightField label="Coût" value={item.existing.revenue} highlighted={false} />
                         </Box>
                       ) : null
                     }
@@ -300,7 +300,7 @@ const ImportResultsPanel = memo(({ importResult }: any) => {
                           highlighted={statusChanged}
                           color={decisionColor}
                         />
-                        <HighlightField label="Revenue" value={item.imported.revenue} highlighted={false} />
+                        <HighlightField label="Coût" value={item.imported.revenue} highlighted={false} />
                       </Box>
                     }
                     reason={item.reason}

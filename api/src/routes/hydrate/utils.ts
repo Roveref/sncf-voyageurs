@@ -94,6 +94,16 @@ export function mapNormalizedToFrontend(row: Record<string, unknown>): Record<st
     techPartner3: row.technologyPartner3,
     primaryContactId: row.primaryContactId || "",
     primaryContact: row.primaryContact || "",
+    // GAIF native metrics
+    utilizationPct: row.utilizationPct ?? 0,
+    incidents12m: row.incidents12m ?? 0,
+    consoEau: row.consoEau ?? 0,
+    consoElec: row.consoElec ?? 0,
+    consoGaz: row.consoGaz ?? 0,
+    surfaceM2: row.surfaceM2 ?? 0,
+    mtbf: row.mtbf ?? 0,
+    mttr: row.mttr ?? 0,
+    etatAbe: row.etatAbe ?? null,
   };
 
   if (row.isManual) opp.isManual = true;

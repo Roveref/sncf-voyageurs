@@ -35,9 +35,9 @@ const GRADE_COLORS: Record<string, string> = {
 };
 
 const TYPE_CONFIG = {
-  create: { icon: AddCircleOutlineIcon, color: "#10b981", label: "Add" },
-  edit: { icon: EditIcon, color: "#3b82f6", label: "Edit" },
-  delete: { icon: DeleteOutlineIcon, color: "#ef4444", label: "Delete" },
+  create: { icon: AddCircleOutlineIcon, color: "#10b981", label: "Ajouter" },
+  edit: { icon: EditIcon, color: "#3b82f6", label: "Modifier" },
+  delete: { icon: DeleteOutlineIcon, color: "#ef4444", label: "Supprimer" },
 };
 
 interface Props {

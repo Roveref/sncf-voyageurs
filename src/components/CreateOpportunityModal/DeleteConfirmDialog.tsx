@@ -29,9 +29,9 @@ const DeleteConfirmDialog = ({
   open,
   onCancel,
   onConfirm,
-  title = "Delete Opportunity",
-  message = "Are you sure you want to delete this opportunity? This action cannot be undone.",
-  confirmLabel = "Delete",
+  title = "Supprimer l'actif",
+  message = "Êtes-vous sûr de vouloir supprimer cet actif ? Cette action est irréversible.",
+  confirmLabel = "Supprimer",
   confirmColor = "error",
 }: DeleteConfirmDialogProps) => {
   const theme = useTheme();
@@ -73,7 +73,7 @@ const DeleteConfirmDialog = ({
         </Box>
         <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5, mt: 3 }}>
           <Button onClick={onCancel} variant="outlined">
-            Cancel
+            Annuler
           </Button>
           <Button onClick={onConfirm} variant="contained" color={confirmColor}>
             {confirmLabel}

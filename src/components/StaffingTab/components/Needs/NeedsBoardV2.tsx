@@ -182,7 +182,7 @@ const NeedsBoardV2 = memo(
           </ToggleButtonGroup>
 
           <Chip
-            label="Pipeline"
+            label="Parc d'actifs"
             size="small"
             clickable
             onClick={() => setShowPipeline(!showPipeline)}

@@ -75,7 +75,7 @@ const CategoriesSection = memo(
         <Box sx={SX_SECTION_HEADER}>
           <Box sx={SX_FLEX_ROW}>
             <Typography variant="h6" fontWeight={600} color={theme.palette.primary.dark}>
-              Categories
+              CatÃ©gories
             </Typography>
             <Box sx={SX_FLEX_GAP025}>
               <IconButton

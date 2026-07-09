@@ -652,10 +652,10 @@ def write_to_sqlite(db_path, opportunities, accounts, var_country_region, option
 
     opp_placeholders = ", ".join("?" for _ in OPP_COLUMNS)
     opp_update = ", ".join(f"{c} = excluded.{c}" for c in OPP_COLUMNS if c != "opportunityId")
-    opp_sql = f"INSERT INTO crm_opportunities ({', '.join(OPP_COLUMNS)}) VALUES ({opp_placeholders}) ON CONFLICT(opportunityId) DO UPDATE SET {opp_update}"
+    opp_sql = f"INSERT INTO assets ({', '.join(OPP_COLUMNS)}) VALUES ({opp_placeholders}) ON CONFLICT(opportunityId) DO UPDATE SET {opp_update}"
 
     acc_placeholders = ", ".join("?" for _ in ACC_COLUMNS)
-    acc_sql = f"INSERT OR REPLACE INTO crm_accounts ({', '.join(ACC_COLUMNS)}) VALUES ({acc_placeholders})"
+    acc_sql = f"INSERT OR REPLACE INTO sites ({', '.join(ACC_COLUMNS)}) VALUES ({acc_placeholders})"
 
     try:
         cur = conn.cursor()
@@ -865,7 +865,7 @@ def delta_sync(session, db_path, json_output=False):
     # Build fake records compatible with build_lookups + resolve functions
     conn_tmp = sqlite3.connect(db_path)
     acc_rows = conn_tmp.execute(
-        "SELECT accountId, account, subSegmentCode, subSegment FROM crm_accounts"
+        "SELECT accountId, account, subSegmentCode, subSegment FROM sites"
     ).fetchall()
 
     # Create fake ind_segment entries so the GUID chain resolves from SQLite data
@@ -958,12 +958,12 @@ def delta_sync(session, db_path, json_output=False):
         # ── Opportunities ──
         opp_placeholders = ", ".join("?" for _ in OPP_COLUMNS)
         opp_update = ", ".join(f"{c} = excluded.{c}" for c in OPP_COLUMNS if c != "opportunityId")
-        opp_sql = f"INSERT INTO crm_opportunities ({', '.join(OPP_COLUMNS)}) VALUES ({opp_placeholders}) ON CONFLICT(opportunityId) DO UPDATE SET {opp_update}"
+        opp_sql = f"INSERT INTO assets ({', '.join(OPP_COLUMNS)}) VALUES ({opp_placeholders}) ON CONFLICT(opportunityId) DO UPDATE SET {opp_update}"
         for row in opportunities:
             opportunityId = row.get("opportunityId")
             if not opportunityId:
                 continue
-            existing = cur.execute("SELECT * FROM crm_opportunities WHERE opportunityId = ?", (opportunityId,)).fetchone()
+            existing = cur.execute("SELECT * FROM assets WHERE opportunityId = ?", (opportunityId,)).fetchone()
 
             row["updatedAt"] = now
             cur.execute(opp_sql, [row.get(c) for c in OPP_COLUMNS])
@@ -979,12 +979,12 @@ def delta_sync(session, db_path, json_output=False):
                 changed_opps.append(row)
 
         # ── Accounts ──
-        acc_sql = f"INSERT OR REPLACE INTO crm_accounts ({', '.join(ACC_COLUMNS)}) VALUES ({', '.join('?' for _ in ACC_COLUMNS)})"
+        acc_sql = f"INSERT OR REPLACE INTO sites ({', '.join(ACC_COLUMNS)}) VALUES ({', '.join('?' for _ in ACC_COLUMNS)})"
         for row in accounts:
             acc_id = row.get("accountId")
             if not acc_id:
                 continue
-            existing = cur.execute("SELECT * FROM crm_accounts WHERE accountId = ?", (acc_id,)).fetchone()
+            existing = cur.execute("SELECT * FROM sites WHERE accountId = ?", (acc_id,)).fetchone()
             row["updatedAt"] = now
             cur.execute(acc_sql, [row.get(c) for c in ACC_COLUMNS])
             if existing:
@@ -1280,7 +1280,7 @@ def daemon_loop(db_path):
         # Accounts from SQLite (avoid re-fetching 65K via OData)
         conn_tmp = sqlite3.connect(db_path)
         acc_rows = conn_tmp.execute(
-            "SELECT accountId, account, subSegmentCode, subSegment FROM crm_accounts"
+            "SELECT accountId, account, subSegmentCode, subSegment FROM sites"
         ).fetchall()
         fake_accounts = []
         fake_ind_segments = []

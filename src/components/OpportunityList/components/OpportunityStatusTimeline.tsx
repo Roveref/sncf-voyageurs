@@ -45,11 +45,11 @@ const OpportunityStatusTimeline = memo(
     const isBooked = displayStatus === 14;
 
     const statusSteps = [
-      { status: 1, label: "Lead", fullLabel: "Lead Identified" },
-      { status: 4, label: "Go", fullLabel: "Go Approved" },
-      { status: 6, label: "Proposal", fullLabel: "Proposal Submitted" },
-      { status: 11, label: "Won", fullLabel: "Client Won" },
-      { status: 14, label: "Booked", fullLabel: "Booked" },
+      { status: 1, label: "Émerg.", fullLabel: "Émergence" },
+      { status: 4, label: "Invest.", fullLabel: "Investissement / CEB" },
+      { status: 6, label: "Étude", fullLabel: "Étude en cours" },
+      { status: 11, label: "Maint.", fullLabel: "Maintenance lourde" },
+      { status: 14, label: "Exploit.", fullLabel: "En exploitation" },
     ];
 
     const currentStepIndex = statusSteps.findIndex((s) => s.status === displayStatus);
@@ -198,8 +198,8 @@ const OpportunityStatusTimeline = memo(
               );
             })}
 
-            {/* Lost indicator */}
-            <Tooltip title={isLost ? "Current status" : 'Change to "Lost"'} arrow>
+            {/* Déclassé indicator */}
+            <Tooltip title={isLost ? "Statut actuel" : 'Passer en "Déclassé"'} arrow>
               <Box
                 onClick={() => !isLost && handleStatusClick(15)}
                 sx={{
@@ -229,7 +229,7 @@ const OpportunityStatusTimeline = memo(
                     color: theme.palette.error.main,
                   }}
                 >
-                  Lost
+                  Déclassé
                 </Typography>
                 <Box
                   className="lost-circle"
@@ -279,26 +279,26 @@ const OpportunityStatusTimeline = memo(
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <WarningAmberIcon color="warning" />
               <Typography variant="h6" fontWeight={600}>
-                Change Status
+                Changer le statut
               </Typography>
             </Box>
           </DialogTitle>
           <DialogContent sx={{ pt: 3 }}>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              You are about to change the status of this opportunity from <strong>{statusText[originalStatus]}</strong>{" "}
-              to <strong>{statusText[selectedNewStatus as any]}</strong>.
+              Vous Ãªtes sur le point de changer le statut de cette opportunitÃ© de{" "}
+              <strong>{statusText[originalStatus]}</strong> Ã  <strong>{statusText[selectedNewStatus as any]}</strong>.
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              This change is local and can be undone at any time.
+              Ce changement est local et peut Ãªtre annulÃ© Ã  tout moment.
             </Typography>
 
             {(selectedNewStatus === 14 || selectedNewStatus === 15) && (
               <Box sx={{ mb: 2 }}>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                  {selectedNewStatus === 14 ? "Booking Date" : "Lost Date"} (default: today)
+                  {selectedNewStatus === 14 ? "Date mise en exploitation" : "Date fin de vie"} (défaut : aujourd'hui)
                 </Typography>
                 <DatePicker
-                  label={selectedNewStatus === 14 ? "Booking Date" : "Lost Date"}
+                  label={selectedNewStatus === 14 ? "Date exploitation" : "Date fin de vie"}
                   value={bookingDate}
                   onChange={(newDate) => setBookingDate(newDate || new Date())}
                   format="dd/MM/yyyy"
@@ -313,8 +313,8 @@ const OpportunityStatusTimeline = memo(
             )}
 
             <TextField
-              label="Comment (optional)"
-              placeholder="Reason for change..."
+              label="Commentaire (optionnel)"
+              placeholder="Raison du changement..."
               multiline
               rows={2}
               fullWidth
@@ -324,9 +324,9 @@ const OpportunityStatusTimeline = memo(
             />
           </DialogContent>
           <DialogActions sx={{ p: 2 }}>
-            <Button onClick={() => setStatusDialogOpen(false)}>Cancel</Button>
+            <Button onClick={() => setStatusDialogOpen(false)}>Annuler</Button>
             <Button variant="contained" color="warning" onClick={handleConfirmStatusChange}>
-              Confirm
+              Confirmer
             </Button>
           </DialogActions>
         </Dialog>

@@ -73,13 +73,14 @@ describe("CreateStaffingNeedModal", () => {
 
   it("renders Create/Save button", () => {
     renderModal();
-    const createBtns = screen.queryAllByText(/Create|Save|Créer/i);
+    // Le bouton Créer utilise un encoding unicode (\u00e9) — on cherche par rôle disabled
+    const createBtns = screen.queryAllByRole("button").filter((b) => /cr[ée]er/i.test(b.textContent || ""));
     expect(createBtns.length).toBeGreaterThan(0);
   });
 
   it("renders Cancel button", () => {
     renderModal();
-    expect(screen.getByText("Cancel")).toBeInTheDocument();
+    expect(screen.getByText("Annuler")).toBeInTheDocument();
   });
 
   it("does not render dialog content when closed", () => {

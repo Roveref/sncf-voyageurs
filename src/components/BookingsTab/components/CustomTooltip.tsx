@@ -24,10 +24,10 @@ export const SOURCE_COLORS = {
 };
 
 export const SOURCE_LABELS = {
-  crmOriginal: "CRM Original",
-  manual: "Manual Opps",
-  crmModified: "CRM Modified",
-  status11: "Status 11",
+  crmOriginal: "Données source",
+  manual: "Interventions",
+  crmModified: "Données modifiées",
+  status11: "Maintenance lourde",
 };
 
 const CustomTooltip = React.memo(
@@ -291,7 +291,7 @@ const CustomTooltip = React.memo(
                     color="text.secondary"
                     sx={{ display: "block", mb: 0.5, letterSpacing: 0.5 }}
                   >
-                    Monthly
+                    Mensuel
                   </Typography>
                   <Typography variant="body2" fontWeight={600} sx={{ whiteSpace: "nowrap" }}>
                     {formatCurrency(yearData.monthly.total)}
@@ -306,7 +306,7 @@ const CustomTooltip = React.memo(
                     )}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    {yearData.monthly.count} opp{yearData.monthly.count > 1 ? "s" : ""}
+                    {yearData.monthly.count} actif{yearData.monthly.count > 1 ? "s" : ""}
                   </Typography>
                   {showIOGlobal && yearData.monthly.io > 0 && (
                     <Typography variant="caption" sx={{ display: "block", color: brand.primaryDark }}>
@@ -322,7 +322,7 @@ const CustomTooltip = React.memo(
                     color="text.secondary"
                     sx={{ display: "block", mb: 0.5, letterSpacing: 0.5 }}
                   >
-                    Cumulative
+                    Cumulé
                   </Typography>
                   <Typography variant="body2" fontWeight={600} sx={{ whiteSpace: "nowrap" }}>
                     {formatCurrency(yearData.cumulative.total)}
@@ -337,7 +337,7 @@ const CustomTooltip = React.memo(
                     )}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    {yearData.cumulative.count} opp{yearData.cumulative.count > 1 ? "s" : ""}
+                    {yearData.cumulative.count} actif{yearData.cumulative.count > 1 ? "s" : ""}
                   </Typography>
                   {showIOGlobal && yearData.cumulative.io > 0 && (
                     <Typography variant="caption" sx={{ display: "block", color: brand.primaryDark }}>
@@ -362,7 +362,7 @@ const CustomTooltip = React.memo(
                     fontWeight={600}
                     sx={{ display: "block", mb: 0.75 }}
                   >
-                    Source Breakdown
+                    Détail par source
                   </Typography>
                   {/* Table-like layout with dynamic columns */}
                   <Box

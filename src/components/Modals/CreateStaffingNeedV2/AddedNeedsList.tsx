@@ -238,9 +238,9 @@ const AddedNeedsList = memo(
 
         {totalCount === 0 ? (
           <Box sx={{ py: 2.5, textAlign: "center", borderRadius: 2, bgcolor: "background.default" }}>
-            <Typography sx={{ fontSize: "0.78rem", color: "text.disabled" }}>No needs yet</Typography>
+            <Typography sx={{ fontSize: "0.78rem", color: "text.disabled" }}>Aucun besoin pour le moment</Typography>
             <Typography sx={{ fontSize: "0.68rem", color: "text.disabled", mt: 0.25 }}>
-              Fill the form and click "+ Add need"
+              Remplissez le formulaire puis cliquez sur « + Ajouter »
             </Typography>
           </Box>
         ) : (

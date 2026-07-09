@@ -60,10 +60,10 @@ const OpportunityTableFooter = memo(
           </Typography>
         </Box>
 
-        {/* Opportunity Count (Account column) */}
+        {/* Asset Count */}
         <Box>
           <Typography variant="body2" fontWeight={600} color="text.secondary">
-            {filteredDataLength} opportunit{filteredDataLength > 1 ? "ies" : "y"}
+            {filteredDataLength} actif{filteredDataLength > 1 ? "s" : ""}
           </Typography>
         </Box>
 
@@ -76,6 +76,12 @@ const OpportunityTableFooter = memo(
             {currencyFormatter.format(totalRevenue)}
           </Typography>
         </Box>
+
+        {/* Valeur d'achat total — placeholder */}
+        <Box />
+
+        {/* Valeur résiduelle total — placeholder */}
+        <Box />
 
         {/* Allocated / I&O details in opportunity name column */}
         <Box sx={{ display: "flex", gap: 1.5, alignItems: "baseline" }}>

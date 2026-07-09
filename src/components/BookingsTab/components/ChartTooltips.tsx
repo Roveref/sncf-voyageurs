@@ -56,7 +56,7 @@ export const RevenueChartTooltip = ({ active, payload, label, showIO = true }: a
         {/* Total revenue */}
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 0.5 }}>
           <Typography variant="body2" color="text.secondary">
-            Revenue ({count || 0} opp{count !== 1 ? "s" : ""}):
+            Valeur ({count || 0} actif{count !== 1 ? "s" : ""}) :
           </Typography>
           <Typography variant="body2" fontWeight={600}>
             {formatCurrency(totalValue)}

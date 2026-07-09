@@ -35,11 +35,11 @@ DEFAULT_VAR_CONFIG = {
     "grade": {
         "Intern": '{"order":1,"target":95,"family":"M-","hoursPerDay":7,"abbr":"Int","bg":"#f7f8f8","text":"#8a8e94","border":"#d8dade"}',
         "Analyst": '{"order":2,"target":90,"family":"M-","hoursPerDay":8,"abbr":"A","bg":"#f5f5f6","text":"#7a7e84","border":"#cccfd4"}',
-        "Consultant": '{"order":3,"target":90,"family":"M-","hoursPerDay":8,"abbr":"C","bg":"#eff0f2","text":"#5a5e64","border":"#b4b8be"}',
-        "Senior Consultant": '{"order":4,"target":90,"family":"M-","hoursPerDay":8,"abbr":"SC","bg":"#ecedef","text":"#4a4e54","border":"#a8abb2"}',
-        "Manager": '{"order":5,"target":75,"family":"M+","hoursPerDay":8,"abbr":"M","bg":"#f7f2ee","text":"#806659","border":"#cdbdaf"}',
-        "Senior Manager": '{"order":6,"target":65,"family":"M+","hoursPerDay":8,"abbr":"SM","bg":"#f2edeb","text":"#6b554a","border":"#b8a89e"}',
-        "Director": '{"order":7,"target":50,"family":"M+","hoursPerDay":8,"abbr":"Dir","bg":"#f0e9e4","text":"#5C4A3F","border":"#b09a8a"}',
+        "Consultant": '{"order":3,"target":85,"family":"M-","hoursPerDay":8,"abbr":"CM","bg":"#eff0f2","text":"#5a5e64","border":"#b4b8be"}',
+        "Senior Consultant": '{"order":4,"target":80,"family":"M-","hoursPerDay":8,"abbr":"Exp","bg":"#ecedef","text":"#4a4e54","border":"#a8abb2"}',
+        "Manager": '{"order":5,"target":70,"family":"M+","hoursPerDay":8,"abbr":"Adj","bg":"#f7f2ee","text":"#806659","border":"#cdbdaf"}',
+        "Senior Manager": '{"order":6,"target":60,"family":"M+","hoursPerDay":8,"abbr":"RP","bg":"#f2edeb","text":"#6b554a","border":"#b8a89e"}',
+        "Director": '{"order":7,"target":40,"family":"M+","hoursPerDay":8,"abbr":"Dir","bg":"#f0e9e4","text":"#5C4A3F","border":"#b09a8a"}',
         "Partner": '{"order":8,"target":25,"family":"M+","hoursPerDay":8,"abbr":"P","bg":"#ede5e0","text":"#4a3728","border":"#a8917e"}',
     },
     "magrProfile": {
@@ -102,21 +102,21 @@ DEFAULT_VAR_CONFIG = {
         "TMT": '{"parent":"TMT","label":"Technology, Media & Telco","names":["Communications","Media & Entertainment incl. Culture","Software"]}',
     },
     "brand": {
-        "colors": '{"primary":"#FF3D47","primaryDark":"#CC2931","primaryLight":"#FF787A","primaryLighter":"#FFA3A8","primaryLightest":"#FFBDC0","primaryBg":"#FFD6D8","primaryDeep":"#99171D","primaryDeepest":"#330000","secondary":"#806659","secondaryDark":"#5C4A3F","secondaryLight":"#98847A","secondaryLighter":"#B2A59F","secondaryLightest":"#CCC1BC","secondaryBg":"#E6DEDA","background":"#FAF8F7","white":"#FFFFFF","black":"#000000","darkBg":"#1A1210","darkPaper":"#241E1B","darkSurface":"#2E2622","darkBorder":"#3D3129","success":"#10B981","successLight":"#34D399","successDark":"#059669","warning":"#F59E0B","warningLight":"#FBBF24","warningDark":"#D97706","info":"#3b82f6"}',
-        "identity": '{"fontFamily":"Aptos, \\"Segoe UI\\", Roboto, \\"Helvetica Neue\\", Arial, sans-serif","logoPath":"/Beonpoint_stars.svg","appName":"Be.on\u00b0","borderRadius":"12"}',
+        "colors": '{"primary":"#EB0070","primaryDark":"#B8005A","primaryLight":"#F04093","primaryLighter":"#F571B0","primaryLightest":"#FAA3CC","primaryBg":"#FDD6E8","primaryDeep":"#870042","primaryDeepest":"#3C001E","secondary":"#374151","secondaryDark":"#1F2937","secondaryLight":"#4B5563","secondaryLighter":"#6B7280","secondaryLightest":"#9CA3AF","secondaryBg":"#E5E7EB","background":"#F8FAFC","white":"#FFFFFF","black":"#000000","darkBg":"#0F172A","darkPaper":"#1E293B","darkSurface":"#263244","darkBorder":"#334155","success":"#10B981","successLight":"#34D399","successDark":"#059669","warning":"#F59E0B","warningLight":"#FBBF24","warningDark":"#D97706","info":"#3b82f6"}',
+        "identity": '{"fontFamily":"Avenir, \\"Segoe UI\\", Roboto, \\"Helvetica Neue\\", Arial, sans-serif","logoPath":"/gaif-logo.svg","appName":"GAIF Pilot","borderRadius":"12"}',
     },
     "theme": {
-        "chart": '["#FF3D47","#806659","#CC2931","#98847A","#99171D","#B2A59F","#FF787A","#330000","#CCC1BC"]',
+        "chart": '["#EB0070","#C8102E","#1E4E8C","#00A3A1","#F59E0B","#7C3AED","#0EA5E9","#10B981","#374151"]',
         "macroGrade": '{"M+":"#1e40af","M-":"#7c3aed"}',
-        "mainCategory": '{"absence":"#ef4444","chargeable":"#3b82f6","training":"#10b981","reservation":"#f59e0b","nonChargeable":"#6b7280"}',
-        "region": '{"WST":{"main":"#FF3D47","light":"#FF787A","dark":"#CC2931"},"NRT":{"main":"#98847A","light":"#B2A59F","dark":"#806659"},"CER":{"main":"#99171D","light":"#CC2931","dark":"#330000"},"CSH":{"main":"#FFA3A8","light":"#FFBDC0","dark":"#FF787A"},"MEA":{"main":"#B2A59F","light":"#CCC1BC","dark":"#806659"}}',
-        "segment": '{"LSC":"#FF3D47","IEM":"#CC2931","AUTO":"#99171D","CRL":"#FF787A","TMT":"#806659","UTL":"#98847A","AMD":"#FF3D47","CLR":"#B2A59F","FSI":"#CC2931","INS":"#CCC1BC","PHS":"#99171D","HSC":"#5C4A3F","ERT":"#FFA3A8"}',
-        "serviceLine": '{"BTU":"#FF3D47","ETU":"#806659","Products":"#CC2931","Arcwide":"#98847A"}',
+        "mainCategory": '{"absence":"#ef4444","chargeable":"#EB0070","training":"#10b981","reservation":"#f59e0b","nonChargeable":"#6b7280"}',
+        "region": '{"IDF":{"main":"#EB0070","light":"#F571B0","dark":"#B8005A"},"National":{"main":"#374151","light":"#6B7280","dark":"#1F2937"},"Sud":{"main":"#F59E0B","light":"#FBBF24","dark":"#D97706"},"Est":{"main":"#0EA5E9","light":"#38BDF8","dark":"#0284C7"},"Ouest":{"main":"#10B981","light":"#34D399","dark":"#059669"},"Nord":{"main":"#7C3AED","light":"#A78BFA","dark":"#6D28D9"}}',
+        "segment": '{"Clients":"#EB0070","Agilite":"#0EA5E9","JusteBesoin":"#10B981","Innovation":"#F59E0B","LSC":"#EB0070","IEM":"#0EA5E9","AUTO":"#10B981","CRL":"#F59E0B","TMT":"#7C3AED","UTL":"#06B6D4","AMD":"#EC4899","CLR":"#6366F1","FSI":"#84CC16","INS":"#F97316","PHS":"#14B8A6","HSC":"#A855F7","ERT":"#EF4444"}',
+        "serviceLine": '{"Ferroviaire":"#C8102E","Immobilier":"#1E4E8C","IO":"#00A3A1","Courants Faibles":"#F59E0B","Propriete Intellectuelle":"#7C3AED","Gares Lignes":"#0EA5E9","BTU":"#EB0070","ETU":"#374151","Products":"#C8102E","Arcwide":"#1E4E8C"}',
         "utilization": '{"available":{"bg":"#f3f4f6","text":"#4b5563","bar":"#d1d5db","dot":"#9ca3af"},"low":{"bg":"#f0f9ff","text":"#0369a1","bar":"#38bdf8","dot":"#38bdf8"},"partial":{"bg":"#eff6ff","text":"#1d4ed8","bar":"#3b82f6","dot":"#3b82f6"},"optimal":{"bg":"#ecfdf5","text":"#047857","bar":"#10b981","dot":"#10b981"},"overbooked":{"bg":"#fef2f2","text":"#b91c1c","bar":"#ef4444","dot":"#ef4444"}}',
     },
     "chatBranding": {
-        "ollama_name": "Be.on\u00b0", "ollama_fabBg": "#98847A", "ollama_fabHoverBg": "#806659",
-        "ollama_headerBg": "#330000", "ollama_icon": "/Beonpoint_stars.svg",
+        "ollama_name": "GAIF Pilot", "ollama_fabBg": "#EB0070", "ollama_fabHoverBg": "#B8005A",
+        "ollama_headerBg": "#870042", "ollama_icon": "/gaif-logo.svg",
         "claude_name": "Claude", "claude_fabBg": "#D97757", "claude_fabHoverBg": "#C4673F",
         "claude_headerBg": "#D97757", "claude_icon": "/claude_logo.png",
     },
@@ -247,54 +247,54 @@ def seed_var_renaming(db_path):
         cur.execute("DELETE FROM var_renaming")
 
         mappings = [
-            # CRM Opportunities (Dynamics 365 → crm_opportunities)
-            ("CRM", "crm_opportunities", "opportunityid", "opportunityId", "Dynamics GUID = PK"),
-            ("CRM", "crm_opportunities", "name", "opportunity", "Opportunity name"),
-            ("CRM", "crm_opportunities", "be_grossrevenue_base", "grossRevenue", "Gross revenue EUR"),
-            ("CRM", "crm_opportunities", "estimatedvalue_base", "netRevenue", "Net revenue EUR"),
-            ("CRM", "crm_opportunities", "be_opportunitystatus", "status", "Status code (1=Lead, 4=Go, 14=Booked, 15=Lost)"),
-            ("CRM", "crm_opportunities", "be_soldcm1", "cm1Pct", "CM1 margin %"),
-            ("CRM", "crm_opportunities", "be_jobcode", "jobCode", "Project job code"),
-            ("CRM", "crm_opportunities", "be_engagementtype", "engagementType", "Engagement type"),
-            ("CRM", "crm_opportunities", "be_estrevenueweighted_base", "weightedBooking", "Weighted booking EUR"),
-            ("CRM", "crm_opportunities", "be_shortreference", "opportunityId", "Short reference (used as ID)"),
-            ("CRM", "crm_opportunities", "createdon", "creationDate", "Creation date"),
-            ("CRM", "crm_opportunities", "actualclosedate", "bookingDate", "Actual close/booking date"),
-            ("CRM", "crm_opportunities", "estimatedclosedate", "estimatedBookingDate", "Estimated close date"),
-            ("CRM", "crm_opportunities", "be_laststatuschangedate", "lastStatusChangeDate", "Last status change"),
-            ("CRM", "crm_opportunities", "be_commentslost", "lostComment", "Lost comment"),
-            ("CRM", "crm_opportunities", "be_opportunityofferingpercentage", "serviceOffering1Pct", "Service offering 1 %"),
-            ("CRM", "crm_opportunities", "be_percentage2", "serviceOffering2Pct", "Service offering 2 %"),
-            ("CRM", "crm_opportunities", "be_percentage3", "serviceOffering3Pct", "Service offering 3 %"),
-            ("CRM", "crm_opportunities", "_be_alliance_value", "technologyPartner1", "Technology partner 1 GUID"),
-            ("CRM", "crm_opportunities", "_be_alliance2_value", "technologyPartner2", "Technology partner 2 GUID"),
-            ("CRM", "crm_opportunities", "_be_alliance3_value", "technologyPartner3", "Technology partner 3 GUID"),
-            ("CRM", "crm_opportunities", "_be_serviceline_value", "serviceLine1", "Service line 1 GUID → resolved to name"),
-            ("CRM", "crm_opportunities", "_be_serviceline2_value", "serviceLine2", "Service line 2 GUID"),
-            ("CRM", "crm_opportunities", "_be_serviceline3_value", "serviceLine3", "Service line 3 GUID"),
-            ("CRM", "crm_opportunities", "_be_servicelineoffering_value", "serviceOffering1", "Service offering 1 GUID"),
-            ("CRM", "crm_opportunities", "_be_servicelineoffering2_value", "serviceOffering2", "Service offering 2 GUID"),
-            ("CRM", "crm_opportunities", "_be_servicelineoffering3_value", "serviceOffering3", "Service offering 3 GUID"),
-            ("CRM", "crm_opportunities", "_be_accountname_value", "accountId", "Account GUID"),
-            ("CRM", "crm_opportunities", "_be_manager_value", "manager", "Manager GUID → resolved to name"),
-            ("CRM", "crm_opportunities", "_be_partner_value", "partner", "Partner GUID → resolved to name"),
-            ("CRM", "crm_opportunities", "_be_engagementmanagerid_value", "em", "Engagement Manager GUID → resolved to name"),
-            ("CRM", "crm_opportunities", "_be_engagementpartnerid_value", "ep", "Engagement Partner GUID → resolved to name"),
-            ("CRM", "crm_opportunities", "_be_manager_value(raw)", "managerCrmGuid", "Manager raw CRM systemuserid"),
-            ("CRM", "crm_opportunities", "_be_partner_value(raw)", "partnerCrmGuid", "Partner raw CRM systemuserid"),
-            ("CRM", "crm_opportunities", "_be_engagementmanagerid_value(raw)", "emCrmGuid", "EM raw CRM systemuserid"),
-            ("CRM", "crm_opportunities", "_be_engagementpartnerid_value(raw)", "epCrmGuid", "EP raw CRM systemuserid"),
-            ("CRM", "crm_opportunities", "_be_reportingcountryid_value", "country", "Country GUID → resolved to name"),
-            ("CRM", "crm_opportunities", "_parentcontactid_value", "primaryContactId", "Primary contact GUID"),
+            # CRM Opportunities (Dynamics 365 → assets)
+            ("CRM", "assets", "opportunityid", "opportunityId", "Dynamics GUID = PK"),
+            ("CRM", "assets", "name", "opportunity", "Opportunity name"),
+            ("CRM", "assets", "be_grossrevenue_base", "grossRevenue", "Gross revenue EUR"),
+            ("CRM", "assets", "estimatedvalue_base", "netRevenue", "Net revenue EUR"),
+            ("CRM", "assets", "be_opportunitystatus", "status", "Status code (1=Émergence, 4=Investissement, 14=En exploitation, 15=Déclassé)"),
+            ("CRM", "assets", "be_soldcm1", "cm1Pct", "CM1 margin %"),
+            ("CRM", "assets", "be_jobcode", "jobCode", "Project job code"),
+            ("CRM", "assets", "be_engagementtype", "engagementType", "Engagement type"),
+            ("CRM", "assets", "be_estrevenueweighted_base", "weightedBooking", "Weighted booking EUR"),
+            ("CRM", "assets", "be_shortreference", "opportunityId", "Short reference (used as ID)"),
+            ("CRM", "assets", "createdon", "creationDate", "Creation date"),
+            ("CRM", "assets", "actualclosedate", "bookingDate", "Actual close/booking date"),
+            ("CRM", "assets", "estimatedclosedate", "estimatedBookingDate", "Estimated close date"),
+            ("CRM", "assets", "be_laststatuschangedate", "lastStatusChangeDate", "Last status change"),
+            ("CRM", "assets", "be_commentslost", "lostComment", "Lost comment"),
+            ("CRM", "assets", "be_opportunityofferingpercentage", "serviceOffering1Pct", "Service offering 1 %"),
+            ("CRM", "assets", "be_percentage2", "serviceOffering2Pct", "Service offering 2 %"),
+            ("CRM", "assets", "be_percentage3", "serviceOffering3Pct", "Service offering 3 %"),
+            ("CRM", "assets", "_be_alliance_value", "technologyPartner1", "Technology partner 1 GUID"),
+            ("CRM", "assets", "_be_alliance2_value", "technologyPartner2", "Technology partner 2 GUID"),
+            ("CRM", "assets", "_be_alliance3_value", "technologyPartner3", "Technology partner 3 GUID"),
+            ("CRM", "assets", "_be_serviceline_value", "serviceLine1", "Service line 1 GUID → resolved to name"),
+            ("CRM", "assets", "_be_serviceline2_value", "serviceLine2", "Service line 2 GUID"),
+            ("CRM", "assets", "_be_serviceline3_value", "serviceLine3", "Service line 3 GUID"),
+            ("CRM", "assets", "_be_servicelineoffering_value", "serviceOffering1", "Service offering 1 GUID"),
+            ("CRM", "assets", "_be_servicelineoffering2_value", "serviceOffering2", "Service offering 2 GUID"),
+            ("CRM", "assets", "_be_servicelineoffering3_value", "serviceOffering3", "Service offering 3 GUID"),
+            ("CRM", "assets", "_be_accountname_value", "accountId", "Account GUID"),
+            ("CRM", "assets", "_be_manager_value", "manager", "Manager GUID → resolved to name"),
+            ("CRM", "assets", "_be_partner_value", "partner", "Partner GUID → resolved to name"),
+            ("CRM", "assets", "_be_engagementmanagerid_value", "em", "Engagement Manager GUID → resolved to name"),
+            ("CRM", "assets", "_be_engagementpartnerid_value", "ep", "Engagement Partner GUID → resolved to name"),
+            ("CRM", "assets", "_be_manager_value(raw)", "managerCrmGuid", "Manager raw CRM systemuserid"),
+            ("CRM", "assets", "_be_partner_value(raw)", "partnerCrmGuid", "Partner raw CRM systemuserid"),
+            ("CRM", "assets", "_be_engagementmanagerid_value(raw)", "emCrmGuid", "EM raw CRM systemuserid"),
+            ("CRM", "assets", "_be_engagementpartnerid_value(raw)", "epCrmGuid", "EP raw CRM systemuserid"),
+            ("CRM", "assets", "_be_reportingcountryid_value", "country", "Country GUID → resolved to name"),
+            ("CRM", "assets", "_parentcontactid_value", "primaryContactId", "Primary contact GUID"),
 
-            # CRM Accounts (Dynamics 365 → crm_accounts)
-            ("CRM", "crm_accounts", "accountid", "accountId", "Account GUID"),
-            ("CRM", "crm_accounts", "name", "account", "Account name"),
-            ("CRM", "crm_accounts", "be_secondarysegmentcode", "subSegmentCode", "Sub-segment code"),
-            ("CRM", "crm_accounts", "_be_industrysegment_value", "subSegment", "Industry segment GUID → resolved"),
-            ("CRM", "crm_accounts", "_be_accountleader_value", "accountLeader", "Account leader GUID → resolved"),
-            ("CRM", "crm_accounts", "_be_country_value", "country", "Country GUID → resolved"),
-            ("CRM", "crm_accounts", "be_reportingparent", "parentAccount", "Parent account"),
+            # CRM Accounts (Dynamics 365 → sites)
+            ("CRM", "sites", "accountid", "accountId", "Account GUID"),
+            ("CRM", "sites", "name", "account", "Account name"),
+            ("CRM", "sites", "be_secondarysegmentcode", "subSegmentCode", "Sub-segment code"),
+            ("CRM", "sites", "_be_industrysegment_value", "subSegment", "Industry segment GUID → resolved"),
+            ("CRM", "sites", "_be_accountleader_value", "accountLeader", "Account leader GUID → resolved"),
+            ("CRM", "sites", "_be_country_value", "country", "Country GUID → resolved"),
+            ("CRM", "sites", "be_reportingparent", "parentAccount", "Parent account"),
 
             # CRM Contacts (Dynamics 365 → crm_contacts)
             ("CRM", "crm_contacts", "contactid", "contactId", "Contact GUID"),
@@ -342,28 +342,28 @@ def seed_var_renaming(db_path):
             ("Skills", "hr_skills", "Catégorie (1)", "category", "Skill category"),
             ("Skills", "hr_skills", "Niveau", "level", "Skill level (1-4)"),
 
-            # Candidates (CSV → hr_candidates + hr_applications)
-            ("Candidates", "hr_candidates", "Id", "id", "Candidate ID"),
-            ("Candidates", "hr_candidates", "Prénom", "firstName", "First name"),
-            ("Candidates", "hr_candidates", "Nom", "lastName", "Last name"),
-            ("Candidates", "hr_candidates", "E-mail", "email", "Email address"),
-            ("Candidates", "hr_candidates", "Téléphone", "phone", "Phone number"),
-            ("Candidates", "hr_candidates", "Statut de la candidature", "status", "Application status"),
-            ("Candidates", "hr_candidates", "Poste", "poste", "Job position"),
-            ("Candidates", "hr_candidates", "Grade", "grade", "Grade"),
-            ("Candidates", "hr_candidates", "Offres d'emploi", "jobPostings", "Job postings (comma-separated)"),
-            ("Candidates", "hr_candidates", "Date de création :", "creationDate", "Creation date"),
-            ("Candidates", "hr_candidates", "Dernière activité à", "lastActivity", "Last activity date"),
-            ("Candidates", "hr_candidates", "Statut du candidat", "candidateStatus", "Candidate status"),
-            ("Candidates", "hr_candidates", "Tags", "tags", "Tags"),
-            ("Candidates", "hr_candidates", "Note", "note", "Evaluation score"),
-            ("Candidates", "hr_candidates", "Évalué par", "evaluatedBy", "Evaluated by"),
-            ("Candidates", "hr_candidates", "Entretien RH", "hrInterview", "HR interview status"),
-            ("Candidates", "hr_candidates", "URL LinkedIn", "linkedinUrl", "LinkedIn URL"),
-            ("Candidates", "hr_candidates", "Recruteur 1", "recruiter1", "Recruiter 1 (name + date + decision)"),
-            ("Candidates", "hr_candidates", "Recruteur 2", "recruiter2", "Recruiter 2 (name + date + decision)"),
-            ("Candidates", "hr_candidates", "Recruteur 3", "recruiter3", "Recruiter 3 (name + date + decision)"),
-            ("Candidates", "hr_applications", "Offres d'emploi", "jobPosting", "Each posting becomes 1 application row"),
+            # Candidates (CSV → nonconformities + nc_scopes)
+            ("Candidates", "nonconformities", "Id", "id", "Candidate ID"),
+            ("Candidates", "nonconformities", "Prénom", "firstName", "First name"),
+            ("Candidates", "nonconformities", "Nom", "lastName", "Last name"),
+            ("Candidates", "nonconformities", "E-mail", "email", "Email address"),
+            ("Candidates", "nonconformities", "Téléphone", "phone", "Phone number"),
+            ("Candidates", "nonconformities", "Statut de la candidature", "status", "Application status"),
+            ("Candidates", "nonconformities", "Poste", "poste", "Job position"),
+            ("Candidates", "nonconformities", "Grade", "grade", "Grade"),
+            ("Candidates", "nonconformities", "Offres d'emploi", "jobPostings", "Job postings (comma-separated)"),
+            ("Candidates", "nonconformities", "Date de création :", "creationDate", "Creation date"),
+            ("Candidates", "nonconformities", "Dernière activité à", "lastActivity", "Last activity date"),
+            ("Candidates", "nonconformities", "Statut du candidat", "candidateStatus", "Candidate status"),
+            ("Candidates", "nonconformities", "Tags", "tags", "Tags"),
+            ("Candidates", "nonconformities", "Note", "note", "Evaluation score"),
+            ("Candidates", "nonconformities", "Évalué par", "evaluatedBy", "Evaluated by"),
+            ("Candidates", "nonconformities", "Entretien RH", "hrInterview", "HR interview status"),
+            ("Candidates", "nonconformities", "URL LinkedIn", "linkedinUrl", "LinkedIn URL"),
+            ("Candidates", "nonconformities", "Recruteur 1", "recruiter1", "Recruiter 1 (name + date + decision)"),
+            ("Candidates", "nonconformities", "Recruteur 2", "recruiter2", "Recruiter 2 (name + date + decision)"),
+            ("Candidates", "nonconformities", "Recruteur 3", "recruiter3", "Recruiter 3 (name + date + decision)"),
+            ("Candidates", "nc_scopes", "Offres d'emploi", "jobPosting", "Each posting becomes 1 application row"),
         ]
 
         ins = cur.execute  # shorthand
@@ -375,6 +375,37 @@ def seed_var_renaming(db_path):
 
         conn.commit()
         print(f"  {len(mappings)} entries in var_renaming.")
+    finally:
+        conn.close()
+
+
+def seed_var_optionsets(db_path):
+    """Seed var_optionsets with GAIF lifecycle status labels."""
+    conn = sqlite3.connect(db_path)
+    try:
+        cur = conn.cursor()
+        cur.execute("DELETE FROM var_optionsets")
+
+        gaif_statuses = [
+            ("be_opportunitystatus", 1, "Émergence"),
+            ("be_opportunitystatus", 4, "Investissement / CEB"),
+            ("be_opportunitystatus", 6, "Étude en cours"),
+            ("be_opportunitystatus", 11, "Maintenance lourde"),
+            ("be_opportunitystatus", 13, "Conventionné"),
+            ("be_opportunitystatus", 14, "En exploitation"),
+            ("be_opportunitystatus", 15, "Déclassé"),
+        ]
+        count = 0
+        for attr, val, label in gaif_statuses:
+            cur.execute(
+                "INSERT OR REPLACE INTO var_optionsets (attribute, value, label) VALUES (?, ?, ?)",
+                (attr, val, label),
+            )
+            count += cur.rowcount
+
+        conn.commit()
+        total = cur.execute("SELECT COUNT(*) FROM var_optionsets").fetchone()[0]
+        print(f"  {count} new optionsets added, {total} total in var_optionsets.")
     finally:
         conn.close()
 
@@ -396,6 +427,9 @@ def init_single_db(db_path, label, force=False, config_only=False):
 
     print("  Seeding holidays...")
     seed_var_holidays(db_path)
+
+    print("  Seeding optionsets...")
+    seed_var_optionsets(db_path)
 
     print("  Seeding renaming table...")
     seed_var_renaming(db_path)

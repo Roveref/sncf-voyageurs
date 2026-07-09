@@ -22,9 +22,9 @@ describe("STATUS_TEXT", () => {
   });
 
   it("contains correct text for specific statuses", () => {
-    expect(STATUS_TEXT[1]).toBe("Lead Identified");
-    expect(STATUS_TEXT[14]).toBe("Booked");
-    expect(STATUS_TEXT[15]).toBe("Lost");
+    expect(STATUS_TEXT[1]).toBe("Émergence");
+    expect(STATUS_TEXT[14]).toBe("En exploitation");
+    expect(STATUS_TEXT[15]).toBe("Déclassé");
   });
 });
 

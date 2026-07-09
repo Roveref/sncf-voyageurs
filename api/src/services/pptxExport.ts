@@ -1,8 +1,10 @@
 /**
- * Export PPTX — Génère un .pptx à partir du template BearingPoint .potx
+ * Export PPTX — Génère un .pptx à partir du template GAIF Pilot.
  *
- * Ouvre le template, supprime les slides d'exemple, injecte de nouvelles slides
- * avec le contenu de l'analyse IA, en référençant les layouts existants.
+ * Le template physique (.potx) conserve les masters visuels hérités du
+ * dashboard d'origine — à rebranding GAIF/SNCF côté design (couleurs, logos,
+ * footer) dans un second temps. Les slides générées utilisent les layouts
+ * existants mais avec du contenu GAIF natif.
  */
 
 import JSZip from "jszip";
@@ -11,16 +13,16 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const TEMPLATE_PATH = path.resolve(__dirname, "../../templates/BearingPoint_ppt_tmpl_BestPractice.potx");
+const TEMPLATE_PATH = path.resolve(__dirname, "../../templates/gaif_pilot_ppt_template.potx");
 
 // Layout indices (1-based, matching slideLayout{N}.xml)
 const LAYOUTS = {
-  TITLE_RED: 1, // "Title slide - Bearing red" — title + body
+  TITLE_RED: 1, // "Title slide" — title + body (rouge primaire)
   CHAPTER: 8, // "Chapter" — title + body
   DIVIDER: 11, // "Divider" — title only
   CONTENT_LARGE: 17, // "Content large" — content + body (title area)
   CONTENT_TWO_COL: 20, // "Content two column" — 2x content + body
-  END_RED: 30, // "End slide - Bearing red" — body
+  END_RED: 30, // "End slide" — body (rouge primaire)
 };
 
 export interface PptxSlide {
@@ -37,7 +39,7 @@ export interface PptxSlide {
 }
 
 /**
- * Generate a PPTX file from the BearingPoint template with custom slides.
+ * Generate a PPTX file from the legacy template (GAIF-branded slides).
  * Returns the PPTX as a Buffer.
  */
 export async function generatePptx(slides: PptxSlide[], reportTitle: string): Promise<Buffer> {

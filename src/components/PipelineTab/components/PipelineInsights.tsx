@@ -114,6 +114,16 @@ const PipelineInsights = ({
     calculateInsights(data);
   }, [data, showNetRevenue]);
 
+  const parcValues = React.useMemo(() => {
+    const opps = data || [];
+    const acquisitionValue = opps.reduce(
+      (sum: number, opp: Opportunity) => sum + (Number(opp.grossRevenue || 0) || 0),
+      0
+    );
+    const residualValue = opps.reduce((sum: number, opp: Opportunity) => sum + (Number(opp.netRevenue || 0) || 0), 0);
+    return { acquisitionValue, residualValue };
+  }, [data]);
+
   const calculateInsights = (opportunityData: Opportunity[]) => {
     try {
       // Filter opportunities with Status 1 (Lead Identified) or Status 4 (Go Approved)
@@ -257,7 +267,7 @@ const PipelineInsights = ({
         }}
       >
         <Typography variant="h6" gutterBottom fontWeight={700}>
-          Pipeline Insights
+          Indicateurs du parc
         </Typography>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Box
@@ -268,13 +278,67 @@ const PipelineInsights = ({
               borderRadius: 2,
             }}
           >
-            <AnimatedCount value={data.length} variant="h6" color="primary.main" suffix=" opps" />
+            <AnimatedCount value={data.length} variant="h6" color="primary.main" suffix=" actifs" />
           </Box>
           {pipCloseBtn}
         </Box>
       </Box>
 
       <Divider sx={{ mb: 3 }} />
+
+      {/* Valeur d'achat / Valeur résiduelle — vue d'ensemble du parc */}
+      <Grid container spacing={3} sx={{ px: 2, pt: 1, pb: 2, "& .MuiGrid-item": { overflow: "visible" } }}>
+        <Grid size={{ xs: 12, sm: 6 }} sx={{ overflow: "visible" }}>
+          <Box
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              textAlign: "center",
+              height: "100%",
+              bgcolor: !showNetRevenue
+                ? alpha(theme.palette.warning.main, 0.12)
+                : alpha(theme.palette.warning.main, 0.04),
+              border: !showNetRevenue ? `2px solid ${alpha(theme.palette.warning.main, 0.5)}` : "2px solid transparent",
+              transition: "all 0.3s ease",
+              ...animations.cardEntrance(0),
+            }}
+          >
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              gutterBottom
+              sx={{ display: "block", fontSize: "0.7rem" }}
+            >
+              Valeur d'achat totale
+            </Typography>
+            <AnimatedCurrency value={parcValues.acquisitionValue} variant="h6" fontWeight={700} color="warning.dark" />
+          </Box>
+        </Grid>
+
+        <Grid size={{ xs: 12, sm: 6 }} sx={{ overflow: "visible" }}>
+          <Box
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              textAlign: "center",
+              height: "100%",
+              bgcolor: showNetRevenue ? alpha(theme.palette.info.main, 0.12) : alpha(theme.palette.info.main, 0.04),
+              transition: "all 0.3s ease",
+              ...animations.cardEntrance(0),
+            }}
+          >
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              gutterBottom
+              sx={{ display: "block", fontSize: "0.7rem" }}
+            >
+              Valeur résiduelle
+            </Typography>
+            <AnimatedCurrency value={parcValues.residualValue} variant="h6" fontWeight={700} color="info.main" />
+          </Box>
+        </Grid>
+      </Grid>
 
       <Grid container spacing={3} sx={{ px: 2, py: 1, "& .MuiGrid-item": { overflow: "visible" } }}>
         {/* New Opportunities - This Month */}
@@ -283,7 +347,7 @@ const PipelineInsights = ({
             sx={{
               p: 2,
               borderRadius: 2,
-              bgcolor: isActiveFilter("New Opportunities")
+              bgcolor: isActiveFilter("Émergence")
                 ? alpha(theme.palette.text.primary, 0.12)
                 : alpha(theme.palette.text.primary, 0.04),
               height: "100%",
@@ -297,7 +361,7 @@ const PipelineInsights = ({
               },
               ...animations.cardEntrance(100),
             }}
-            onClick={() => handleInsightClick(insights.newOpportunities.filteredData, "New Opportunities")}
+            onClick={() => handleInsightClick(insights.newOpportunities.filteredData, "Émergence")}
           >
             <Box
               sx={{
@@ -308,7 +372,7 @@ const PipelineInsights = ({
               }}
             >
               <Typography variant="subtitle2" color="text.secondary">
-                Leads
+                Émergence
               </Typography>
             </Box>
 
@@ -363,7 +427,7 @@ const PipelineInsights = ({
             sx={{
               p: 2,
               borderRadius: 2,
-              bgcolor: isActiveFilter("Proposals Submitted")
+              bgcolor: isActiveFilter("Étude en cours")
                 ? alpha(theme.palette.text.primary, 0.12)
                 : alpha(theme.palette.text.primary, 0.04),
               height: "100%",
@@ -377,7 +441,7 @@ const PipelineInsights = ({
               },
               ...animations.cardEntrance(200),
             }}
-            onClick={() => handleInsightClick(insights.recentStatus6.filteredData, "Proposals Submitted")}
+            onClick={() => handleInsightClick(insights.recentStatus6.filteredData, "Étude en cours")}
           >
             <Box
               sx={{
@@ -388,7 +452,7 @@ const PipelineInsights = ({
               }}
             >
               <Typography variant="subtitle2" color="text.secondary">
-                Proposals Submitted
+                Étude en cours
               </Typography>
             </Box>
 
@@ -443,7 +507,7 @@ const PipelineInsights = ({
             sx={{
               p: 2,
               borderRadius: 2,
-              bgcolor: isActiveFilter("Booking Pending")
+              bgcolor: isActiveFilter("En attente exploit.")
                 ? alpha(theme.palette.text.primary, 0.12)
                 : alpha(theme.palette.text.primary, 0.04),
               height: "100%",
@@ -457,7 +521,7 @@ const PipelineInsights = ({
               },
               ...animations.cardEntrance(300),
             }}
-            onClick={() => handleInsightClick(insights.recentStatus11.filteredData, "Booking Pending")}
+            onClick={() => handleInsightClick(insights.recentStatus11.filteredData, "En attente exploit.")}
           >
             <Box
               sx={{
@@ -468,7 +532,7 @@ const PipelineInsights = ({
               }}
             >
               <Typography variant="subtitle2" color="text.secondary">
-                Booking Pending
+                Maintenance lourde
               </Typography>
             </Box>
 

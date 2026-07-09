@@ -71,14 +71,14 @@ export const getRevenueForSorting = (
  * @returns {string} Human-readable label
  */
 export const getRevenueSortModeLabel = (revenueSortMode: string, showNetRevenue: boolean): string => {
-  const revenueType = showNetRevenue ? "Net" : "Gross";
+  const revenueType = showNetRevenue ? "Net" : "Brut";
   switch (revenueSortMode) {
     case "total":
       return `Total ${revenueType}`;
     case "io":
-      return `I&O ${revenueType}`;
+      return `GAIF ${revenueType}`;
     case "filtered":
-      return `Filtre ${revenueType}`;
+      return `Filtré ${revenueType}`;
     default:
       return `Total ${revenueType}`;
   }

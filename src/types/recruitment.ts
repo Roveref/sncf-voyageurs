@@ -8,7 +8,16 @@ export interface RecruitmentCandidate {
   lastName: string;
   email: string;
   phone: string;
-  status: "rejected" | "active" | "hired";
+  status:
+    | "rejected"
+    | "active"
+    | "hired"
+    | "detectee"
+    | "en_analyse"
+    | "plan_action"
+    | "en_traitement"
+    | "resolue"
+    | "fermee";
   poste: string;
   gradeBucket: string;
   jobPostings: string;

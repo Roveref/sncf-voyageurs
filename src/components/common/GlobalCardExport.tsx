@@ -164,7 +164,7 @@ const GlobalCardExport = memo(() => {
 
     const zone = document.createElement("div");
     zone.className = "card-export-zone";
-    zone.title = "Click to export SVG \u00b7 Shift+click to copy";
+    zone.title = "Cliquer pour exporter en SVG · Maj+clic pour copier";
     zoneEl.current = zone;
 
     function findCard(el: HTMLElement | null): HTMLElement | null {

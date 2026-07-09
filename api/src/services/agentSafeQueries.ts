@@ -40,13 +40,13 @@ const QUERY_PATTERNS: Record<string, (params: SafeQueryParams) => string> = {
     const rows = db
       .prepare(
         `SELECT opportunityId, opportunity, account, grossRevenue, winPct, manager, partner
-       FROM crm_opportunities WHERE status = ? ORDER BY grossRevenue DESC LIMIT 50`
+       FROM assets WHERE status = ? ORDER BY grossRevenue DESC LIMIT 50`
       )
       .all(status) as any[];
     const userRows = db
       .prepare(
         `SELECT opportunityId, opportunity, account, grossRevenue, winPct
-       FROM user_opportunities WHERE status = ? ORDER BY grossRevenue DESC LIMIT 20`
+       FROM user_assets WHERE status = ? ORDER BY grossRevenue DESC LIMIT 20`
       )
       .all(status) as any[];
     return formatRows([...rows, ...userRows]);
@@ -58,7 +58,7 @@ const QUERY_PATTERNS: Record<string, (params: SafeQueryParams) => string> = {
     const rows = db
       .prepare(
         `SELECT opportunityId, opportunity, account, status, grossRevenue, winPct, manager
-       FROM crm_opportunities WHERE LOWER(account) LIKE ? AND status != 15
+       FROM assets WHERE LOWER(account) LIKE ? AND status != 15
        ORDER BY grossRevenue DESC LIMIT 30`
       )
       .all(`%${account}%`) as any[];
@@ -83,12 +83,14 @@ const QUERY_PATTERNS: Record<string, (params: SafeQueryParams) => string> = {
     const rows = db
       .prepare(
         `SELECT status,
-              CASE status WHEN 1 THEN 'Lead' WHEN 4 THEN 'Go' WHEN 6 THEN 'Proposal'
-                WHEN 11 THEN 'Won' WHEN 14 THEN 'Booked' WHEN 15 THEN 'Lost' ELSE 'Other' END as label,
+              CASE status
+                WHEN 1 THEN 'Émergence' WHEN 4 THEN 'Investissement / CEB' WHEN 6 THEN 'Étude en cours'
+                WHEN 11 THEN 'Maintenance lourde' WHEN 13 THEN 'Conventionné' WHEN 14 THEN 'En exploitation'
+                WHEN 15 THEN 'Déclassé' ELSE 'Autre' END as label,
               COUNT(*) as count,
               COALESCE(SUM(grossRevenue), 0) as totalRevenue,
               COALESCE(SUM(weightedBooking), 0) as totalWeighted
-       FROM crm_opportunities GROUP BY status ORDER BY status`
+       FROM assets GROUP BY status ORDER BY status`
       )
       .all() as any[];
     return formatRows(rows);
@@ -116,7 +118,7 @@ const QUERY_PATTERNS: Record<string, (params: SafeQueryParams) => string> = {
         `SELECT n.id, n.grade, n.quantity, n.startDate, n.endDate, n.utilization, n.skills, n.probability,
               o.opportunity as oppName, o.account
        FROM user_staffing_needs n
-       LEFT JOIN crm_opportunities o ON n.opportunityId = o.opportunityId
+       LEFT JOIN assets o ON n.opportunityId = o.opportunityId
        WHERE n.opportunityId = ? ORDER BY n.startDate`
       )
       .all(oppId) as any[];
@@ -143,7 +145,7 @@ const QUERY_PATTERNS: Record<string, (params: SafeQueryParams) => string> = {
         `SELECT subSegmentCode as segment, COUNT(*) as count,
               COALESCE(SUM(grossRevenue), 0) as totalGross,
               COALESCE(SUM(weightedBooking), 0) as totalWeighted
-       FROM crm_opportunities WHERE status NOT IN (15)
+       FROM assets WHERE status NOT IN (15)
        GROUP BY subSegmentCode ORDER BY totalGross DESC`
       )
       .all() as any[];
@@ -167,7 +169,7 @@ const QUERY_PATTERNS: Record<string, (params: SafeQueryParams) => string> = {
     const oppId = String(p.opportunityId || "");
     const rows = db
       .prepare(
-        `SELECT name, gradeBucket, percentage FROM user_revenue_team
+        `SELECT name, gradeBucket, percentage FROM user_asset_team
        WHERE opportunityId = ? ORDER BY percentage DESC`
       )
       .all(oppId) as any[];

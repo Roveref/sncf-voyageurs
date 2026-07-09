@@ -303,7 +303,7 @@ const AccountFilterModal = ({
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
             <FilterListIcon sx={{ color: brandColor, fontSize: 28 }} />
             <Typography variant="h5" sx={{ fontWeight: 600, color: "text.primary" }}>
-              Account Filter
+              Filtre Sites
             </Typography>
           </Box>
           <IconButton
@@ -325,7 +325,7 @@ const AccountFilterModal = ({
         <Box sx={{ mb: 3 }}>
           <TextField
             fullWidth
-            placeholder="Search accounts by name..."
+            placeholder="Rechercher des comptes..."
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
             InputProps={{
@@ -391,10 +391,10 @@ const AccountFilterModal = ({
 
       <DialogActions sx={{ px: 4, py: 2.5, backgroundColor: theme.palette.background.default }}>
         <Button onClick={handleCancel} variant="outlined" sx={{ px: 3, borderRadius: 1.5 }}>
-          Cancel
+          Annuler
         </Button>
         <Button onClick={handleApply} variant="contained" color="primary" sx={{ px: 3, borderRadius: 1.5 }}>
-          Apply ({tempSelectedAccounts.length})
+          Appliquer ({tempSelectedAccounts.length})
         </Button>
       </DialogActions>
     </Dialog>

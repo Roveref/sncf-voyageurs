@@ -55,7 +55,7 @@ const AccountListPanel = ({
     <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
         <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "text.primary" }}>
-          Accounts List
+          Liste des sites
         </Typography>
         <Button
           variant="text"
@@ -70,7 +70,7 @@ const AccountListPanel = ({
             },
           }}
         >
-          {isAllDisplayedSelected ? "Deselect All" : "Select All Displayed"}
+          {isAllDisplayedSelected ? "Tout dÃ©sÃ©lectionner" : "Tout sÃ©lectionner"}
         </Button>
       </Box>
 
@@ -87,8 +87,8 @@ const AccountListPanel = ({
             },
           }}
         >
-          Showing {maxDisplayedAccounts} of {filteredAccountsLength} accounts. Use the search bar, select a segment, or
-          check <strong>"Show all"</strong> to see everything.
+          Affichage de {maxDisplayedAccounts} sur {filteredAccountsLength} sites. Utilisez la barre de recherche,
+          sÃ©lectionnez un patrimoine, ou cochez <strong>"Tout afficher"</strong> pour tout voir.
         </Alert>
       )}
       {showAll && filteredAccountsLength > 500 && (
@@ -102,7 +102,7 @@ const AccountListPanel = ({
             },
           }}
         >
-          Displaying {filteredAccountsLength} accounts — the list may be slow.
+          Affichage de {filteredAccountsLength} sites \u2014 la liste peut Ãªtre lente.
         </Alert>
       )}
 
@@ -121,10 +121,10 @@ const AccountListPanel = ({
           <Box sx={{ p: 4, textAlign: "center" }}>
             <SearchIcon sx={{ fontSize: 48, color: theme.palette.text.disabled, mb: 2 }} />
             <Typography variant="body1" color="text.secondary">
-              No accounts found
+              Aucun site trouvÃ©
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              Try adjusting your filters or search term
+              Ajustez vos filtres ou votre recherche
             </Typography>
           </Box>
         ) : (
@@ -176,7 +176,7 @@ const AccountListPanel = ({
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexShrink: 0 }}>
                   {item.isManual && (
                     <Chip
-                      label="New"
+                      label="Nouveau"
                       size="small"
                       sx={{
                         height: 20,

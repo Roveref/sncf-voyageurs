@@ -14,11 +14,11 @@ interface MobileBottomNavProps {
 }
 
 const TAB_ITEMS = [
-  { label: "Pipeline", icon: <TrendingUpRoundedIcon /> },
-  { label: "Bookings", icon: <TaskAltRoundedIcon /> },
-  { label: "Staffing", icon: <GroupsRoundedIcon /> },
-  { label: "Project", icon: <HubRoundedIcon /> },
-  { label: "Recruit.", icon: <PersonAddAltRoundedIcon /> },
+  { label: "Parc", icon: <TrendingUpRoundedIcon /> },
+  { label: "Maint.", icon: <TaskAltRoundedIcon /> },
+  { label: "Plan", icon: <GroupsRoundedIcon /> },
+  { label: "Cycle", icon: <HubRoundedIcon /> },
+  { label: "Conf.", icon: <PersonAddAltRoundedIcon /> },
 ] as const;
 
 const MobileBottomNav = memo(({ activeTab, onTabChange }: MobileBottomNavProps) => (

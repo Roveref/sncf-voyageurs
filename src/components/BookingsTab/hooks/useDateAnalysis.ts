@@ -39,7 +39,8 @@ export const useDateAnalysis = (
     const endDate = dateRange[1] || new Date();
 
     return data.filter((item: Record<string, any>) => {
-      if (item.status !== 14) return false;
+      if (!item.isManual) return false; // Only interventions (user_assets)
+      if (item.status === 15) return false;
       if (!item.bookingDate) return false;
       const statusDate = new Date(item.bookingDate);
       return statusDate >= startDate && statusDate <= endDate;
@@ -53,6 +54,7 @@ export const useDateAnalysis = (
     const endDate = dateRange[1] || new Date();
 
     return data.filter((item: Record<string, any>) => {
+      if (!item.isManual) return false;
       if (item.status !== 15) return false;
       if (!item.bookingDate) return false;
       const statusDate = new Date(item.bookingDate);

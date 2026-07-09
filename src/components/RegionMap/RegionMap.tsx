@@ -32,7 +32,7 @@ interface RegionMapProps {
   darkMode?: boolean;
 }
 
-// BearingPoint color palette for regions (from brandConfig)
+// GAIF color palette for regions (from brandConfig)
 const REGION_COLORS: Record<string, { main: string; light: string; dark: string }> = { ...regionColors };
 
 const FALLBACK_COLORS = [

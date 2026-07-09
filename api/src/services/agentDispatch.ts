@@ -368,10 +368,10 @@ export const TOOL_DISPATCH: Record<string, ToolHandler> = {
       const endErr = validateDateParam("endDate", endDate);
       if (endErr)
         return { description: `Create staffing need`, result: endErr, logSuffix: `create_staffing_need → ${endErr}` };
-      // Validate opp exists (in either crm_opportunities or user_opportunities)
+      // Validate opp exists (in either assets or user_assets)
       const opp =
-        db.prepare(`SELECT opportunityId FROM crm_opportunities WHERE opportunityId = ?`).get(opportunityId) ||
-        db.prepare(`SELECT opportunityId FROM user_opportunities WHERE opportunityId = ?`).get(opportunityId);
+        db.prepare(`SELECT opportunityId FROM assets WHERE opportunityId = ?`).get(opportunityId) ||
+        db.prepare(`SELECT opportunityId FROM user_assets WHERE opportunityId = ?`).get(opportunityId);
       if (!opp)
         return {
           description: `Create staffing need`,
@@ -453,16 +453,17 @@ export const TOOL_DISPATCH: Record<string, ToolHandler> = {
   update_opportunity_status(input) {
     const { opportunityId, newStatus, comment = "", bookingDate } = input as any;
     const statusNames: Record<number, string> = {
-      1: "Lead",
-      4: "Go Approved",
-      6: "Proposal",
-      11: "Won",
-      14: "Booked",
-      15: "Lost",
+      1: "Émergence",
+      4: "Investissement / CEB",
+      6: "Étude en cours",
+      11: "Maintenance lourde",
+      13: "Conventionné",
+      14: "En exploitation",
+      15: "Déclassé",
     };
     try {
-      const opp = (db.prepare(`SELECT status FROM crm_opportunities WHERE opportunityId = ?`).get(opportunityId) ||
-        db.prepare(`SELECT status FROM user_opportunities WHERE opportunityId = ?`).get(opportunityId)) as any;
+      const opp = (db.prepare(`SELECT status FROM assets WHERE opportunityId = ?`).get(opportunityId) ||
+        db.prepare(`SELECT status FROM user_assets WHERE opportunityId = ?`).get(opportunityId)) as any;
       const originalStatus = opp?.status ?? 0;
       const modifiedAt = new Date().toISOString();
       // Write status override into EAV table (append-only history)
@@ -500,7 +501,7 @@ export const TOOL_DISPATCH: Record<string, ToolHandler> = {
     try {
       const now = new Date().toISOString();
       db.prepare(
-        `INSERT INTO user_opportunities (opportunityId, opportunity, account, status, grossRevenue, netRevenue, winPct, serviceLine1, creationDate, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        `INSERT INTO user_assets (opportunityId, opportunity, account, status, grossRevenue, netRevenue, winPct, serviceLine1, creationDate, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       ).run(
         opportunityId,
         name,
@@ -537,9 +538,9 @@ export const TOOL_DISPATCH: Record<string, ToolHandler> = {
     const { opportunityId, members } = input as any;
     try {
       db.transaction(() => {
-        db.prepare(`DELETE FROM user_revenue_team WHERE opportunityId = ?`).run(opportunityId);
+        db.prepare(`DELETE FROM user_asset_team WHERE opportunityId = ?`).run(opportunityId);
         const ins = db.prepare(
-          `INSERT INTO user_revenue_team (id, opportunityId, name, gradeBucket, percentage) VALUES (?, ?, ?, ?, ?)`
+          `INSERT INTO user_asset_team (id, opportunityId, name, gradeBucket, percentage) VALUES (?, ?, ?, ?, ?)`
         );
         for (const m of members) {
           ins.run(crypto.randomUUID(), opportunityId, m.name, m.gradeBucket, m.percentage);
@@ -565,14 +566,12 @@ export const TOOL_DISPATCH: Record<string, ToolHandler> = {
   delete_opportunity(input) {
     const { opportunityId } = input as any;
     try {
-      // Check if it exists in user_opportunities (manual) — only manual opps can be deleted
+      // Check if it exists in user_assets (manual) — only manual opps can be deleted
       const userOpp = db
-        .prepare(`SELECT opportunityId FROM user_opportunities WHERE opportunityId = ?`)
+        .prepare(`SELECT opportunityId FROM user_assets WHERE opportunityId = ?`)
         .get(opportunityId) as any;
       if (!userOpp) {
-        const crmOpp = db
-          .prepare(`SELECT opportunityId FROM crm_opportunities WHERE opportunityId = ?`)
-          .get(opportunityId) as any;
+        const crmOpp = db.prepare(`SELECT opportunityId FROM assets WHERE opportunityId = ?`).get(opportunityId) as any;
         if (!crmOpp) {
           return {
             description: `Delete opportunity: ${opportunityId}`,
@@ -587,11 +586,11 @@ export const TOOL_DISPATCH: Record<string, ToolHandler> = {
         };
       }
       db.transaction(() => {
-        db.prepare(`DELETE FROM user_opportunities WHERE opportunityId = ?`).run(opportunityId);
+        db.prepare(`DELETE FROM user_assets WHERE opportunityId = ?`).run(opportunityId);
         db.prepare(`DELETE FROM user_overrides WHERE entityType = 'opportunity' AND entityId = ?`).run(opportunityId);
         db.prepare(`DELETE FROM user_actions WHERE opportunityId = ?`).run(opportunityId);
         db.prepare(`DELETE FROM user_staffing_needs WHERE opportunityId = ?`).run(opportunityId);
-        db.prepare(`DELETE FROM user_revenue_team WHERE opportunityId = ?`).run(opportunityId);
+        db.prepare(`DELETE FROM user_asset_team WHERE opportunityId = ?`).run(opportunityId);
       })();
       logAudit("agent", "delete_opportunity", "opportunity", opportunityId);
       notifyDataChanged("crm", { opportunityId, deleted: true });
@@ -722,7 +721,7 @@ export const TOOL_DISPATCH: Record<string, ToolHandler> = {
       // Concentration analysis: top 3 accounts as % of total pipeline
       const accountRevenue = db
         .prepare(
-          "SELECT account, SUM(grossRevenue) as total FROM crm_opportunities WHERE status NOT IN (15) GROUP BY account ORDER BY total DESC"
+          "SELECT account, SUM(grossRevenue) as total FROM assets WHERE status NOT IN (15) GROUP BY account ORDER BY total DESC"
         )
         .all() as any[];
       const totalPipeline = accountRevenue.reduce((s: number, a: any) => s + (a.total || 0), 0);
@@ -733,7 +732,7 @@ export const TOOL_DISPATCH: Record<string, ToolHandler> = {
       const today = new Date().toISOString().slice(0, 10);
       const stagnant = db
         .prepare(
-          `SELECT COUNT(*) as count FROM crm_opportunities WHERE status = 6
+          `SELECT COUNT(*) as count FROM assets WHERE status = 6
          AND (lastStatusChangeDate IS NOT NULL AND lastStatusChangeDate < date(?, '-60 days')
            OR lastStatusChangeDate IS NULL AND creationDate < date(?, '-60 days'))`
         )
@@ -788,12 +787,12 @@ export const TOOL_DISPATCH: Record<string, ToolHandler> = {
       if (type === "all" || type === "opportunity") {
         const opps = db
           .prepare(
-            "SELECT opportunityId as id, opportunity as name, account, status, grossRevenue FROM crm_opportunities WHERE LOWER(opportunity) LIKE ? OR LOWER(account) LIKE ? LIMIT 5"
+            "SELECT opportunityId as id, opportunity as name, account, status, grossRevenue FROM assets WHERE LOWER(opportunity) LIKE ? OR LOWER(account) LIKE ? LIMIT 5"
           )
           .all(`%${searchTerm}%`, `%${searchTerm}%`) as any[];
         const userOpps = db
           .prepare(
-            "SELECT opportunityId as id, opportunity as name, account, status, grossRevenue FROM user_opportunities WHERE LOWER(opportunity) LIKE ? OR LOWER(account) LIKE ? LIMIT 5"
+            "SELECT opportunityId as id, opportunity as name, account, status, grossRevenue FROM user_assets WHERE LOWER(opportunity) LIKE ? OR LOWER(account) LIKE ? LIMIT 5"
           )
           .all(`%${searchTerm}%`, `%${searchTerm}%`) as any[];
         results.push(...opps.map((o: any) => ({ ...o, _type: "opportunity" })));
@@ -803,7 +802,7 @@ export const TOOL_DISPATCH: Record<string, ToolHandler> = {
       if (type === "all" || type === "account") {
         const accts = db
           .prepare(
-            "SELECT account, subSegmentCode, accountLeader, country FROM crm_accounts WHERE LOWER(account) LIKE ? LIMIT 5"
+            "SELECT account, subSegmentCode, accountLeader, country FROM sites WHERE LOWER(account) LIKE ? LIMIT 5"
           )
           .all(`%${searchTerm}%`) as any[];
         results.push(...accts.map((a: any) => ({ ...a, _type: "account" })));
@@ -943,7 +942,7 @@ export const TOOL_DISPATCH: Record<string, ToolHandler> = {
     const { candidateId, staffingNeedId, matchScore } = input as any;
     try {
       const candidate = db
-        .prepare("SELECT id, firstName, lastName, grade FROM hr_candidates WHERE id = ?")
+        .prepare("SELECT id, firstName, lastName, grade FROM nonconformities WHERE id = ?")
         .get(candidateId) as any;
       if (!candidate)
         return {
@@ -962,7 +961,7 @@ export const TOOL_DISPATCH: Record<string, ToolHandler> = {
         };
 
       db.prepare(
-        `INSERT INTO candidate_staffing_match (candidateId, staffingNeedId, matchScore, matchedAt, matchedBy)
+        `INSERT INTO nc_staffing_match (candidateId, staffingNeedId, matchScore, matchedAt, matchedBy)
          VALUES (?, ?, ?, ?, 'agent') ON CONFLICT(candidateId, staffingNeedId) DO UPDATE SET matchScore = excluded.matchScore, matchedAt = excluded.matchedAt`
       ).run(candidateId, staffingNeedId, matchScore ?? null, new Date().toISOString());
 
@@ -981,5 +980,225 @@ export const TOOL_DISPATCH: Record<string, ToolHandler> = {
         logSuffix: `match_candidate → Error: ${e.message}`,
       };
     }
+  },
+
+  // ── GAIF — Comitologie : actions ouvertes par comité (lecture table gaif_comite_actions) ──
+  get_comite_actions(input) {
+    const comiteRaw = String(input.comite || "")
+      .toLowerCase()
+      .trim();
+    // Résolution flexible : "copil-immo", "COPIL-IMMO", "copil_immo", "immo" fonctionnent tous
+    let comite: { id: string; label: string; cadence: string; themes: string; nextOccurrence: string } | undefined;
+    try {
+      const rows = db.prepare(`SELECT id, label, cadence, themes, nextOccurrence FROM gaif_comites`).all() as Array<{
+        id: string;
+        label: string;
+        cadence: string;
+        themes: string;
+        nextOccurrence: string;
+      }>;
+      comite = rows.find(
+        (r) =>
+          r.id.toLowerCase() === comiteRaw ||
+          r.id.toLowerCase().includes(comiteRaw) ||
+          r.label.toLowerCase().includes(comiteRaw)
+      );
+    } catch {
+      // Table may not exist on legacy DB
+    }
+
+    if (!comite) {
+      return {
+        description: "get_comite_actions",
+        result: `Comité inconnu: "${comiteRaw}". Comités valides: copil-reseau, copil-immo, cotech-idfm, copil-rse.`,
+        logSuffix: `get_comite_actions → unknown(${comiteRaw})`,
+      };
+    }
+
+    let themes: string[] = [];
+    try {
+      themes = JSON.parse(comite.themes);
+    } catch {
+      themes = [];
+    }
+
+    let actions: Array<{
+      id: string;
+      description: string;
+      ownerId: string;
+      dueDate: string;
+      status: string;
+      priority: string;
+    }> = [];
+    try {
+      actions = db
+        .prepare(
+          `SELECT id, description, ownerId, dueDate, status, priority
+           FROM gaif_comite_actions WHERE comiteId = ? AND status != 'done' AND status != 'cancelled'
+           ORDER BY dueDate ASC LIMIT 25`
+        )
+        .all(comite.id) as typeof actions;
+    } catch {
+      // Table may not exist on legacy DB
+    }
+
+    const lines: string[] = [];
+    lines.push(`## ${comite.label} (${comite.cadence})`);
+    lines.push(`**Prochaine occurrence** : ${comite.nextOccurrence}`);
+    if (themes.length > 0) lines.push(`**Thèmes** : ${themes.join(" · ")}`);
+    lines.push("");
+    if (actions.length === 0) {
+      lines.push("_Aucune action ouverte associée à ce comité._");
+    } else {
+      lines.push(
+        `**${actions.length} action${actions.length > 1 ? "s" : ""} ouverte${actions.length > 1 ? "s" : ""}** :`
+      );
+      for (const a of actions) {
+        const priority = a.priority ? ` [${a.priority}]` : "";
+        lines.push(`- [${a.status}]${priority} ${a.description} · ${a.ownerId} · échéance ${a.dueDate}`);
+      }
+    }
+    return {
+      description: `Comité ${comite.label}`,
+      result: lines.join("\n"),
+      logSuffix: `get_comite_actions(${comite.id}) → ${actions.length} actions`,
+    };
+  },
+
+  // ── GAIF — Analyse des écarts de conformité par site/patrimoine ──
+  get_compliance_gaps(input) {
+    const patrimoine = input.patrimoine ? String(input.patrimoine) : null;
+    const site = input.site ? String(input.site) : null;
+    const threshold = Number(input.threshold ?? 95);
+    let sql = `SELECT opportunityId, opportunity, serviceLine1 as site, subSegmentCode as patrimoine,
+                      engagementType as criticite, cm1Pct as conformite, partner
+               FROM assets
+               WHERE cm1Pct < ?`;
+    const params: any[] = [threshold];
+    if (patrimoine) {
+      sql += " AND subSegmentCode = ?";
+      params.push(patrimoine);
+    }
+    if (site) {
+      sql += " AND serviceLine1 LIKE ?";
+      params.push(`%${site}%`);
+    }
+    sql += " ORDER BY cm1Pct ASC LIMIT 50";
+    try {
+      const rows = db.prepare(sql).all(...params) as Array<{
+        opportunityId: string;
+        opportunity: string;
+        site: string;
+        patrimoine: string;
+        criticite: string;
+        conformite: number;
+        partner: string | null;
+      }>;
+      if (rows.length === 0) {
+        return {
+          description: "Compliance gaps",
+          result:
+            "Aucun actif sous le seuil de conformité dans le périmètre demandé. Les seuils PSGA (critique <1%/autre <5% optimal) sont respectés.",
+          logSuffix: `get_compliance_gaps → 0`,
+        };
+      }
+      const lines: string[] = [];
+      lines.push(`## ${rows.length} actif${rows.length > 1 ? "s" : ""} sous ${threshold}% de conformité`);
+      const critCount = rows.filter((r) => String(r.criticite || "").includes("Critique")).length;
+      lines.push(
+        `Dont **${critCount} actif${critCount > 1 ? "s" : ""} critique${critCount > 1 ? "s" : ""}** (priorité PSGA).`
+      );
+      lines.push("");
+      lines.push("| Actif | Site | Patrimoine | Criticité | Conformité | Prestataire |");
+      lines.push("|---|---|---|---|---|---|");
+      for (const r of rows.slice(0, 25)) {
+        lines.push(
+          `| ${r.opportunity} | ${r.site} | ${r.patrimoine} | ${String(r.criticite).replace("Criticité ", "")} | ${Number(r.conformite).toFixed(1)}% | ${r.partner ?? "—"} |`
+        );
+      }
+      if (rows.length > 25) lines.push(`\n_… et ${rows.length - 25} autres._`);
+      return {
+        description: "Compliance gaps",
+        result: lines.join("\n"),
+        logSuffix: `get_compliance_gaps → ${rows.length} rows`,
+      };
+    } catch (e: any) {
+      return {
+        description: "Compliance gaps",
+        result: `Erreur SQL : ${e.message}`,
+        logSuffix: `get_compliance_gaps → Error: ${e.message}`,
+      };
+    }
+  },
+
+  // ── GAIF — Recherche dans le corpus doctrinaire (lecture table gaif_doctrinaire_docs) ──
+  knowledge_base_lookup(input) {
+    const query = String(input.query || "")
+      .toLowerCase()
+      .trim();
+    if (query.length < 3) {
+      return {
+        description: "Knowledge base lookup",
+        result: "Requête trop courte (min 3 caractères).",
+        logSuffix: "kb_lookup → short",
+      };
+    }
+    type KBRow = {
+      id: string;
+      title: string;
+      category: string;
+      summary: string | null;
+      content: string | null;
+      tags: string | null;
+    };
+    let rows: KBRow[] = [];
+    try {
+      rows = db
+        .prepare(
+          `SELECT id, title, category, summary, content, tags FROM gaif_doctrinaire_docs WHERE status != 'Retiré' OR status IS NULL`
+        )
+        .all() as KBRow[];
+    } catch {
+      return {
+        description: "Knowledge base lookup",
+        result: "Corpus documentaire non initialisé. Lance : python3 scripts/init_db.py puis re-seed la démo GAIF.",
+        logSuffix: "kb_lookup → table missing",
+      };
+    }
+    const tokens = query.split(/\s+/).filter((t) => t.length > 2);
+    const scored = rows
+      .map((r) => {
+        const tagsArray: string[] = (() => {
+          try {
+            return r.tags ? JSON.parse(r.tags) : [];
+          } catch {
+            return [];
+          }
+        })();
+        const hay =
+          `${r.title} ${r.category} ${r.summary ?? ""} ${r.content ?? ""} ${tagsArray.join(" ")}`.toLowerCase();
+        let score = 0;
+        for (const t of tokens) if (hay.includes(t)) score++;
+        return { row: r, score };
+      })
+      .filter((s) => s.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5);
+    if (scored.length === 0) {
+      return {
+        description: "Knowledge base lookup",
+        result: `Aucune entrée trouvée pour "${query}". Essaie des mots-clés plus génériques (ex: maintenance, criticité, comitologie, PSGA).`,
+        logSuffix: `kb_lookup(${query}) → 0`,
+      };
+    }
+    const lines = scored.map(({ row }) => {
+      const body = row.content || row.summary || "(contenu vide)";
+      return `### ${row.title} (${row.category})\n${body}`;
+    });
+    return {
+      description: `KB lookup: ${query}`,
+      result: lines.join("\n\n"),
+      logSuffix: `kb_lookup(${query}) → ${scored.length}`,
+    };
   },
 };

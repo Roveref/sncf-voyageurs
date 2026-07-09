@@ -227,15 +227,10 @@ export function useDerivedData(
     return [];
   }, [filteredData, activeTab]);
 
-  // Per-tab data (always computed, not dependent on activeTab)
-  const pipelineData = useMemo(
-    () => filteredData?.filter((item: any) => item.status >= 1 && item.status <= 11) || [],
-    [filteredData]
-  );
-  const bookingsData = useMemo(
-    () => filteredData?.filter((item: any) => [11, 14, 15].includes(item.status)) || [],
-    [filteredData]
-  );
+  // Per-tab data : Parc d'actifs = CRM actifs uniquement (pas les interventions manuelles)
+  // Maintenance = toutes les données (le BookingsTab filtre en interne sur isManual)
+  const pipelineData = useMemo(() => filteredData?.filter((item: any) => !item.isManual) || [], [filteredData]);
+  const bookingsData = useMemo(() => filteredData || [], [filteredData]);
 
   return { allOpportunityData, filteredData, filteredDataRaw, tabData, pipelineData, bookingsData };
 }

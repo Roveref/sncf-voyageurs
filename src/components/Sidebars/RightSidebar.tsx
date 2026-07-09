@@ -256,7 +256,7 @@ const RightSidebar = () => {
             >
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <Typography variant="h6" fontWeight={600} color={theme.palette.secondary.dark}>
-                  Unit
+                  Entités
                 </Typography>
 
                 {/* Expand/Collapse level buttons */}

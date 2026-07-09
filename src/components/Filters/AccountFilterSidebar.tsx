@@ -101,7 +101,7 @@ const AccountFilterSidebar = ({
               "&:hover": { textDecoration: "underline" },
             }}
           >
-            Clear all
+            Tout effacer
           </Typography>
         )}
       </Box>
@@ -126,8 +126,8 @@ const AccountFilterSidebar = ({
         renderInput={(params) => (
           <TextField
             {...params}
-            label="Segments"
-            placeholder={selectedSegments.length === 0 ? "All segments" : ""}
+            label="Patrimoines"
+            placeholder={selectedSegments.length === 0 ? "Tous les patrimoines" : ""}
             sx={{
               "& .MuiOutlinedInput-root": {
                 borderRadius: 1.5,
@@ -158,8 +158,8 @@ const AccountFilterSidebar = ({
         renderInput={(params) => (
           <TextField
             {...params}
-            label="Sub-Segments"
-            placeholder={selectedSubSegments.length === 0 ? "All sub-segments" : ""}
+            label="Familles d'actifs"
+            placeholder={selectedSubSegments.length === 0 ? "Toutes les familles" : ""}
             sx={{
               "& .MuiOutlinedInput-root": {
                 borderRadius: 1.5,

@@ -337,14 +337,14 @@ export const EmployeeModal = memo(
           {/* Employee identity */}
           {isNew && (
             <>
-              <FormRow label="Name" icon={PersonIcon}>
+              <FormRow label="Nom" icon={PersonIcon}>
                 <TextField
                   size="small"
                   fullWidth
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="First Last"
-                  inputProps={{ "aria-label": "Employee name" }}
+                  placeholder="Prénom Nom"
+                  inputProps={{ "aria-label": "Nom du collaborateur" }}
                 />
               </FormRow>
               <FormRow label="ID" icon={BadgeIcon}>

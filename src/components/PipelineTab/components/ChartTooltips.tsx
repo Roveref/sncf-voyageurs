@@ -39,7 +39,7 @@ export const StatusChartTooltip = ({ active, payload, showIO = true }: any) => {
 
     if (earlyTotal > 0) {
       pipelineStages.push({
-        name: "Lead Identified → Go Approved",
+        name: "Émergence",
         allocated: earlyAllocated,
         nonAllocated: earlyNonAllocated,
         total: earlyTotal,
@@ -57,7 +57,7 @@ export const StatusChartTooltip = ({ active, payload, showIO = true }: any) => {
 
     if (midTotal > 0) {
       pipelineStages.push({
-        name: "Proposal Submitted",
+        name: "Étude en cours",
         allocated: midAllocated,
         nonAllocated: midNonAllocated,
         total: midTotal,
@@ -75,7 +75,7 @@ export const StatusChartTooltip = ({ active, payload, showIO = true }: any) => {
 
     if (lateTotal > 0) {
       pipelineStages.push({
-        name: "Client Won → AEL",
+        name: "Maintenance lourde",
         allocated: lateAllocated,
         nonAllocated: lateNonAllocated,
         total: lateTotal,
@@ -120,7 +120,7 @@ export const StatusChartTooltip = ({ active, payload, showIO = true }: any) => {
             {/* Stage name and total */}
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 2 }}>
               <Typography variant="body2" fontWeight={500} color={stage.color} sx={{ flex: 1, lineHeight: 1.4 }}>
-                {stage.name} ({stage.count} opp{stage.count !== 1 ? "s" : ""}):
+                {stage.name} ({stage.count} actif{stage.count !== 1 ? "s" : ""}) :
               </Typography>
               <Typography variant="body2" fontWeight={600} sx={{ whiteSpace: "nowrap" }}>
                 {formatCurrency(stage.total)}
@@ -139,7 +139,7 @@ export const StatusChartTooltip = ({ active, payload, showIO = true }: any) => {
                     color: "text.secondary",
                   }}
                 >
-                  <span>• Allocated:</span>
+                  <span>• Alloué :</span>
                   <span style={{ fontWeight: 600, marginLeft: "8px" }}>{formatCurrency(stage.allocated)}</span>
                 </Typography>
                 <Typography
@@ -152,7 +152,7 @@ export const StatusChartTooltip = ({ active, payload, showIO = true }: any) => {
                     opacity: 0.7,
                   }}
                 >
-                  <span>• Other:</span>
+                  <span>• Autre :</span>
                   <span style={{ fontWeight: 600, marginLeft: "8px" }}>{formatCurrency(stage.nonAllocated)}</span>
                 </Typography>
               </Box>
@@ -182,8 +182,8 @@ export const StatusChartTooltip = ({ active, payload, showIO = true }: any) => {
         {/* Total Section */}
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <Typography variant="body2" fontWeight={700}>
-            Total ({pipelineStages.reduce((sum, stage) => sum + stage.count, 0)} opp
-            {pipelineStages.reduce((sum, stage) => sum + stage.count, 0) !== 1 ? "s" : ""}):
+            Total ({pipelineStages.reduce((sum, stage) => sum + stage.count, 0)} actif
+            {pipelineStages.reduce((sum, stage) => sum + stage.count, 0) !== 1 ? "s" : ""}) :
           </Typography>
           <Typography variant="body2" fontWeight={700}>
             {formatCurrency(chartTotalRevenue)}
@@ -194,7 +194,7 @@ export const StatusChartTooltip = ({ active, payload, showIO = true }: any) => {
         {pipelineStages.some((stage) => stage.nonAllocated > 0) && (
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: 0.5 }}>
             <Typography variant="body2" fontWeight={600} color="text.secondary" sx={{ fontSize: "0.85rem" }}>
-              Total Allocated:
+              Total alloué :
             </Typography>
             <Typography variant="body2" fontWeight={600} color="text.secondary" sx={{ fontSize: "0.85rem" }}>
               {formatCurrency(pipelineStages.reduce((sum, stage) => sum + stage.allocated, 0))}
@@ -258,17 +258,17 @@ export const RevenueChartTooltip = ({ active, payload, label, showIO = true }: a
           {`${label || payload[0].name}`}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {`Revenue: ${formatCurrency(payload[0].value)}`}
+          {`Valeur : ${formatCurrency(payload[0].value)}`}
         </Typography>
         {/* Add calculated value in parentheses if available */}
         {showIO && payload[0].payload.calculatedValue && (
           <Typography variant="body2" color="primary.main">
-            {`(I&O: ${formatCurrency(payload[0].payload.calculatedValue)})`}
+            {`(I&O : ${formatCurrency(payload[0].payload.calculatedValue)})`}
           </Typography>
         )}
         {payload[0].payload.count && (
           <Typography variant="body2" color="text.secondary">
-            {`Count: ${payload[0].payload.count} opportunities`}
+            {`Nombre : ${payload[0].payload.count} actifs`}
           </Typography>
         )}
       </Card>

@@ -161,10 +161,10 @@ const NotificationBell = memo(() => {
     const d = new Date(iso);
     const now = new Date();
     const diffMin = Math.floor((now.getTime() - d.getTime()) / 60000);
-    if (diffMin < 1) return "just now";
-    if (diffMin < 60) return `${diffMin}m ago`;
+    if (diffMin < 1) return "à l'instant";
+    if (diffMin < 60) return `il y a ${diffMin} min`;
     const diffH = Math.floor(diffMin / 60);
-    if (diffH < 24) return `${diffH}h ago`;
+    if (diffH < 24) return `il y a ${diffH}h`;
     return d.toLocaleDateString("fr-FR", { day: "2-digit", month: "short" });
   };
 
@@ -213,7 +213,7 @@ const NotificationBell = memo(() => {
           </Typography>
           {unreadCount > 0 && (
             <Button size="small" onClick={handleMarkAllRead} sx={{ textTransform: "none", fontSize: "0.7rem" }}>
-              Mark all read
+              Tout marquer comme lu
             </Button>
           )}
         </Box>
@@ -221,7 +221,7 @@ const NotificationBell = memo(() => {
         {notifications.length === 0 ? (
           <Box sx={{ py: 4, textAlign: "center" }}>
             <Typography variant="body2" color="text.disabled">
-              No notifications
+              Aucune notification
             </Typography>
           </Box>
         ) : (

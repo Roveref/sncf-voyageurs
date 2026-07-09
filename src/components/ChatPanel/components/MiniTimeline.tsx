@@ -63,10 +63,10 @@ const MiniTimeline = memo(({ title, data, isDark, warm }: MiniTimelineProps) => 
     >
       <Typography sx={{ fontSize: 12, fontWeight: 600, mb: 1.5, color: warm.text }}>{title}</Typography>
 
-      {/* Need period */}
+      {/* Period period */}
       <Box sx={{ mb: 0.75 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, mb: 0.25 }}>
-          <Typography sx={{ fontSize: 10, color: warm.muted, minWidth: 80, textAlign: "right" }}>Need</Typography>
+          <Typography sx={{ fontSize: 10, color: warm.muted, minWidth: 80, textAlign: "right" }}>Besoin</Typography>
           <Typography sx={{ fontSize: 9.5, color: warm.muted }}>
             {formatShort(data.needStart)} - {formatShort(data.needEnd)}
           </Typography>

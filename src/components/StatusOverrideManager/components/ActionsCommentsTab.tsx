@@ -216,7 +216,7 @@ const ActionsCommentsTab = memo(() => {
       {totalItems === 0 ? (
         <Box sx={{ p: 4, textAlign: "center" }}>
           <Typography variant="body2" color="text.secondary">
-            {allOriginalItems === 0 ? "No actions" : "No results matching your search"}
+            {allOriginalItems === 0 ? "Aucune action" : "Aucun résultat pour cette recherche"}
           </Typography>
         </Box>
       ) : (

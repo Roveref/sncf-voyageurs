@@ -106,7 +106,7 @@ router.get("/opportunities", validate({ query: paginationQuery }), (req: Request
               country, region, subSegmentCode, subSegment,
               serviceLine1, serviceLine2, serviceLine3,
               serviceOffering1, serviceOffering2, serviceOffering3
-       FROM crm_opportunities WHERE 1=1`;
+       FROM assets WHERE 1=1`;
   const params: unknown[] = [];
 
   if (status) {
@@ -140,7 +140,7 @@ router.get("/opportunities/:id", (req: Request, res: Response) => {
             creationDate, bookingDate, estimatedBookingDate,
             lastStatusChangeDate, manager, partner, em, ep,
             country, region, subSegmentCode, subSegment
-     FROM crm_opportunities WHERE opportunityId = ?`
+     FROM assets WHERE opportunityId = ?`
     )
     .get(req.params.id);
   if (!opp) {
@@ -168,7 +168,7 @@ router.post("/opportunities", validate({ body: createOpportunityBody }), (req: R
 
   const now = new Date().toISOString();
   db.prepare(
-    `INSERT INTO user_opportunities (opportunityId, opportunity, account, status, grossRevenue, netRevenue, winPct, subSegmentCode, manager, partner, createdAt, updatedAt)
+    `INSERT INTO user_assets (opportunityId, opportunity, account, status, grossRevenue, netRevenue, winPct, subSegmentCode, manager, partner, createdAt, updatedAt)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).run(
     id,
@@ -195,10 +195,10 @@ router.put("/opportunities/:id", (req: Request, res: Response) => {
   const username = (req as any).user?.username || "anonymous";
   const now = new Date().toISOString();
 
-  // Try user_opportunities first, then crm_opportunities
+  // Try user_assets first, then assets
   const userResult = db
     .prepare(
-      `UPDATE user_opportunities SET
+      `UPDATE user_assets SET
       opportunity = COALESCE(?, opportunity),
       account = COALESCE(?, account),
       status = COALESCE(?, status),
@@ -227,7 +227,7 @@ router.put("/opportunities/:id", (req: Request, res: Response) => {
 
   const crmResult = db
     .prepare(
-      `UPDATE crm_opportunities SET
+      `UPDATE assets SET
       opportunity = COALESCE(?, opportunity),
       account = COALESCE(?, account),
       status = COALESCE(?, status),
@@ -263,10 +263,10 @@ router.delete("/opportunities/:id", (req: Request, res: Response) => {
   const cascadeDelete = db.transaction(() => {
     db.prepare("DELETE FROM user_actions WHERE opportunityId = ?").run(id);
     db.prepare("DELETE FROM user_staffing_needs WHERE opportunityId = ?").run(id);
-    db.prepare("DELETE FROM user_revenue_team WHERE opportunityId = ?").run(id);
+    db.prepare("DELETE FROM user_asset_team WHERE opportunityId = ?").run(id);
     db.prepare("DELETE FROM user_overrides WHERE entityType = 'opportunity' AND entityId = ?").run(id);
-    db.prepare("DELETE FROM user_opportunities WHERE opportunityId = ?").run(id);
-    db.prepare("DELETE FROM crm_opportunities WHERE opportunityId = ?").run(id);
+    db.prepare("DELETE FROM user_assets WHERE opportunityId = ?").run(id);
+    db.prepare("DELETE FROM assets WHERE opportunityId = ?").run(id);
   });
   cascadeDelete();
   logAudit(username, "delete_opportunity", "opportunity", id);
@@ -320,7 +320,7 @@ router.get("/stats", (_req: Request, res: Response) => {
         COUNT(*) as totalOpportunities,
         COALESCE(SUM(grossRevenue), 0) as totalRevenue,
         COALESCE(AVG(winPct), 0) as avgWinPct
-       FROM crm_opportunities WHERE status NOT IN (14, 15)`
+       FROM assets WHERE status NOT IN (14, 15)`
     )
     .get();
 
@@ -329,7 +329,7 @@ router.get("/stats", (_req: Request, res: Response) => {
       `SELECT
         COUNT(*) as totalBookings,
         COALESCE(SUM(grossRevenue), 0) as totalRevenue
-       FROM crm_opportunities WHERE status = 14`
+       FROM assets WHERE status = 14`
     )
     .get();
 

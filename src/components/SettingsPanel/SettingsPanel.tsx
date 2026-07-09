@@ -115,14 +115,14 @@ const EntryRow = memo(function EntryRow({
         sx={{ flex: 1 }}
         slotProps={{ input: { sx: { fontFamily: "monospace", fontSize: "0.85rem" } } }}
       />
-      <Tooltip title="Save">
+      <Tooltip title="Enregistrer">
         <span>
           <IconButton size="small" color="primary" disabled={!dirty || saving} onClick={handleSave}>
             {saving ? <CircularProgress size={18} /> : <SaveIcon fontSize="small" />}
           </IconButton>
         </span>
       </Tooltip>
-      <Tooltip title="Delete">
+      <Tooltip title="Supprimer">
         <span>
           <IconButton size="small" color="error" disabled={deleting} onClick={handleDelete}>
             {deleting ? <CircularProgress size={18} /> : <DeleteIcon fontSize="small" />}

@@ -391,7 +391,7 @@ const DateRangeFilter = memo(
                 fontWeight: 500,
               }}
             >
-              to
+              au
             </Box>
 
             <DatePicker

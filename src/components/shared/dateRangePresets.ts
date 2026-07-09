@@ -23,16 +23,16 @@ function resolveWeekStart(today: Date): Date {
 export const PIPELINE_PRESETS: PresetGroup[] = [
   {
     items: [
-      { id: "7J", label: "7 days", days: 7 },
-      { id: "30J", label: "30 days", days: 30 },
-      { id: "90J", label: "90 days", days: 90 },
+      { id: "7J", label: "7 jours", days: 7 },
+      { id: "30J", label: "30 jours", days: 30 },
+      { id: "90J", label: "90 jours", days: 90 },
     ],
   },
   {
     items: [
-      { id: "WTD", label: "Week", type: "week" },
-      { id: "MTD", label: "Month", type: "month" },
-      { id: "YTD", label: "Year", type: "year" },
+      { id: "WTD", label: "Semaine", type: "week" },
+      { id: "MTD", label: "Mois", type: "month" },
+      { id: "YTD", label: "Année", type: "year" },
     ],
   },
 ];
@@ -55,16 +55,16 @@ export function resolvePipelinePreset(presetId: string): { startDate: Date; endD
 export const BOOKINGS_PRESETS: PresetGroup[] = [
   {
     items: [
-      { id: "7J", label: "7 days", days: 7 },
-      { id: "30J", label: "30 days", days: 30 },
-      { id: "90J", label: "90 days", days: 90 },
+      { id: "7J", label: "7 jours", days: 7 },
+      { id: "30J", label: "30 jours", days: 30 },
+      { id: "90J", label: "90 jours", days: 90 },
     ],
   },
   {
     items: [
-      { id: "WTD", label: "Week", type: "week" },
-      { id: "MTD", label: "Month", type: "month" },
-      { id: "LY", label: "Last Year", type: "lastYear" },
+      { id: "WTD", label: "Semaine", type: "week" },
+      { id: "MTD", label: "Mois", type: "month" },
+      { id: "LY", label: "Année préc.", type: "lastYear" },
     ],
   },
 ];

@@ -20,7 +20,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import CloseIcon from "@mui/icons-material/Close";
 import { useUserDataStore } from "../../../../stores/useUserDataStore";
-import { getGradeColor, getGradeAbbr, GRADE_ORDER, compareGrades } from "../../constants";
+import { getGradeColor, getGradeAbbr, getGradeUILabel, GRADE_ORDER, compareGrades } from "../../constants";
 import {
   computeAllNeedStatuses,
   getAssignmentsForNeed,
@@ -542,7 +542,7 @@ const NeedsList = memo(
                     </Typography>
                   </Box>
                   <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.78rem", flex: 1 }}>
-                    {grade}
+                    {getGradeUILabel(grade)}
                   </Typography>
                   <Typography
                     variant="caption"
@@ -672,7 +672,7 @@ const NeedsList = memo(
                                 color: "#CC2931",
                               }}
                             >
-                              {candidateNeedId === need.id ? "Close" : "Candidates"}
+                              {candidateNeedId === need.id ? "Fermer" : "Experts suggérés"}
                             </Button>
                           )}
                         </Box>

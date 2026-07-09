@@ -7,7 +7,7 @@ import TuneIcon from "@mui/icons-material/Tune";
 import { alpha } from "@mui/material/styles";
 import { brand } from "../../../../config/brandConfig";
 
-// BearingPoint brand palette — all tones from the BP red/brown/grey family (from brandConfig)
+// GAIF brand palette — all tones from the legacy consulting palette (from brandConfig)
 export const COLORS = {
   forecast: brand.primary, // R50 Bearing Red — Forecast TU
   actual: brand.secondary, // G60 Brown — Actual TU (SAP)
@@ -20,15 +20,15 @@ export const COLORS = {
 };
 
 export const SERIES = [
-  { key: "forecast", label: "MDS", color: COLORS.forecast },
-  { key: "actual", label: "SAP", color: COLORS.actual },
-  { key: "target", label: "Theoretical", color: COLORS.target },
-  { key: "fte", label: "FTE", color: COLORS.fte },
-  { key: "ioTU", label: "I&O", color: COLORS.io },
-  { key: "infiniteTU", label: "∞ Capacity", color: COLORS.infinite },
-  { key: "probInfTU", label: "∞ Capacity prob.", color: COLORS.probInfinite },
-  { key: "gradeCappedTU", label: "∞ Cap. grade", color: brand.secondary },
-  { key: "turnoverChurn", label: "Turnover", color: COLORS.turnoverChurn },
+  { key: "forecast", label: "Prévu", color: COLORS.forecast },
+  { key: "actual", label: "Réalisé", color: COLORS.actual },
+  { key: "target", label: "Théorique", color: COLORS.target },
+  { key: "fte", label: "ETP", color: COLORS.fte },
+  { key: "ioTU", label: "GAIF", color: COLORS.io },
+  { key: "infiniteTU", label: "Capacité ∞", color: COLORS.infinite },
+  { key: "probInfTU", label: "Capacité ∞ prob.", color: COLORS.probInfinite },
+  { key: "gradeCappedTU", label: "Capacité ∞ par rôle", color: brand.secondary },
+  { key: "turnoverChurn", label: "Rotation", color: COLORS.turnoverChurn },
 ];
 
 // Dash patterns matching each Line component's strokeDasharray

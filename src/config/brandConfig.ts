@@ -9,35 +9,35 @@
 // ── Brand Palette ──────────────────────────────────────────────────────────────
 
 export const brand = {
-  // Primary (BearingPoint Red)
-  primary: "#FF3D47",
-  primaryDark: "#CC2931",
-  primaryLight: "#FF787A",
-  primaryLighter: "#FFA3A8",
-  primaryLightest: "#FFBDC0",
-  primaryBg: "#FFD6D8",
-  primaryDeep: "#99171D",
-  primaryDeepest: "#330000",
-  // Secondary (Warm Grey)
-  secondary: "#806659",
-  secondaryDark: "#5C4A3F",
-  secondaryLight: "#98847A",
-  secondaryLighter: "#B2A59F",
-  secondaryLightest: "#CCC1BC",
-  secondaryBg: "#E6DEDA",
+  // Primary (SNCF Voyageurs Magenta)
+  primary: "#EB0070",
+  primaryDark: "#B8005A",
+  primaryLight: "#F04093",
+  primaryLighter: "#F571B0",
+  primaryLightest: "#FAA3CC",
+  primaryBg: "#FDD6E8",
+  primaryDeep: "#870042",
+  primaryDeepest: "#3C001E",
+  // Secondary (Anthracite)
+  secondary: "#374151",
+  secondaryDark: "#1F2937",
+  secondaryLight: "#4B5563",
+  secondaryLighter: "#6B7280",
+  secondaryLightest: "#9CA3AF",
+  secondaryBg: "#E5E7EB",
   // Background
-  background: "#FAF8F7",
+  background: "#F8FAFC",
   white: "#FFFFFF",
   black: "#000000",
   // Dark mode
-  darkBg: "#1A1210",
-  darkPaper: "#241E1B",
-  darkSurface: "#2E2622",
-  darkBorder: "#3D3129",
+  darkBg: "#0F172A",
+  darkPaper: "#1E293B",
+  darkSurface: "#263244",
+  darkBorder: "#334155",
   // Identity
-  fontFamily: 'Aptos, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-  logoPath: "/Beonpoint_stars.svg",
-  appName: "Be.on\u00B0",
+  fontFamily: 'Avenir, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+  logoPath: "/gaif-logo.svg",
+  appName: "GAIF Pilot",
   borderRadius: 12,
 };
 
@@ -53,44 +53,73 @@ export const functional = {
   info: "#3b82f6",
 };
 
-// ── Segment Colors ─────────────────────────────────────────────────────────────
+// ── Segment Colors (repurposed for GAIF — 4 marqueurs d'industrialisation) ────
 
 export const segmentColors: Record<string, string> = {
-  LSC: "#FF3D47",
-  IEM: "#CC2931",
-  AUTO: "#99171D",
-  CRL: "#FF787A",
-  TMT: "#806659",
-  UTL: "#98847A",
-  AMD: "#FF3D47",
-  CLR: "#B2A59F",
-  FSI: "#CC2931",
-  INS: "#CCC1BC",
-  PHS: "#99171D",
-  HSC: "#5C4A3F",
-  ERT: "#FFA3A8",
+  // 4 marqueurs d'industrialisation GAIF
+  Clients: "#EB0070",
+  Agilite: "#0EA5E9",
+  JusteBesoin: "#10B981",
+  Innovation: "#F59E0B",
+  // Legacy segment codes (kept for backward compatibility with existing components)
+  LSC: "#EB0070",
+  IEM: "#0EA5E9",
+  AUTO: "#10B981",
+  CRL: "#F59E0B",
+  TMT: "#7C3AED",
+  UTL: "#06B6D4",
+  AMD: "#EC4899",
+  CLR: "#6366F1",
+  FSI: "#84CC16",
+  INS: "#F97316",
+  PHS: "#14B8A6",
+  HSC: "#A855F7",
+  ERT: "#EF4444",
 };
 
-// ── Service Line Colors ────────────────────────────────────────────────────────
+// ── Service Line Colors — one per GAIF patrimoine ─────────────────────────────
 
 export const serviceLineColors: Record<string, string> = {
-  BTU: "#FF3D47",
-  ETU: "#806659",
-  Products: "#CC2931",
-  Arcwide: "#98847A",
+  // Patrimoines GAIF (7)
+  Ferroviaire: "#C8102E",
+  Immobilier: "#1E4E8C",
+  IO: "#00A3A1",
+  "Courants Faibles": "#F59E0B",
+  "Propriete Intellectuelle": "#7C3AED",
+  "Gares Lignes": "#0EA5E9",
+  Foncier: "#10B981",
+  // Business Units SNCF Voyageurs (3) — miroir de BU_COLOR dans src/data/gaifSites.ts
+  Transilien: "#EB0070",
+  TER: "#0EA5E9",
+  Intercités: "#7C3AED",
+  // Legacy service lines (kept to avoid breaking existing components)
+  BTU: "#EB0070",
+  ETU: "#374151",
+  Products: "#C8102E",
+  Arcwide: "#1E4E8C",
 };
 
-// ── Grade Colors ───────────────────────────────────────────────────────────────
+// ── Grade Colors — GAIF niveaux hiérarchiques ─────────────────────────────────
 
 export const gradeColors: Record<string, { bg: string; text: string; border: string }> = {
-  Partner: { bg: "#ede5e0", text: "#4a3728", border: "#a8917e" },
-  Director: { bg: "#f0e9e4", text: "#5C4A3F", border: "#b09a8a" },
-  "Senior Manager": { bg: "#f2edeb", text: "#6b554a", border: "#b8a89e" },
-  Manager: { bg: "#f7f2ee", text: "#806659", border: "#cdbdaf" },
-  "Senior Consultant": { bg: "#ecedef", text: "#4a4e54", border: "#a8abb2" },
-  Consultant: { bg: "#eff0f2", text: "#5a5e64", border: "#b4b8be" },
-  Analyst: { bg: "#f5f5f6", text: "#7a7e84", border: "#cccfd4" },
-  Intern: { bg: "#f7f8f8", text: "#8a8e94", border: "#d8dade" },
+  // GAIF levels
+  Directeur: { bg: "#fce7f3", text: "#831843", border: "#f9a8d4" },
+  "Responsable pôle": { bg: "#fdf2f8", text: "#9d174d", border: "#f9a8d4" },
+  "Adj. pôle": { bg: "#fdf4ff", text: "#86198f", border: "#e9d5ff" },
+  "Expert senior": { bg: "#eff6ff", text: "#1e40af", border: "#93c5fd" },
+  "Chargé mission senior": { bg: "#f0f9ff", text: "#0c4a6e", border: "#7dd3fc" },
+  "Chargé mission": { bg: "#f0fdfa", text: "#134e4a", border: "#5eead4" },
+  "Secrétaire technique": { bg: "#f5f3ff", text: "#4c1d95", border: "#c4b5fd" },
+  PMO: { bg: "#fffbeb", text: "#78350f", border: "#fcd34d" },
+  // Legacy grades (backward compat)
+  Partner: { bg: "#fce7f3", text: "#831843", border: "#f9a8d4" },
+  Director: { bg: "#fdf2f8", text: "#9d174d", border: "#f9a8d4" },
+  "Senior Manager": { bg: "#fdf4ff", text: "#86198f", border: "#e9d5ff" },
+  Manager: { bg: "#eff6ff", text: "#1e40af", border: "#93c5fd" },
+  "Senior Consultant": { bg: "#f0f9ff", text: "#0c4a6e", border: "#7dd3fc" },
+  Consultant: { bg: "#f0fdfa", text: "#134e4a", border: "#5eead4" },
+  Analyst: { bg: "#f5f3ff", text: "#4c1d95", border: "#c4b5fd" },
+  Intern: { bg: "#fffbeb", text: "#78350f", border: "#fcd34d" },
 };
 
 // Category colors now applied by applyCategoryConfig() from var_config.category
@@ -122,40 +151,48 @@ export const macroGradeColors: Record<string, string> = {
   "M-": "#7c3aed",
 };
 
-// ── Chart Palette ──────────────────────────────────────────────────────────────
+// ── Chart Palette — GAIF patrimoines + accents ─────────────────────────────────
 
 export const chartPalette: string[] = [
-  "#FF3D47",
-  "#806659",
-  "#CC2931",
-  "#98847A",
-  "#99171D",
-  "#B2A59F",
-  "#FF787A",
-  "#330000",
-  "#CCC1BC",
+  "#EB0070", // primary magenta
+  "#C8102E", // ferroviaire
+  "#1E4E8C", // immobilier
+  "#00A3A1", // IO
+  "#F59E0B", // courants faibles
+  "#7C3AED", // PI
+  "#0EA5E9", // gares/lignes
+  "#10B981", // accent green
+  "#374151", // anthracite
 ];
 
-// ── Region Colors ──────────────────────────────────────────────────────────────
+// ── Region Colors — GAIF régions SNCF ──────────────────────────────────────────
 
 export const regionColors: Record<string, { main: string; light: string; dark: string }> = {
-  WST: { main: "#FF3D47", light: "#FF787A", dark: "#CC2931" },
-  EMEA: { main: "#FF3D47", light: "#FF787A", dark: "#CC2931" },
-  Europe: { main: "#FF3D47", light: "#FF787A", dark: "#CC2931" },
-  NRT: { main: "#98847A", light: "#B2A59F", dark: "#806659" },
-  "North America": { main: "#98847A", light: "#B2A59F", dark: "#806659" },
-  Americas: { main: "#98847A", light: "#B2A59F", dark: "#806659" },
-  CER: { main: "#99171D", light: "#CC2931", dark: "#330000" },
-  "South America": { main: "#99171D", light: "#CC2931", dark: "#330000" },
-  "Latin America": { main: "#99171D", light: "#CC2931", dark: "#330000" },
-  CSH: { main: "#FFA3A8", light: "#FFBDC0", dark: "#FF787A" },
-  APAC: { main: "#FFA3A8", light: "#FFBDC0", dark: "#FF787A" },
-  "Asia Pacific": { main: "#FFA3A8", light: "#FFBDC0", dark: "#FF787A" },
-  Asia: { main: "#FFA3A8", light: "#FFBDC0", dark: "#FF787A" },
-  MEA: { main: "#B2A59F", light: "#CCC1BC", dark: "#806659" },
-  "Middle East": { main: "#B2A59F", light: "#CCC1BC", dark: "#806659" },
-  "Middle East & Africa": { main: "#B2A59F", light: "#CCC1BC", dark: "#806659" },
-  Africa: { main: "#B2A59F", light: "#CCC1BC", dark: "#806659" },
+  // GAIF regions (entités)
+  IDF: { main: "#EB0070", light: "#F571B0", dark: "#B8005A" },
+  National: { main: "#374151", light: "#6B7280", dark: "#1F2937" },
+  Sud: { main: "#F59E0B", light: "#FBBF24", dark: "#D97706" },
+  Est: { main: "#0EA5E9", light: "#38BDF8", dark: "#0284C7" },
+  Ouest: { main: "#10B981", light: "#34D399", dark: "#059669" },
+  Nord: { main: "#7C3AED", light: "#A78BFA", dark: "#6D28D9" },
+  // Legacy (backward compat)
+  WST: { main: "#EB0070", light: "#F571B0", dark: "#B8005A" },
+  EMEA: { main: "#EB0070", light: "#F571B0", dark: "#B8005A" },
+  Europe: { main: "#EB0070", light: "#F571B0", dark: "#B8005A" },
+  NRT: { main: "#374151", light: "#6B7280", dark: "#1F2937" },
+  "North America": { main: "#374151", light: "#6B7280", dark: "#1F2937" },
+  Americas: { main: "#374151", light: "#6B7280", dark: "#1F2937" },
+  CER: { main: "#F59E0B", light: "#FBBF24", dark: "#D97706" },
+  "South America": { main: "#F59E0B", light: "#FBBF24", dark: "#D97706" },
+  "Latin America": { main: "#F59E0B", light: "#FBBF24", dark: "#D97706" },
+  CSH: { main: "#0EA5E9", light: "#38BDF8", dark: "#0284C7" },
+  APAC: { main: "#0EA5E9", light: "#38BDF8", dark: "#0284C7" },
+  "Asia Pacific": { main: "#0EA5E9", light: "#38BDF8", dark: "#0284C7" },
+  Asia: { main: "#0EA5E9", light: "#38BDF8", dark: "#0284C7" },
+  MEA: { main: "#10B981", light: "#34D399", dark: "#059669" },
+  "Middle East": { main: "#10B981", light: "#34D399", dark: "#059669" },
+  "Middle East & Africa": { main: "#10B981", light: "#34D399", dark: "#059669" },
+  Africa: { main: "#10B981", light: "#34D399", dark: "#059669" },
 };
 
 // ── Chat Provider Branding ─────────────────────────────────────────────────────
@@ -179,19 +216,19 @@ export const chatBranding: Record<
   }
 > = {
   ollama: {
-    name: "Be.on\u00B0",
-    fabIcon: "/Beonpoint_stars.svg",
+    name: "GAIF Pilot",
+    fabIcon: "/gaif-logo.svg",
     fabIconFilter: "brightness(0) invert(1)",
-    fabBg: "#98847A",
-    fabHoverBg: "#806659",
-    fabShadow: "0 4px 20px rgba(128,102,89,0.4)",
-    headerBg: "#330000",
-    headerIcon: "/Beonpoint_stars.svg",
+    fabBg: "#EB0070",
+    fabHoverBg: "#B8005A",
+    fabShadow: "0 4px 20px rgba(235,0,112,0.4)",
+    headerBg: "#870042",
+    headerIcon: "/gaif-logo.svg",
     headerIconSize: 28,
     headerIconFilter: undefined,
-    headerIconOpacity: 0.15,
-    thinking: "Thinking",
-    icon: "/Beonpoint_stars.svg",
+    headerIconOpacity: 0.18,
+    thinking: "Analyse en cours",
+    icon: "/gaif-logo.svg",
   },
   claude: {
     name: "Claude",

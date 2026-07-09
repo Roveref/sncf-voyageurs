@@ -8,10 +8,11 @@ import { GroupedBarChart } from "./GroupedBarChart";
 import { MiniTimeline } from "./MiniTimeline";
 import { VarianceIndicator } from "./VarianceIndicator";
 import { SkillTags } from "./SkillTags";
+import { chartPalette } from "../../../config/brandConfig";
 
 // ── Constants ──
 
-const DEFAULT_COLORS = ["#D97757", "#5C4A3F", "#98847A", "#FF3D47", "#806659", "#CC2931", "#B2A59F", "#CCC1BC"];
+const DEFAULT_COLORS = chartPalette;
 
 // ── Component ──
 

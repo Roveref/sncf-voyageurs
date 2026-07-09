@@ -77,7 +77,9 @@ const EmployeeMetadataTab = memo(({ empNameMap }: any) => {
       {filtered.length === 0 ? (
         <Box sx={{ p: 4, textAlign: "center" }}>
           <Typography variant="body2" color="text.secondary">
-            {allEmployees.length === 0 ? "No employee metadata or manual employees" : "No results matching your search"}
+            {allEmployees.length === 0
+              ? "Aucune métadonnée ni collaborateur manuel"
+              : "Aucun résultat pour cette recherche"}
           </Typography>
         </Box>
       ) : (

@@ -20,17 +20,17 @@ describe("NoDataEmptyState", () => {
     document.body.removeChild(container);
   });
 
-  it("displays the 'No data loaded yet' heading", () => {
+  it("displays the 'Aucune donnée chargée' heading", () => {
     const container = renderIntoDocument(<NoDataEmptyState />);
-    expect(container.textContent).toContain("No data loaded yet");
+    expect(container.textContent).toContain("Aucune donnée chargée");
     document.body.removeChild(container);
   });
 
-  it("renders the Upload Excel File button", () => {
+  it("renders the Importer un fichier Excel button", () => {
     const container = renderIntoDocument(<NoDataEmptyState />);
     const button = container.querySelector("button");
     expect(button).not.toBeNull();
-    expect(button!.textContent).toContain("Upload Excel File");
+    expect(button!.textContent).toContain("Importer un fichier Excel");
     document.body.removeChild(container);
   });
 
@@ -53,9 +53,9 @@ describe("NoResultsEmptyState", () => {
     document.body.removeChild(container);
   });
 
-  it("displays the default 'No results found' message", () => {
+  it("displays the default 'Aucun résultat trouvé' message", () => {
     const container = renderIntoDocument(<NoResultsEmptyState />);
-    expect(container.textContent).toContain("No results found");
+    expect(container.textContent).toContain("Aucun résultat trouvé");
     document.body.removeChild(container);
   });
 
@@ -65,19 +65,19 @@ describe("NoResultsEmptyState", () => {
     document.body.removeChild(container);
   });
 
-  it("does not render a Clear Filters button when onClearFilters is not provided", () => {
+  it("does not render a Effacer les filtres button when onClearFilters is not provided", () => {
     const container = renderIntoDocument(<NoResultsEmptyState />);
     // No button should be present without the callback
     expect(container.querySelector("button")).toBeNull();
     document.body.removeChild(container);
   });
 
-  it("renders the Clear Filters button when onClearFilters is provided", () => {
+  it("renders the Effacer les filtres button when onClearFilters is provided", () => {
     const onClearFilters = vi.fn();
     const container = renderIntoDocument(<NoResultsEmptyState onClearFilters={onClearFilters} />);
     const button = container.querySelector("button");
     expect(button).not.toBeNull();
-    expect(button!.textContent).toContain("Clear Filters");
+    expect(button!.textContent).toContain("Effacer les filtres");
     document.body.removeChild(container);
   });
 
@@ -101,7 +101,7 @@ describe("ErrorEmptyState", () => {
 
   it("displays the default error message", () => {
     const container = renderIntoDocument(<ErrorEmptyState />);
-    expect(container.textContent).toContain("Something went wrong");
+    expect(container.textContent).toContain("Une erreur est survenue");
     document.body.removeChild(container);
   });
 
@@ -122,7 +122,7 @@ describe("ErrorEmptyState", () => {
     const container = renderIntoDocument(<ErrorEmptyState onRetry={onRetry} />);
     const button = container.querySelector("button");
     expect(button).not.toBeNull();
-    expect(button!.textContent).toContain("Try Again");
+    expect(button!.textContent).toContain("Réessayer");
     document.body.removeChild(container);
   });
 

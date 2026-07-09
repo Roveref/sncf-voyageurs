@@ -65,22 +65,22 @@ export const useBookingsData = (
   showNetRevenue: boolean,
   includeStatus11: boolean
 ) => {
-  // Filter booked opportunities (Status 14)
+  // Interventions réalisées (données manuelles = user_assets)
   const bookedData = useMemo((): OpportunityRecord[] => {
     if (!data || loading) return [];
-    return data.filter((item) => item.status === 14);
+    return data.filter((item) => item.isManual === true && item.status !== 15);
   }, [data, loading]);
 
-  // Filter lost opportunities (Status 15)
+  // Interventions annulées
   const lostData = useMemo((): OpportunityRecord[] => {
     if (!data || loading) return [];
-    return data.filter((item) => item.status === 15);
+    return data.filter((item) => item.isManual === true && item.status === 15);
   }, [data, loading]);
 
-  // Filter Status 11 opportunities
+  // Interventions en préparation (status 11)
   const status11Data = useMemo((): OpportunityRecord[] => {
     if (!data || loading) return [];
-    return data.filter((item) => item.status === 11);
+    return data.filter((item) => item.isManual === true && item.status === 11);
   }, [data, loading]);
 
   // Calculate total bookings

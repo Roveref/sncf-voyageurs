@@ -835,8 +835,8 @@ def parse_recruiter_field(raw):
 
 
 def import_candidates(rows, cur, now):
-    cur.execute("DELETE FROM hr_applications")
-    cur.execute("DELETE FROM hr_candidates")
+    cur.execute("DELETE FROM nc_scopes")
+    cur.execute("DELETE FROM nonconformities")
     inserted = 0
     for row in rows:
         cid = str(find_field(row, ["Id"]) or "").strip()
@@ -881,7 +881,7 @@ def import_candidates(rows, cur, now):
         _seg, _off, applications = resolve_applications(jobPostings)
 
         cur.execute(
-            """INSERT OR REPLACE INTO hr_candidates
+            """INSERT OR REPLACE INTO nonconformities
                (id, firstName, lastName, email, phone, status, poste, gradeBucket,
                 jobPostings, creationDate, lastActivity, grade, candidateStatus,
                 tags, note, evaluatedBy, hrInterview, linkedinUrl,
@@ -906,7 +906,7 @@ def import_candidates(rows, cur, now):
         # Insert individual applications into join table
         for app in applications:
             cur.execute(
-                "INSERT OR IGNORE INTO hr_applications (candidateId, jobPosting, segment, offering) VALUES (?, ?, ?, ?)",
+                "INSERT OR IGNORE INTO nc_scopes (candidateId, jobPosting, segment, offering) VALUES (?, ?, ?, ?)",
                 (cid, app["posting"], app["segment"], app["offering"]),
             )
 
@@ -979,7 +979,7 @@ def match_recruitment_to_employees(cur):
 
     # Match recruiters
     candidates = cur.execute(
-        "SELECT id, recruiter1, recruiter2, recruiter3 FROM hr_candidates"
+        "SELECT id, recruiter1, recruiter2, recruiter3 FROM nonconformities"
     ).fetchall()
 
     rec_matched = 0
@@ -989,14 +989,14 @@ def match_recruitment_to_employees(cur):
         e3 = find_best_match(r3)
         if e1 or e2 or e3:
             cur.execute(
-                "UPDATE hr_candidates SET recruiter1EmpId=?, recruiter2EmpId=?, recruiter3EmpId=? WHERE id=?",
+                "UPDATE nonconformities SET recruiter1EmpId=?, recruiter2EmpId=?, recruiter3EmpId=? WHERE id=?",
                 (e1, e2, e3, cid),
             )
             rec_matched += 1
 
     # Match hired candidates → employees (lower threshold for name variations)
     hired = cur.execute(
-        "SELECT id, firstName, lastName FROM hr_candidates WHERE status='hired'"
+        "SELECT id, firstName, lastName FROM nonconformities WHERE status='hired'"
     ).fetchall()
 
     hire_matched = 0
@@ -1010,7 +1010,7 @@ def match_recruitment_to_employees(cur):
                 best_score = s
                 best_id = eid
         if best_score >= 0.82:
-            cur.execute("UPDATE hr_candidates SET matchedEmpId=? WHERE id=?", (best_id, cid))
+            cur.execute("UPDATE nonconformities SET matchedEmpId=? WHERE id=?", (best_id, cid))
             hire_matched += 1
 
     print(f"  Matching: {rec_matched} recruiter links, {hire_matched} hired→employee links")

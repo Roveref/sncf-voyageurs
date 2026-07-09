@@ -5,7 +5,9 @@ For setup, scripts, and environment variables, see `README.md`.
 
 ## Project
 
-BearingPoint Dashboard — SPA React de staffing et pilotage d'équipe BearingPoint. Visualisation timeline Gantt, heatmaps d'utilisation, pipeline d'opportunités, bookings.
+**GAIF Pilot** — plateforme EAM React de pilotage des installations fixes pour la Direction GAIF (Gestion d'Actifs Installations Fixes) SNCF Voyageurs. Couvre 7 patrimoines (ferroviaire, immobilier, IO, courants faibles, propriété intellectuelle, gares & lignes, foncier) sur 18 sites opérationnels (11 TN + 5 TER + 2 IC).
+
+**Origine** : forké depuis un dashboard consulting BearingPoint (CRM + staffing). Refonte v2 terminée : rename SQL dur (crm_opportunities → assets, crm_accounts → sites, hr_candidates → nonconformities), 34 widgets GAIF natifs, agent IA adapté PSGA/ISO 55001. Voir `/Users/francoisrovere/.claude/plans/fais-une-analyse-de-snazzy-pearl.md` pour le plan refonte.
 
 ## Architecture
 
@@ -27,7 +29,8 @@ src/
 │   ├── queryFns.ts                  # Query functions wrapping api.ts
 │   ├── QueryProvider.tsx            # QueryClient (staleTime: Infinity, gcTime: 30min) + DevTools
 │   ├── use*Query.ts                 # 11 individual query hooks (health, ready, crm, staffing, sap, etc.)
-│   ├── useCrmData.ts               # Facade: read CRM from cache (replaces useCrmStore for reads)
+│   ├── useCrmData.ts               # Facade: read assets from cache (nom legacy, lit la table `assets` depuis v2)
+│   ├── useGaifData.ts              # Facade: GAIF bundle (contracts, projects, comites, risks, audits, docs, VR)
 │   ├── useStaffingData.ts           # Facade: read staffing records from cache (replaces useDataStore.hydratedStaffingRecords)
 │   ├── useSapData.ts                # Facade: read SAP data from cache with Set conversion (replaces useDataStore.hydratedSapData)
 │   ├── useSkillsData.ts             # Facade: read skills from cache with Map/Set conversions (replaces useDataStore.hydratedSkillsData)
@@ -54,13 +57,14 @@ src/
 │   │   └── workers/
 │   │       ├── scoringWorker.ts     # Web Worker for buildScoringMatrix + generateProposals
 │   │       └── gridWorker.ts        # Web Worker for buildDailyGrid (initial load only)
-│   ├── PipelineTab/                 # Lazy loaded, breadcrumb drill-down
-│   ├── BookingsTab/                 # Lazy loaded
-│   ├── JobcodeTimelineTab/          # Lazy loaded
-│   ├── RecruitmentTab/              # Lazy loaded
-│   ├── CustomDashboard/             # Lazy loaded
-│   ├── OpportunityList/             # Shared pipeline/bookings components
-│   ├── ChatPanel/                   # AI assistant (Claude/Ollama) — stacked layout on mobile
+│   ├── PipelineTab/                 # « Parc d'actifs » — inventaire + insights
+│   ├── BookingsTab/                 # « Maintenance » — coûts + VR Calendar
+│   ├── JobcodeTimelineTab/          # « Cycle de vie » — 4 phases PSGA + file d'attente investissements
+│   ├── RecruitmentTab/              # « Conformité » — non-conformités ISO 55001
+│   ├── CustomDashboard/             # « Vue d'ensemble » — 34 widgets GAIF
+│   ├── OpportunityList/             # Table actifs (partagée Parc/Maintenance)
+│   ├── GaifSitesMap/                # Carte France avec les 18 sites (Landing)
+│   ├── ChatPanel/                   # AI assistant (Claude/Ollama) adapté vocabulaire GAIF
 │   ├── common/
 │   │   ├── ErrorBoundary.tsx        # Wraps all lazy components
 │   │   ├── OnboardingOverlay.tsx    # 5-step spotlight tour on first visit
@@ -68,7 +72,8 @@ src/
 │   │   └── SkeletonLoaders.tsx      # Shimmer loading placeholders
 │   ├── AuthGate.tsx                 # JWT auth gate (wraps App in index.tsx)
 │   └── LoginPage.tsx                # Login form
-└── theme.ts                         # MUI theme (BearingPoint brand)
+├── data/                            # Référentiels GAIF (patrimoines, sites, raci, comites, projects, docs, risks)
+└── theme.ts                         # MUI theme SNCF Voyageurs (#EB0070 magenta)
 
 api/
 ├── src/

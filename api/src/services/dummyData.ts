@@ -6,7 +6,7 @@
  *
  * Remplit TOUTES les tables nécessaires au fonctionnement de l'app :
  * - var_country_region, var_optionsets, var_config (config)
- * - employees, crm_accounts, crm_opportunities (données sources)
+ * - employees, sites, assets (données sources)
  * - mds_assignments, sap_records, hr_skills (staffing)
  * - user_actions, user_staffing_needs (modifications)
  */
@@ -1201,7 +1201,7 @@ export function seedDemoData(): { counts: Record<string, number> } {
     // ── Accounts ──
 
     const insAcc = db.prepare(
-      `INSERT OR REPLACE INTO crm_accounts (accountId, account, subSegmentCode, subSegment, country, region, accountLeader, updatedAt)
+      `INSERT OR REPLACE INTO sites (accountId, account, subSegmentCode, subSegment, country, region, accountLeader, updatedAt)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
     );
     for (const a of accounts)
@@ -1210,7 +1210,7 @@ export function seedDemoData(): { counts: Record<string, number> } {
     // ── Opportunities ──
 
     const insOpp = db.prepare(
-      `INSERT OR REPLACE INTO crm_opportunities
+      `INSERT OR REPLACE INTO assets
        (opportunityId, opportunity, accountId, account, status, grossRevenue, netRevenue, winPct, cm1Pct, jobCode,
         engagementType, weightedBooking,
         manager, partner, em, ep, country, region, subSegmentCode, subSegment,
@@ -1297,33 +1297,7 @@ export function seedDemoData(): { counts: Record<string, number> } {
     const insSkill = db.prepare("INSERT OR IGNORE INTO hr_skills (empId, name, level, category) VALUES (?, ?, ?, ?)");
     for (const s of skills) insSkill.run(s.empId, s.name, s.level, s.category);
 
-    // ── Contacts ──
-
-    const insContact = db.prepare(
-      `INSERT OR REPLACE INTO crm_contacts
-       (contactId, fullName, firstName, lastName, email, phone, mobile, jobTitle, department, city, country, accountId, account, owner, createdOn, updatedAt)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    );
-    for (const c of contacts) {
-      insContact.run(
-        c.contactId,
-        c.fullName,
-        c.firstName,
-        c.lastName,
-        c.email,
-        c.phone,
-        c.mobile,
-        c.jobTitle,
-        c.department,
-        c.city,
-        c.country,
-        c.accountId,
-        c.account,
-        randomFrom(partners).name,
-        randomDate("2020-01-01", "2025-12-31"),
-        now
-      );
-    }
+    // ── Contacts (crm_contacts dropped post-refonte v2 — skipped) ──
 
     // ── User data (actions, staffing needs) ──
 
@@ -1355,7 +1329,7 @@ export function seedDemoData(): { counts: Record<string, number> } {
     // ── Revenue team ──
 
     const insRevTeam = db.prepare(
-      "INSERT INTO user_revenue_team (id, opportunityId, name, gradeBucket, percentage) VALUES (?, ?, ?, ?, ?)"
+      "INSERT INTO user_asset_team (id, opportunityId, name, gradeBucket, percentage) VALUES (?, ?, ?, ?, ?)"
     );
     for (const rt of revenueTeam) insRevTeam.run(rt.id, rt.opportunityId, rt.name, rt.gradeBucket, rt.percentage);
 
@@ -1377,13 +1351,13 @@ export function seedDemoData(): { counts: Record<string, number> } {
 
     const partnerNames = employees.filter((e) => e.grade === "Partner").map((e) => e.name);
     const ROLES = [
-      "Delivery Lead",
-      "Account Lead",
-      "Practice Lead",
-      "Solution Architect",
-      "Team Lead",
-      "Engagement Manager",
-      "Scrum Master",
+      "Responsable patrimoine",
+      "Expert référent",
+      "Chef de mission",
+      "Chargé de mission",
+      "Directeur de patrimoine",
+      "Responsable mission",
+      "Pilote GAIF",
     ];
 
     for (const emp of employees) {
@@ -1513,7 +1487,7 @@ export function seedDemoData(): { counts: Record<string, number> } {
     const recruiters = employees.filter((e) => ["Manager", "Senior Manager", "Director"].includes(e.grade)).slice(0, 8);
 
     const insCandidate = db.prepare(
-      `INSERT OR REPLACE INTO hr_candidates
+      `INSERT OR REPLACE INTO nonconformities
        (id, firstName, lastName, email, phone, status, poste, gradeBucket, jobPostings,
         creationDate, lastActivity, grade, candidateStatus, tags, note, evaluatedBy,
         recruiter1, recruiter1Date, recruiter1Decision, recruiter1EmpId,
@@ -1523,7 +1497,7 @@ export function seedDemoData(): { counts: Record<string, number> } {
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     );
     const insApp = db.prepare(
-      `INSERT OR REPLACE INTO hr_applications (candidateId, jobPosting, segment, offering)
+      `INSERT OR REPLACE INTO nc_scopes (candidateId, jobPosting, segment, offering)
        VALUES (?, ?, ?, ?)`
     );
 
@@ -1605,7 +1579,7 @@ export function seedDemoData(): { counts: Record<string, number> } {
     // ── Manual user opportunities (user-created opps — full data like CRM) ──
 
     const insUserOpp = db.prepare(
-      `INSERT OR REPLACE INTO user_opportunities
+      `INSERT OR REPLACE INTO user_assets
        (opportunityId, opportunity, accountId, account, status, grossRevenue, netRevenue, winPct, cm1Pct,
         jobCode, engagementType, weightedBooking,
         creationDate, bookingDate, estimatedBookingDate, lastStatusChangeDate,
@@ -1768,9 +1742,9 @@ export function clearDemoData() {
   db.transaction(() => {
     // User data (new tables)
     db.exec("DELETE FROM user_overrides");
-    db.exec("DELETE FROM user_opportunities");
+    db.exec("DELETE FROM user_assets");
     db.exec("DELETE FROM user_employees");
-    db.exec("DELETE FROM user_revenue_team");
+    db.exec("DELETE FROM user_asset_team");
     db.exec("DELETE FROM user_scenarios");
     // var_* tables are NOT cleared here — managed by copyVarTables() in demo.ts
     db.exec("DELETE FROM user_staffing_needs");
@@ -1778,15 +1752,14 @@ export function clearDemoData() {
     db.exec("DELETE FROM user_accounts");
     db.exec("DELETE FROM user_notifications");
     // Recruitment
-    db.exec("DELETE FROM hr_applications");
-    db.exec("DELETE FROM hr_candidates");
+    db.exec("DELETE FROM nc_scopes");
+    db.exec("DELETE FROM nonconformities");
     // Source data
     db.exec("DELETE FROM hr_skills");
     db.exec("DELETE FROM sap_records");
     db.exec("DELETE FROM mds_assignments");
-    db.exec("DELETE FROM crm_contacts");
-    db.exec("DELETE FROM crm_opportunities");
-    db.exec("DELETE FROM crm_accounts");
+    db.exec("DELETE FROM assets");
+    db.exec("DELETE FROM sites");
     db.exec("DELETE FROM employees");
     // AI history
     db.exec("DELETE FROM var_aihistory");

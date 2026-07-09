@@ -27,8 +27,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import UndoIcon from "@mui/icons-material/Undo";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import GroupIcon from "@mui/icons-material/Group";
-import TableChartIcon from "@mui/icons-material/TableChart";
-import SlideshowIcon from "@mui/icons-material/Slideshow";
 import OpportunityActions from "./OpportunityActions";
 import StaffingNeeds from "./StaffingNeeds";
 import OpportunityContacts from "./OpportunityContacts";
@@ -39,16 +37,75 @@ import { STATUS_COLORS, STATUS_TEXT } from "../../../utils/constants";
 import { formatDateFR } from "../../../utils/formatters";
 import { getTechnologyPartnerTags } from "../utils/opportunityUtils";
 import { calculateRevenueWithSegmentLogic } from "../../PipelineTab/utils/revenueCalculations";
-import { useComputedStore } from "../../../stores/useComputedStore";
 import { useUserDataStore } from "../../../stores/useUserDataStore";
 import { useUIStore } from "../../../stores/useUIStore";
 import { API_BASE, apiFetch } from "../../../services/api";
 import { brand } from "../../../config/brandConfig";
+import { parseAssetMetrics, ETAT_ABE_COLORS } from "../../../data/gaifAssetMetrics";
+import { useStaffingIndex, lookupStaffingForAsset } from "../../../queries/useStaffingIndex";
 
 const formatDateSafely = formatDateFR;
 const statusColors = STATUS_COLORS;
 const statusText = STATUS_TEXT;
 const EMPTY_TEAM: any[] = [];
+
+/** Petite tuile KPI utilisée dans le bandeau hero d'un actif. */
+const KpiTile = memo(
+  ({
+    label,
+    value,
+    tone = "neutral",
+    customColor,
+    theme,
+  }: {
+    label: string;
+    value: string;
+    tone?: "success" | "warning" | "error" | "neutral";
+    customColor?: string;
+    theme: any;
+  }) => {
+    const color =
+      customColor ||
+      (tone === "success"
+        ? theme.palette.success.main
+        : tone === "warning"
+          ? theme.palette.warning.main
+          : tone === "error"
+            ? theme.palette.error.main
+            : theme.palette.text.primary);
+    return (
+      <Box
+        sx={{
+          minWidth: 80,
+          px: 1.25,
+          py: 0.75,
+          borderRadius: 1.5,
+          bgcolor: alpha(color, 0.08),
+          borderLeft: `3px solid ${color}`,
+        }}
+      >
+        <Typography
+          variant="caption"
+          sx={{
+            fontSize: "0.6rem",
+            fontWeight: 600,
+            textTransform: "uppercase",
+            letterSpacing: 0.4,
+            color: "text.secondary",
+            display: "block",
+            lineHeight: 1.2,
+          }}
+        >
+          {label}
+        </Typography>
+        <Typography variant="body1" fontWeight={700} sx={{ color, lineHeight: 1.2 }}>
+          {value}
+        </Typography>
+      </Box>
+    );
+  }
+);
+KpiTile.displayName = "KpiTile";
 
 /**
  * Memoized component for opportunity expanded details
@@ -92,6 +149,16 @@ const OpportunityExpandedDetails = memo(
     const ioAmount = calculateRevenueWithSegmentLogic(row, showNetRevenue);
     const totalAmount = showNetRevenue ? row.netRevenue || 0 : row.grossRevenue || 0;
     const ioPercentage = totalAmount > 0 ? (ioAmount / totalAmount) * 100 : 0;
+
+    // GAIF metrics (parsed from native columns or legacy ::META:: encoding)
+    const gaifMetrics = useMemo(() => parseAssetMetrics(row), [row]);
+    const hasGaifMetrics =
+      gaifMetrics.utilizationPct > 0 ||
+      gaifMetrics.mtbf > 0 ||
+      gaifMetrics.mttr > 0 ||
+      gaifMetrics.incidents12m > 0 ||
+      !!gaifMetrics.etatAbe ||
+      !!row.cm1Pct;
 
     // Handle status change from timeline sub-component
     const handleStatusChange = useCallback(
@@ -161,28 +228,12 @@ const OpportunityExpandedDetails = memo(
       return () => controller.abort();
     }, [rowAccountId, rowAccountName]);
 
-    const staffingIndexVer = useComputedStore((s) => s.staffingIndexVersion);
-    const currentStaffingCount = useMemo(() => {
-      try {
-        const raw = localStorage.getItem("staffing_employee_index");
-        if (!raw) return 0;
-        const index = JSON.parse(raw);
-        const jobCode = row.jobCode;
-        const opportunityId = row.opportunityId;
-        const seen = new Set<string>();
-        for (const key of [jobCode, opportunityId].filter(Boolean)) {
-          const entries = index[String(key).trim()];
-          if (entries)
-            for (const e of entries) {
-              if (e.empId && !seen.has(e.empId)) seen.add(e.empId);
-            }
-        }
-        return seen.size;
-      } catch {
-        return 0;
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [row, staffingIndexVer]);
+    // Staffing index from React Query cache (no dependency on StaffingTab being visited)
+    const staffingIndex = useStaffingIndex();
+    const currentStaffingCount = useMemo(
+      () => lookupStaffingForAsset(staffingIndex, row.opportunityId, row.jobCode).length,
+      [staffingIndex, row.opportunityId, row.jobCode]
+    );
 
     return (
       <Box sx={{ m: 2 }}>
@@ -214,67 +265,46 @@ const OpportunityExpandedDetails = memo(
               <AccountLogo accountName={row.account || ""} size={56} />
 
               <Box>
-                <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                  {row.crmGuid && !row.opportunityId?.startsWith("manual-") ? (
-                    <Typography
-                      variant="h6"
-                      color={accentColor}
-                      fontWeight={700}
-                      component="a"
-                      href={`https://bearingpoint.crm4.dynamics.com/main.aspx?appid=3e971613-c281-ea11-a813-000d3ab824d7&forceUCI=1&pagetype=entityrecord&etn=opportunity&id=${row.crmGuid}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      sx={{
-                        textDecoration: "none",
-                        cursor: "pointer",
-                        transition: "color 0.2s ease, transform 0.2s ease",
-                        "&:hover": {
-                          textDecoration: "underline",
-                          color: alpha(theme.palette.secondary.main, 0.7),
-                          transform: "translateX(2px)",
-                        },
-                        "&:active": {
-                          transform: "translateX(1px)",
-                        },
-                        display: "flex",
-                        alignItems: "center",
-                        mr: 2,
-                      }}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {row.opportunity}
-                      <Box
-                        component="span"
-                        sx={{
-                          ml: 1,
-                          fontSize: "0.8rem",
-                          opacity: 0.7,
-                          transition: "opacity 0.2s ease",
-                          "&:hover": {
-                            opacity: 1,
-                          },
-                        }}
-                      >
-                        🔗
-                      </Box>
-                    </Typography>
-                  ) : (
-                    <Typography variant="h6" color={accentColor} fontWeight={700} sx={{ mr: 2 }}>
-                      {row.opportunity}
-                    </Typography>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 1, flexWrap: "wrap", gap: 1 }}>
+                  <Typography variant="h6" color={accentColor} fontWeight={700} sx={{ mr: 1 }}>
+                    {row.opportunity}
+                  </Typography>
+
+                  {/* Disponibilité Chip (was winPct) — signal opérationnel fort */}
+                  {row.winPct != null && row.winPct !== "" && (
+                    <Tooltip title="Taux de disponibilité de l'actif">
+                      <Chip
+                        label={`Dispo ${row.winPct}%`}
+                        color={row.winPct >= 90 ? "success" : row.winPct >= 70 ? "warning" : "error"}
+                        size="small"
+                        sx={{ fontWeight: 600 }}
+                      />
+                    </Tooltip>
                   )}
 
-                  {/* Win Percentage Chip */}
-                  {row.winPct && (
-                    <Chip
-                      label={`${row.winPct}%`}
-                      color={row.winPct >= 75 ? "success" : row.winPct >= 50 ? "warning" : "error"}
-                      size="small"
-                      sx={{
-                        fontWeight: 600,
-                        mr: 1,
-                      }}
-                    />
+                  {/* Criticité Chip — dimension métier prioritaire */}
+                  {row.engagementType && (
+                    <Tooltip title="Criticité patrimoniale">
+                      <Chip
+                        label={row.engagementType}
+                        size="small"
+                        sx={{
+                          fontWeight: 600,
+                          bgcolor:
+                            row.engagementType === "Critique"
+                              ? alpha(theme.palette.error.main, 0.12)
+                              : row.engagementType === "Modérée"
+                                ? alpha(theme.palette.warning.main, 0.12)
+                                : alpha(theme.palette.success.main, 0.12),
+                          color:
+                            row.engagementType === "Critique"
+                              ? theme.palette.error.main
+                              : row.engagementType === "Modérée"
+                                ? theme.palette.warning.main
+                                : theme.palette.success.main,
+                        }}
+                      />
+                    </Tooltip>
                   )}
 
                   {/* Job Code Chip */}
@@ -293,13 +323,13 @@ const OpportunityExpandedDetails = memo(
                 </Box>
 
                 <Typography variant="body2" color="text.secondary">
-                  ID: {row.opportunityId} • Created: {formatDateSafely(row.creationDate)}
+                  Identifiant {row.opportunityId} · Créé le {formatDateSafely(row.creationDate)}
                 </Typography>
               </Box>
             </Box>
             {/* /logo + title wrapper */}
             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-              {/* Edit button for manual opportunities */}
+              {/* Modifier (actifs manuels uniquement) */}
               {row.isManual && setEditOpportunity && (
                 <Button
                   variant="outlined"
@@ -313,11 +343,11 @@ const OpportunityExpandedDetails = memo(
                     },
                   }}
                 >
-                  Edit
+                  Modifier
                 </Button>
               )}
 
-              {/* Duplicate button (creates a manual copy of any opportunity) */}
+              {/* Dupliquer (crée une copie manuelle de n'importe quel actif) */}
               {setEditOpportunity && (
                 <Button
                   variant="text"
@@ -326,33 +356,33 @@ const OpportunityExpandedDetails = memo(
                     const copy = { ...row };
                     delete copy.opportunityId;
                     copy.isManual = true;
-                    copy.opportunity = `${row.opportunity || row.opportunity || ""} (copy)`;
+                    copy.opportunity = `${row.opportunity || ""} (copie)`;
                     setEditOpportunity(copy);
                   }}
                   sx={{ fontSize: "0.72rem", textTransform: "none", color: "text.secondary" }}
                 >
-                  Duplicate
+                  Dupliquer
                 </Button>
               )}
 
-              {/* Override indicator and revert button */}
+              {/* Indicateur d'override et bouton annuler */}
               {isOverridden && (
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1, mr: 2 }}>
                   <Tooltip
-                    title={`Status modified: ${statusText[override?.originalStatus as any]} → ${statusText[override?.newStatus as any]}`}
+                    title={`Phase modifiée : ${statusText[override?.originalStatus as any]} → ${statusText[override?.newStatus as any]}`}
                   >
                     <Chip
                       icon={<WarningAmberIcon sx={{ fontSize: 14 }} />}
-                      label="Modified"
+                      label="Modifié"
                       size="small"
                       color="warning"
                       sx={{ fontWeight: 600, fontSize: "0.7rem" }}
                     />
                   </Tooltip>
-                  <Tooltip title="Undo modification">
+                  <Tooltip title="Annuler la modification">
                     <IconButton
                       size="small"
-                      aria-label="Undo status modification"
+                      aria-label="Annuler la modification de phase"
                       onClick={handleRevertStatus}
                       sx={{
                         color: theme.palette.warning.main,
@@ -379,7 +409,7 @@ const OpportunityExpandedDetails = memo(
             </Box>
           </Box>
 
-          {/* Lost Comment Section - Only for lost opportunities */}
+          {/* Commentaire déclassement — uniquement pour les actifs en statut 15 */}
           {row.status === 15 && row.lostComment && (
             <Box
               sx={{
@@ -398,7 +428,7 @@ const OpportunityExpandedDetails = memo(
                 <Box sx={{ display: "flex", alignItems: "center", mb: 1.5 }}>
                   <CommentIcon color="error" sx={{ mr: 1, fontSize: 20 }} />
                   <Typography variant="subtitle1" fontWeight={600} color="error.main">
-                    Lost Comment
+                    Commentaire déclassement
                   </Typography>
                 </Box>
                 <Typography
@@ -429,71 +459,116 @@ const OpportunityExpandedDetails = memo(
                   borderRight: { md: `1px solid ${theme.palette.divider}` },
                 }}
               >
-                {/* Revenue — full width */}
+                {/* ── HERO : valeur acquisition + résiduelle (+ % conservé) + KPIs GAIF clés ── */}
                 <Box sx={{ mb: 2, pb: 2, borderBottom: `1px solid ${theme.palette.divider}` }}>
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ fontSize: "0.6rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}
-                  >
-                    {showNetRevenue ? "Net Revenue" : "Gross Revenue"}
-                  </Typography>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Typography variant="h5" fontWeight={700} color={accentColor}>
-                      {formatCurrency(showNetRevenue ? row.netRevenue : row.grossRevenue)}
-                    </Typography>
-                    {row.opportunityId && (
-                      <>
-                        <Tooltip title="Contract BCS (SharePoint)">
-                          <IconButton
-                            size="small"
-                            aria-label="Open Contract BCS on SharePoint"
-                            component="a"
-                            href={`https://be4you.sharepoint.com/sites/OPUS-${row.opportunityId}/OPUS%20Documents/Internal/ContractBCS/`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            sx={{ color: "#217346", "&:hover": { bgcolor: alpha("#217346", 0.1) } }}
-                          >
-                            <TableChartIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Submitted Proposal (SharePoint)">
-                          <IconButton
-                            size="small"
-                            aria-label="Open Submitted Proposal on SharePoint"
-                            component="a"
-                            href={`https://be4you.sharepoint.com/sites/OPUS-${row.opportunityId}/OPUS%20Documents/Client/SubmittedProposal/`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            sx={{ color: "#D24726", "&:hover": { bgcolor: alpha("#D24726", 0.1) } }}
-                          >
-                            <SlideshowIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </>
+                  <Box sx={{ display: "flex", alignItems: "flex-end", gap: 3, flexWrap: "wrap" }}>
+                    {/* Valeur d'achat */}
+                    <Box sx={{ minWidth: 160 }}>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{
+                          fontSize: "0.6rem",
+                          fontWeight: 600,
+                          textTransform: "uppercase",
+                          letterSpacing: 0.5,
+                          display: "block",
+                        }}
+                      >
+                        Valeur d'achat
+                      </Typography>
+                      <Typography variant="h4" fontWeight={700} color={accentColor} sx={{ lineHeight: 1.1 }}>
+                        {formatCurrency(row.grossRevenue)}
+                      </Typography>
+                    </Box>
+
+                    {/* Valeur résiduelle + % de valeur conservée */}
+                    <Box sx={{ minWidth: 160 }}>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{
+                          fontSize: "0.6rem",
+                          fontWeight: 600,
+                          textTransform: "uppercase",
+                          letterSpacing: 0.5,
+                          display: "block",
+                        }}
+                      >
+                        Valeur résiduelle
+                      </Typography>
+                      <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
+                        <Typography variant="h4" fontWeight={700} color="text.primary" sx={{ lineHeight: 1.1 }}>
+                          {formatCurrency(row.netRevenue)}
+                        </Typography>
+                        {Number(row.grossRevenue) > 0 && (
+                          <Typography variant="body2" fontWeight={600} color="text.secondary">
+                            ({Math.round(((Number(row.netRevenue) || 0) / Number(row.grossRevenue)) * 100)}%)
+                          </Typography>
+                        )}
+                      </Box>
+                    </Box>
+
+                    {/* Tuiles KPIs GAIF */}
+                    {hasGaifMetrics && (
+                      <Box sx={{ display: "flex", gap: 1.5, flexWrap: "wrap", flex: 1 }}>
+                        {row.cm1Pct != null && row.cm1Pct !== "" && (
+                          <KpiTile
+                            label="Conformité"
+                            value={`${row.cm1Pct}%`}
+                            tone={row.cm1Pct >= 95 ? "success" : row.cm1Pct >= 80 ? "warning" : "error"}
+                            theme={theme}
+                          />
+                        )}
+                        {gaifMetrics.utilizationPct > 0 && (
+                          <KpiTile
+                            label="Utilisation"
+                            value={`${Math.round(gaifMetrics.utilizationPct)}%`}
+                            tone={gaifMetrics.utilizationPct >= 80 ? "success" : "warning"}
+                            theme={theme}
+                          />
+                        )}
+                        {gaifMetrics.mtbf > 0 && (
+                          <KpiTile
+                            label="MTBF"
+                            value={`${Math.round(gaifMetrics.mtbf)} h`}
+                            tone="neutral"
+                            theme={theme}
+                          />
+                        )}
+                        {gaifMetrics.mttr > 0 && (
+                          <KpiTile
+                            label="MTTR"
+                            value={`${gaifMetrics.mttr.toFixed(1)} h`}
+                            tone="neutral"
+                            theme={theme}
+                          />
+                        )}
+                        {gaifMetrics.incidents12m > 0 && (
+                          <KpiTile
+                            label="Incidents 12m"
+                            value={String(gaifMetrics.incidents12m)}
+                            tone={
+                              gaifMetrics.incidents12m >= 5
+                                ? "error"
+                                : gaifMetrics.incidents12m >= 2
+                                  ? "warning"
+                                  : "success"
+                            }
+                            theme={theme}
+                          />
+                        )}
+                        {gaifMetrics.etatAbe && (
+                          <KpiTile
+                            label="État ABE"
+                            value={gaifMetrics.etatAbe}
+                            customColor={ETAT_ABE_COLORS[gaifMetrics.etatAbe]}
+                            theme={theme}
+                          />
+                        )}
+                      </Box>
                     )}
                   </Box>
-                  {row.isAllocated && (
-                    <Typography
-                      variant="caption"
-                      color="secondary.main"
-                      sx={{ display: "flex", alignItems: "center", gap: 0.5, mt: 0.5 }}
-                    >
-                      <Box sx={{ width: 5, height: 5, borderRadius: "50%", bgcolor: "secondary.main" }} />
-                      Alloc: {row.allocatedServiceLine} · {row.allocationPercentage}% ·{" "}
-                      {formatCurrency(showNetRevenue ? row.allocatedNetRevenue : row.allocatedGrossRevenue)}
-                    </Typography>
-                  )}
-                  {showIO && ioAmount > 0 && (
-                    <Typography
-                      variant="caption"
-                      color="primary.main"
-                      sx={{ display: "flex", alignItems: "center", gap: 0.5, mt: 0.25 }}
-                    >
-                      <Box sx={{ width: 5, height: 5, borderRadius: "50%", bgcolor: "primary.main" }} />
-                      I&O: {Math.round(ioPercentage)}% · {formatCurrency(ioAmount)}
-                    </Typography>
-                  )}
                 </Box>
 
                 {/* 2-column grid: Details+Services | Team */}
@@ -512,12 +587,12 @@ const OpportunityExpandedDetails = memo(
                         display: "block",
                       }}
                     >
-                      Details
+                      Informations
                     </Typography>
                     {[
-                      ["Account", row.account],
-                      ["Segment", row.subSegmentCode || "—"],
-                      ["Sub Segment", row.subSegment || "—"],
+                      ["Site", row.account],
+                      ["Patrimoine", row.subSegmentCode || "—"],
+                      ["Famille", row.subSegment || "—"],
                     ].map(([label, value]) => (
                       <Box
                         key={label as string}
@@ -527,7 +602,7 @@ const OpportunityExpandedDetails = memo(
                           {label}
                         </Typography>
                         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, maxWidth: "60%" }}>
-                          {label === "Account" && <AccountLogo accountName={String(value || "")} size={16} />}
+                          {label === "Site" && <AccountLogo accountName={String(value || "")} size={16} />}
                           <Typography
                             variant="caption"
                             fontWeight={600}
@@ -547,7 +622,7 @@ const OpportunityExpandedDetails = memo(
                     {technologyPartners.length > 0 && (
                       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", py: 0.3 }}>
                         <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.72rem" }}>
-                          Technology
+                          Prestataire
                         </Typography>
                         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, justifyContent: "flex-end" }}>
                           {technologyPartners.map((p) => (
@@ -581,13 +656,30 @@ const OpportunityExpandedDetails = memo(
                         display: "block",
                       }}
                     >
-                      Project
+                      Cycle de maintenance
                     </Typography>
                     {[
-                      ["Project Type", row.engagementType || "—"],
-                      ["CM1%", row.cm1Pct ? `${row.cm1Pct}%` : "—"],
-                      ["Est. Booking", formatDateSafely(row.estimatedBookingDate)],
-                      ["Actual Booking", formatDateSafely(row.bookingDate)],
+                      ["Prochaine VR", formatDateSafely(row.estimatedBookingDate)],
+                      ["Dernière VR", formatDateSafely(row.bookingDate)],
+                      ...(gaifMetrics.surfaceM2 > 0
+                        ? [["Surface", `${gaifMetrics.surfaceM2.toLocaleString("fr-FR")} m²`]]
+                        : []),
+                      ...(gaifMetrics.consoElec > 0
+                        ? [
+                            [
+                              "Conso électricité",
+                              gaifMetrics.surfaceM2 > 0
+                                ? `${gaifMetrics.consoElec} kWh/m²/an`
+                                : `${gaifMetrics.consoElec.toLocaleString("fr-FR")} kWh/an`,
+                            ],
+                          ]
+                        : []),
+                      ...(gaifMetrics.consoEau > 0
+                        ? [["Conso eau", `${gaifMetrics.consoEau.toLocaleString("fr-FR")} m³/an`]]
+                        : []),
+                      ...(gaifMetrics.consoGaz > 0
+                        ? [["Conso gaz", `${gaifMetrics.consoGaz.toLocaleString("fr-FR")} kWh/an`]]
+                        : []),
                     ].map(([label, value]) => (
                       <Box key={label as string} sx={{ display: "flex", justifyContent: "space-between", py: 0.3 }}>
                         <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.72rem" }}>
@@ -625,13 +717,13 @@ const OpportunityExpandedDetails = memo(
                         display: "block",
                       }}
                     >
-                      Team
+                      Équipe
                     </Typography>
                     {[
-                      ["EM", row.em],
-                      ["EP", row.ep],
-                      ["Manager", row.manager],
-                      ["Partner", row.partner],
+                      ["Responsable mission", row.em],
+                      ["Expert référent", row.ep],
+                      ["Chef de projet", row.manager],
+                      ["Directeur de patrimoine", row.partner],
                     ].map(([label, value]) => (
                       <Box key={label as string} sx={{ display: "flex", justifyContent: "space-between", py: 0.3 }}>
                         <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.72rem" }}>
@@ -643,209 +735,189 @@ const OpportunityExpandedDetails = memo(
                       </Box>
                     ))}
 
-                    {/* Services */}
-                    <Divider sx={{ my: 1.5 }} />
-                    <Typography
-                      variant="caption"
-                      color="text.disabled"
-                      sx={{
-                        fontSize: "0.6rem",
-                        fontWeight: 700,
-                        textTransform: "uppercase",
-                        letterSpacing: 0.8,
-                        mb: 1,
-                        display: "block",
-                      }}
-                    >
-                      Services
-                    </Typography>
-                    {[
-                      {
-                        name: row.serviceLine1,
-                        offering: row.serviceOffering1,
-                        alloc: row.allocation1 || row.serviceOffering1Pct,
-                        color: "primary" as const,
-                      },
-                      ...(row.serviceLine2 && row.serviceLine2 !== "-"
-                        ? [
-                            {
-                              name: row.serviceLine2,
-                              offering: row.serviceOffering2,
-                              alloc: row.allocation2 || row.serviceOffering2Pct,
-                              color: "secondary" as const,
-                            },
-                          ]
-                        : []),
-                      ...(row.serviceLine3 && row.serviceLine3 !== "-"
-                        ? [
-                            {
-                              name: row.serviceLine3,
-                              offering: row.serviceOffering3,
-                              alloc: row.allocation3 || row.serviceOffering3Pct,
-                              color: "info" as const,
-                            },
-                          ]
-                        : []),
-                    ].map((svc, i) => {
-                      const svcAmount =
-                        ((showNetRevenue ? row.netRevenue : row.grossRevenue) || 0) * ((svc.alloc || 0) / 100);
-                      return (
-                        <Box
-                          key={i}
+                    {/* Missions socles — mapping GAIF : serviceOffering1 = mission socle,
+                        serviceOffering2Pct = coût maintenance annuel (€) */}
+                    {(row.serviceOffering1 || row.serviceOffering2Pct) && (
+                      <>
+                        <Divider sx={{ my: 1.5 }} />
+                        <Typography
+                          variant="caption"
+                          color="text.disabled"
                           sx={{
-                            mb: 0.75,
-                            p: 0.75,
-                            borderRadius: 1,
-                            bgcolor: alpha(theme.palette[svc.color].main, 0.04),
+                            fontSize: "0.6rem",
+                            fontWeight: 700,
+                            textTransform: "uppercase",
+                            letterSpacing: 0.8,
+                            mb: 1,
+                            display: "block",
                           }}
                         >
-                          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                            <Typography variant="caption" fontWeight={600} sx={{ fontSize: "0.72rem" }}>
-                              {svc.name}
-                            </Typography>
-                            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
-                              {svc.alloc > 0 && (
-                                <Chip
-                                  label={`${svc.alloc}%`}
-                                  size="small"
-                                  sx={{
-                                    height: 18,
-                                    fontSize: "0.6rem",
-                                    fontWeight: 600,
-                                    bgcolor: alpha(theme.palette[svc.color].main, 0.1),
-                                    color: `${svc.color}.main`,
-                                  }}
-                                />
-                              )}
-                              {svc.alloc > 0 && (
-                                <Typography
-                                  variant="caption"
-                                  fontWeight={700}
-                                  sx={{ fontSize: "0.68rem", color: `${svc.color}.main` }}
-                                >
-                                  {formatCurrency(svcAmount)}
-                                </Typography>
-                              )}
+                          Missions socles
+                        </Typography>
+
+                        {row.serviceOffering1 && (
+                          <Box
+                            sx={{
+                              mb: 0.75,
+                              p: 0.75,
+                              borderRadius: 1,
+                              bgcolor: alpha(theme.palette.primary.main, 0.04),
+                            }}
+                          >
+                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                              <Typography variant="caption" fontWeight={600} sx={{ fontSize: "0.72rem" }}>
+                                {row.serviceOffering1}
+                              </Typography>
                             </Box>
                           </Box>
-                          {svc.offering && (
-                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.65rem" }}>
-                              {svc.offering}
-                            </Typography>
-                          )}
-                        </Box>
-                      );
-                    })}
-                  </Grid>
-                </Grid>
+                        )}
 
-                {/* Revenue Team — full width below the 2-col grid */}
-                <Divider sx={{ my: 1.5 }} />
-                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 0.5 }}>
-                  <Typography
-                    variant="caption"
-                    color="text.disabled"
-                    sx={{ fontSize: "0.6rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.8 }}
-                  >
-                    Revenue Team
-                  </Typography>
-                  <IconButton
-                    size="small"
-                    aria-label="Edit revenue team"
-                    onClick={() => setRevenueTeamOpen(true)}
-                    sx={{ p: 0.25, color: "secondary.main" }}
-                  >
-                    <EditIcon sx={{ fontSize: 13 }} />
-                  </IconButton>
-                </Box>
-                {revenueTeamMembers.length > 0 ? (
-                  <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 1.5 }}>
-                    {["M/SM", "Director", "Partner"].map((bucket) => {
-                      const bucketMembers = revenueTeamMembers.filter((m: any) => m.gradeBucket === bucket);
-                      const bucketTotal = bucketMembers.reduce((s: number, m: any) => s + (m.percentage || 0), 0);
-                      const bucketColor =
-                        bucket === "Partner"
-                          ? brand.secondaryDark
-                          : bucket === "Director"
-                            ? brand.secondaryLight
-                            : brand.secondary;
-                      return (
-                        <Box key={bucket}>
-                          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 0.5 }}>
+                        {Number(row.serviceOffering2Pct) > 0 && (
+                          <Box
+                            sx={{
+                              mb: 0.75,
+                              p: 0.75,
+                              borderRadius: 1,
+                              bgcolor: alpha(theme.palette.success.main, 0.04),
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                            }}
+                          >
+                            <Typography variant="caption" fontWeight={600} sx={{ fontSize: "0.72rem" }}>
+                              Coût maintenance annuel
+                            </Typography>
                             <Typography
                               variant="caption"
                               fontWeight={700}
-                              sx={{
-                                fontSize: "0.6rem",
-                                textTransform: "uppercase",
-                                letterSpacing: 0.5,
-                                color: bucketColor,
-                              }}
+                              sx={{ fontSize: "0.72rem", color: "success.main" }}
                             >
-                              {bucket}
+                              {formatCurrency(Number(row.serviceOffering2Pct))}
                             </Typography>
-                            {bucketMembers.length > 0 && (
-                              <Typography
-                                variant="caption"
-                                fontWeight={700}
-                                sx={{
-                                  fontSize: "0.6rem",
-                                  color:
-                                    bucketTotal > 100
-                                      ? "error.main"
-                                      : bucketTotal === 100
-                                        ? "success.main"
-                                        : "text.disabled",
-                                }}
-                              >
-                                {bucketTotal}%
-                              </Typography>
-                            )}
                           </Box>
-                          {bucketMembers.length > 0 ? (
-                            bucketMembers.map((m: any) => (
+                        )}
+                      </>
+                    )}
+                  </Grid>
+                </Grid>
+
+                {/* Revenue Team — hidden for GAIF Pilot */}
+                {false && (
+                  <>
+                    <Divider sx={{ my: 1.5 }} />
+                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 0.5 }}>
+                      <Typography
+                        variant="caption"
+                        color="text.disabled"
+                        sx={{ fontSize: "0.6rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.8 }}
+                      >
+                        Revenue Team
+                      </Typography>
+                      <IconButton
+                        size="small"
+                        aria-label="Edit revenue team"
+                        onClick={() => setRevenueTeamOpen(true)}
+                        sx={{ p: 0.25, color: "secondary.main" }}
+                      >
+                        <EditIcon sx={{ fontSize: 13 }} />
+                      </IconButton>
+                    </Box>
+                    {revenueTeamMembers.length > 0 ? (
+                      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 1.5 }}>
+                        {["M/SM", "Director", "Partner"].map((bucket) => {
+                          const bucketMembers = revenueTeamMembers.filter((m: any) => m.gradeBucket === bucket);
+                          const bucketTotal = bucketMembers.reduce((s: number, m: any) => s + (m.percentage || 0), 0);
+                          const bucketColor =
+                            bucket === "Partner"
+                              ? brand.secondaryDark
+                              : bucket === "Director"
+                                ? brand.secondaryLight
+                                : brand.secondary;
+                          return (
+                            <Box key={bucket}>
                               <Box
-                                key={m.id}
-                                sx={{
-                                  display: "flex",
-                                  justifyContent: "space-between",
-                                  alignItems: "center",
-                                  py: 0.25,
-                                  px: 0.75,
-                                  borderRadius: 1,
-                                  bgcolor: alpha(bucketColor, 0.04),
-                                  mb: 0.25,
-                                }}
+                                sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 0.5 }}
                               >
-                                <Typography variant="caption" fontWeight={600} sx={{ fontSize: "0.7rem" }}>
-                                  {m.name || "—"}
-                                </Typography>
                                 <Typography
                                   variant="caption"
                                   fontWeight={700}
-                                  sx={{ fontSize: "0.7rem", color: bucketColor }}
+                                  sx={{
+                                    fontSize: "0.6rem",
+                                    textTransform: "uppercase",
+                                    letterSpacing: 0.5,
+                                    color: bucketColor,
+                                  }}
                                 >
-                                  {m.percentage}%
+                                  {bucket}
                                 </Typography>
+                                {bucketMembers.length > 0 && (
+                                  <Typography
+                                    variant="caption"
+                                    fontWeight={700}
+                                    sx={{
+                                      fontSize: "0.6rem",
+                                      color:
+                                        bucketTotal > 100
+                                          ? "error.main"
+                                          : bucketTotal === 100
+                                            ? "success.main"
+                                            : "text.disabled",
+                                    }}
+                                  >
+                                    {bucketTotal}%
+                                  </Typography>
+                                )}
                               </Box>
-                            ))
-                          ) : (
-                            <Typography
-                              variant="caption"
-                              color="text.disabled"
-                              sx={{ fontSize: "0.65rem", fontStyle: "italic" }}
-                            >
-                              —
-                            </Typography>
-                          )}
-                        </Box>
-                      );
-                    })}
-                  </Box>
-                ) : (
-                  <Typography variant="caption" color="text.disabled" sx={{ fontStyle: "italic", fontSize: "0.68rem" }}>
-                    Not configured
-                  </Typography>
+                              {bucketMembers.length > 0 ? (
+                                bucketMembers.map((m: any) => (
+                                  <Box
+                                    key={m.id}
+                                    sx={{
+                                      display: "flex",
+                                      justifyContent: "space-between",
+                                      alignItems: "center",
+                                      py: 0.25,
+                                      px: 0.75,
+                                      borderRadius: 1,
+                                      bgcolor: alpha(bucketColor, 0.04),
+                                      mb: 0.25,
+                                    }}
+                                  >
+                                    <Typography variant="caption" fontWeight={600} sx={{ fontSize: "0.7rem" }}>
+                                      {m.name || "—"}
+                                    </Typography>
+                                    <Typography
+                                      variant="caption"
+                                      fontWeight={700}
+                                      sx={{ fontSize: "0.7rem", color: bucketColor }}
+                                    >
+                                      {m.percentage}%
+                                    </Typography>
+                                  </Box>
+                                ))
+                              ) : (
+                                <Typography
+                                  variant="caption"
+                                  color="text.disabled"
+                                  sx={{ fontSize: "0.65rem", fontStyle: "italic" }}
+                                >
+                                  —
+                                </Typography>
+                              )}
+                            </Box>
+                          );
+                        })}
+                      </Box>
+                    ) : (
+                      <Typography
+                        variant="caption"
+                        color="text.disabled"
+                        sx={{ fontStyle: "italic", fontSize: "0.68rem" }}
+                      >
+                        Not configured
+                      </Typography>
+                    )}
+                  </>
                 )}
               </Grid>
 
@@ -870,7 +942,7 @@ const OpportunityExpandedDetails = memo(
                       <Tab
                         label={
                           <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
-                            Staffing
+                            Experts
                             {staffingNeedsCount > 0 && (
                               <Chip
                                 label={staffingNeedsCount}
@@ -943,7 +1015,7 @@ const OpportunityExpandedDetails = memo(
                           "&:hover": { textDecoration: "underline" },
                         }}
                       >
-                        Voir dans Staffing →
+                        Voir dans Plan de charge →
                       </Typography>
                     )}
                   </Box>
@@ -955,14 +1027,14 @@ const OpportunityExpandedDetails = memo(
                       opportunityId={row.opportunityId}
                       opportunityName={row.opportunity}
                       opportunityDetails={{
-                        EM: row.em,
-                        EP: row.ep,
+                        Responsable: row.em,
+                        Prestataire: row.ep,
                         account: row.account,
                         Status: statusText[row.status] || `Status ${row.status}`,
                         Revenue: showNetRevenue ? row.netRevenue || 0 : row.grossRevenue || 0,
                         ServiceLine: row.serviceLine1,
-                        Manager: row.manager,
-                        Partner: row.partner,
+                        Responsable2: row.manager,
+                        Prestataire2: row.partner,
                       }}
                     />
                   )}
@@ -979,16 +1051,19 @@ const OpportunityExpandedDetails = memo(
           </CardContent>
         </Card>
 
-        <RevenueTeamDialog
-          open={revenueTeamOpen}
-          onClose={() => setRevenueTeamOpen(false)}
-          opportunityId={opportunityId}
-          opportunityName={row.opportunity || ""}
-          em={row.em}
-          ep={row.ep}
-          manager={row.manager}
-          partner={row.partner}
-        />
+        {/* RevenueTeamDialog — hidden for GAIF Pilot */}
+        {false && (
+          <RevenueTeamDialog
+            open={revenueTeamOpen}
+            onClose={() => setRevenueTeamOpen(false)}
+            opportunityId={opportunityId}
+            opportunityName={row.opportunity || ""}
+            em={row.em}
+            ep={row.ep}
+            manager={row.manager}
+            partner={row.partner}
+          />
+        )}
       </Box>
     );
   }

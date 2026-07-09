@@ -132,8 +132,8 @@ const OpportunityActions = ({ opportunityId, opportunityName, opportunityDetails
     minutes += `## Opportunity Details\n\n- **ID**: ${opportunityId}\n- **Name**: ${opportunityName}\n`;
     minutes += `- **Status**: ${opportunityDetails?.status || "N/A"}\n- **Account**: ${opportunityDetails?.account || "N/A"}\n`;
     minutes += `- **Revenue**: ${typeof opportunityDetails?.grossRevenue === "number" ? formatCurrency(opportunityDetails.grossRevenue) : opportunityDetails?.grossRevenue || "N/A"}\n\n`;
-    minutes += `## Team\n\n- **EM**: ${opportunityDetails?.em || "N/A"}\n- **EP**: ${opportunityDetails?.ep || "N/A"}\n`;
-    minutes += `- **Manager**: ${opportunityDetails?.manager || "N/A"}\n- **Partner**: ${opportunityDetails?.partner || "N/A"}\n\n`;
+    minutes += `## Team\n\n- **Responsable**: ${opportunityDetails?.em || opportunityDetails?.Responsable || "N/A"}\n- **Prestataire**: ${opportunityDetails?.ep || opportunityDetails?.Prestataire || "N/A"}\n`;
+    minutes += `- **Responsable 2**: ${opportunityDetails?.manager || opportunityDetails?.Responsable2 || "N/A"}\n- **Prestataire 2**: ${opportunityDetails?.partner || opportunityDetails?.Prestataire2 || "N/A"}\n\n`;
     if (actions.length > 0) {
       minutes += `## Action Items\n\n`;
       actions.forEach((a: OpportunityAction) => {
@@ -191,7 +191,7 @@ const OpportunityActions = ({ opportunityId, opportunityName, opportunityDetails
       {(isAddingAction || editingAction) && (
         <Box sx={{ p: 2, mb: 2, borderRadius: 2, bgcolor: alpha(theme.palette.background.default, 0.5) }}>
           <Typography variant="subtitle2" gutterBottom fontWeight={600} color={accentColor}>
-            {editingAction ? "Edit Action Item" : "New Action Item"}
+            {editingAction ? "Modifier l'action" : "Nouvelle action"}
           </Typography>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
             <TextField
@@ -264,7 +264,7 @@ const OpportunityActions = ({ opportunityId, opportunityName, opportunityDetails
                   setEditingAction(null);
                 }}
               >
-                Cancel
+                Annuler
               </Button>
               <Button
                 variant="contained"
@@ -272,7 +272,7 @@ const OpportunityActions = ({ opportunityId, opportunityName, opportunityDetails
                 startIcon={<SaveIcon />}
                 onClick={editingAction ? handleUpdateAction : handleAddAction}
               >
-                {editingAction ? "Update" : "Save"}
+                {editingAction ? "Modifier" : "Enregistrer"}
               </Button>
             </Box>
           </Box>
@@ -377,7 +377,7 @@ const OpportunityActions = ({ opportunityId, opportunityName, opportunityDetails
         </Box>
       ) : (
         <Typography variant="caption" color="text.disabled" sx={{ display: "block", mt: 1 }}>
-          No actions yet
+          Aucune action
         </Typography>
       )}
     </Box>

@@ -17,13 +17,13 @@ export interface StatusOption {
 // ── Default status options (overridden at hydration time) ──
 
 export const STATUS_OPTIONS: StatusOption[] = [
-  { status: 1, label: "Lead Identified", shortLabel: "Lead" },
-  { status: 4, label: "Go Approved", shortLabel: "Go" },
-  { status: 6, label: "Proposal Submitted", shortLabel: "Proposal" },
-  { status: 11, label: "Client Won", shortLabel: "Won" },
-  { status: 13, label: "AEL", shortLabel: "AEL" },
-  { status: 14, label: "Booked", shortLabel: "Booked" },
-  { status: 15, label: "Lost", shortLabel: "Lost" },
+  { status: 1, label: "Émergence", shortLabel: "Émergence" },
+  { status: 4, label: "Investissement / CEB", shortLabel: "Invest." },
+  { status: 6, label: "Étude en cours", shortLabel: "Étude" },
+  { status: 11, label: "Maintenance lourde", shortLabel: "Maint." },
+  { status: 13, label: "Conventionné", shortLabel: "Conv." },
+  { status: 14, label: "En exploitation", shortLabel: "Exploit." },
+  { status: 15, label: "Déclassé", shortLabel: "Déclassé" },
 ];
 
 /**

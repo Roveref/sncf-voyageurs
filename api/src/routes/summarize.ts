@@ -66,7 +66,7 @@ router.post("/", async (req: Request, res: Response) => {
 
     const context = gatherSummaryData(type, dateRange);
 
-    const systemPrompt = `BearingPoint Dashboard AI Assistant. Generate professional summaries.
+    const systemPrompt = `GAIF Pilot AI Assistant — Direction GAIF SNCF Voyageurs. Generate professional summaries.
 Respond in English, markdown format, no emojis. Use only the provided data.
 
 ${SUMMARY_PROMPTS[type]}
@@ -99,7 +99,7 @@ function gatherSummaryData(type: SummaryType, dateRange?: { start: string; end: 
     const pipeline = db
       .prepare(
         `SELECT status, COUNT(*) as count, COALESCE(SUM(grossRevenue), 0) as gross, COALESCE(SUM(netRevenue), 0) as net, COALESCE(SUM(weightedBooking), 0) as weighted
-       FROM crm_opportunities WHERE status NOT IN (15) ${dateFilter} GROUP BY status ORDER BY status`
+       FROM assets WHERE status NOT IN (15) ${dateFilter} GROUP BY status ORDER BY status`
       )
       .all(...dateParams);
     blocks.push(
@@ -116,7 +116,7 @@ function gatherSummaryData(type: SummaryType, dateRange?: { start: string; end: 
     const topOpps = db
       .prepare(
         `SELECT opportunity as name, account, status, grossRevenue, winPct, manager, partner
-       FROM crm_opportunities WHERE status NOT IN (14, 15) ${dateFilter}
+       FROM assets WHERE status NOT IN (14, 15) ${dateFilter}
        ORDER BY grossRevenue DESC LIMIT 5`
       )
       .all(...dateParams);
@@ -134,7 +134,7 @@ function gatherSummaryData(type: SummaryType, dateRange?: { start: string; end: 
     const bySegment = db
       .prepare(
         `SELECT subSegmentCode, COUNT(*) as count, SUM(grossRevenue) as gross
-       FROM crm_opportunities WHERE status NOT IN (15) AND subSegmentCode IS NOT NULL ${dateFilter}
+       FROM assets WHERE status NOT IN (15) AND subSegmentCode IS NOT NULL ${dateFilter}
        GROUP BY subSegmentCode ORDER BY gross DESC`
       )
       .all(...dateParams);
@@ -146,7 +146,7 @@ function gatherSummaryData(type: SummaryType, dateRange?: { start: string; end: 
     // Stagnant proposals
     const stagnant = db
       .prepare(
-        `SELECT opportunity as name, account, grossRevenue, creationDate FROM crm_opportunities
+        `SELECT opportunity as name, account, grossRevenue, creationDate FROM assets
        WHERE status = 6 AND creationDate < date('now', '-60 days') ORDER BY grossRevenue DESC LIMIT 5`
       )
       .all();
@@ -204,7 +204,7 @@ function gatherSummaryData(type: SummaryType, dateRange?: { start: string; end: 
     const needs = db
       .prepare(
         `SELECT n.grade, n.quantity, n.startDate, n.endDate, o.opportunity as oppName, o.account
-       FROM user_staffing_needs n JOIN crm_opportunities o ON n.opportunityId = o.opportunityId
+       FROM user_staffing_needs n JOIN assets o ON n.opportunityId = o.opportunityId
        WHERE n.startDate >= ? ORDER BY n.startDate LIMIT 10`
       )
       .all(today);
@@ -222,7 +222,7 @@ function gatherSummaryData(type: SummaryType, dateRange?: { start: string; end: 
     const overdue = db
       .prepare(
         `SELECT a.description, a.owner, a.dueDate, o.opportunity as oppName FROM user_actions a
-       JOIN crm_opportunities o ON a.opportunityId = o.opportunityId
+       JOIN assets o ON a.opportunityId = o.opportunityId
        WHERE a.status != 'done' AND a.dueDate < ?
        ORDER BY a.dueDate LIMIT 10`
       )
@@ -236,7 +236,7 @@ function gatherSummaryData(type: SummaryType, dateRange?: { start: string; end: 
     // Won without staffing
     const wonNoStaff = db
       .prepare(
-        `SELECT o.opportunity as name, o.account, o.grossRevenue FROM crm_opportunities o
+        `SELECT o.opportunity as name, o.account, o.grossRevenue FROM assets o
        WHERE o.status = 11 AND NOT EXISTS (
          SELECT 1 FROM user_staffing_needs n WHERE n.opportunityId = o.opportunityId
        ) LIMIT 10`
@@ -251,7 +251,7 @@ function gatherSummaryData(type: SummaryType, dateRange?: { start: string; end: 
     // Recent bookings
     const recentBookings = db
       .prepare(
-        `SELECT opportunity as name, account, grossRevenue, bookingDate FROM crm_opportunities
+        `SELECT opportunity as name, account, grossRevenue, bookingDate FROM assets
        WHERE status = 14 AND bookingDate >= date('now', '-30 days') ORDER BY bookingDate DESC LIMIT 5`
       )
       .all();

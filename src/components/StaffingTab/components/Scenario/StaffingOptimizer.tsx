@@ -265,13 +265,13 @@ const StaffingOptimizer = memo(
             <Box sx={{ py: 4, textAlign: "center" }}>
               <Typography color="text.secondary">
                 {slots.length === 0
-                  ? "No staffing needs defined. Create needs in the assignment board."
-                  : "No employees available for assignment."}
+                  ? "Aucun besoin d'intervention défini."
+                  : "Aucun collaborateur disponible pour affectation."}
               </Typography>
             </Box>
           </DialogContent>
           <DialogActions>
-            <Button onClick={onClose}>Close</Button>
+            <Button onClick={onClose}>Fermer</Button>
           </DialogActions>
         </Dialog>
       );

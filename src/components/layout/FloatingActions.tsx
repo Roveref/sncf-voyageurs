@@ -62,7 +62,7 @@ const FloatingActions = memo(({ isPhone, totalStaffingNeedsCount }: FloatingActi
       >
         {[
           {
-            label: "Staffing Need",
+            label: "Besoin d'intervention",
             icon: <GroupIcon sx={{ fontSize: 18 }} />,
             color: "warning" as const,
             onClick: () => {
@@ -71,7 +71,7 @@ const FloatingActions = memo(({ isPhone, totalStaffingNeedsCount }: FloatingActi
             },
           },
           {
-            label: "Account",
+            label: "Site",
             icon: <BusinessIcon sx={{ fontSize: 18 }} />,
             color: "secondary" as const,
             onClick: () => {
@@ -80,7 +80,7 @@ const FloatingActions = memo(({ isPhone, totalStaffingNeedsCount }: FloatingActi
             },
           },
           {
-            label: "Opportunity",
+            label: "Actif",
             icon: <MonetizationOnIcon sx={{ fontSize: 18 }} />,
             color: "primary" as const,
             onClick: () => {

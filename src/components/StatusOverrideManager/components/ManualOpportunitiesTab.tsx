@@ -240,7 +240,7 @@ const ManualOpportunitiesTab = memo(
         {filtered.length === 0 ? (
           <Box sx={{ p: 4, textAlign: "center" }}>
             <Typography variant="body2" color="text.secondary">
-              {manualCount === 0 ? "No opportunities to create" : "No results matching your search"}
+              {manualCount === 0 ? "Aucun actif manuel" : "Aucun résultat pour cette recherche"}
             </Typography>
           </Box>
         ) : (

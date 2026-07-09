@@ -25,6 +25,7 @@ import { brand, onBrandConfigChange } from "./config/brandConfig";
 // OPTIMIZED: Lazy load tab components for faster initial load
 const ChatPanel = lazy(() => import("./components/ChatPanel/ChatPanel"));
 const NeedsBoardV2 = lazy(() => import("./components/StaffingTab/components/Needs/NeedsBoardV2"));
+import GaifWidgetsProvider from "./components/CustomDashboard/GaifWidgetsProvider";
 // Widget catalog is now auto-built from the widget registry (DetachableCard auto-registers)
 import GlobalCardExport from "./components/common/GlobalCardExport";
 
@@ -362,6 +363,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <GaifWidgetsProvider />
       {/* Redirect root to /pipeline */}
       <Routes>
         <Route path="/" element={<Navigate to="/pipeline" replace />} />
@@ -532,29 +534,17 @@ function App() {
                     },
                   }}
                 >
-                  {/* BearingPoint Logo SVG */}
-                  <svg width="42" height="37.5" viewBox="0 0 28 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <g clipPath="url(#clip0_4452_398)">
-                      <g clipPath="url(#clip1_4452_398)">
-                        <path
-                          d="M15.3383 11.8074C16.6369 10.6491 17.3389 8.89423 17.3389 6.96374C17.3389 3.03266 14.531 0.294922 10.3542 0.294922H0V24.8643H10.5999C15.1628 24.8643 18.2164 21.951 18.2164 17.6339C18.2164 15.1769 17.1634 12.9657 15.3383 11.8074ZM4.56287 4.22602H9.79266C11.6178 4.22602 12.7059 5.3843 12.7059 7.20942C12.7059 9.03463 11.5827 10.1928 9.82771 10.1928H4.56287V4.22602ZM10.1085 20.9332H4.56287V14.124H10.1085C12.2144 14.124 13.5834 15.3876 13.5834 17.5286C13.5834 19.6697 12.2847 20.9332 10.1085 20.9332Z"
-                          fill={darkMode ? "#000000" : "white"}
-                        />
-                        <path
-                          d="M22.9832 0.212891C20.7551 0.212891 18.9482 2.0198 18.9482 4.24789C18.9482 6.47598 20.7551 8.28286 22.9832 8.28286C25.2113 8.28286 27.0182 6.47598 27.0182 4.24789C27.0182 2.0198 25.2127 0.212891 22.9832 0.212891ZM22.9832 6.18396C21.9134 6.18396 21.0471 5.31631 21.0471 4.24789C21.0471 3.17947 21.9148 2.31182 22.9832 2.31182C24.0516 2.31182 24.9192 3.17947 24.9192 4.24789C24.9192 5.31631 24.0516 6.18396 22.9832 6.18396Z"
-                          fill={darkMode ? "#000000" : "white"}
-                        />
-                      </g>
-                    </g>
-                    <defs>
-                      <clipPath id="clip0_4452_398">
-                        <rect width="27.3649" height="25" fill="white" />
-                      </clipPath>
-                      <clipPath id="clip1_4452_398">
-                        <rect width="27.027" height="24.6597" fill="white" transform="translate(0 0.212891)" />
-                      </clipPath>
-                    </defs>
-                  </svg>
+                  {/* Logo SNCF Voyageurs */}
+                  <Box
+                    component="img"
+                    src="/sncf-voyageurs-logo.png"
+                    alt="SNCF Voyageurs"
+                    sx={{
+                      height: 36,
+                      width: "auto",
+                      filter: darkMode ? "brightness(0) invert(1)" : "none",
+                    }}
+                  />
                 </Box>
 
                 {/* Center - Tabs */}
@@ -586,44 +576,44 @@ function App() {
                         },
                         "&.Mui-selected": {
                           color: "white",
-                          filter: "drop-shadow(0 0 8px rgba(255,61,71,0.5))",
+                          filter: `drop-shadow(0 0 8px ${brand.primary}80)`,
                         },
                       },
                       flexGrow: 0,
                     }}
                   >
                     <Tab
-                      label="Pipeline"
+                      label="Parc d'actifs"
                       icon={<TrendingUpRoundedIcon sx={{ fontSize: 20 }} />}
                       iconPosition="start"
                       sx={{ gap: 1 }}
                     />
                     <Tab
-                      label="Bookings"
+                      label="Maintenance"
                       icon={<TaskAltRoundedIcon sx={{ fontSize: 20 }} />}
                       iconPosition="start"
                       sx={{ gap: 1 }}
                     />
                     <Tab
-                      label="Staffing"
+                      label="Plan de charge"
                       icon={<GroupsRoundedIcon sx={{ fontSize: 20 }} />}
                       iconPosition="start"
                       sx={{ gap: 1 }}
                     />
                     <Tab
-                      label="Project"
+                      label="Cycle de vie"
                       icon={<HubRoundedIcon sx={{ fontSize: 20 }} />}
                       iconPosition="start"
                       sx={{ gap: 1 }}
                     />
                     <Tab
-                      label="Recruitment"
+                      label="Conformité"
                       icon={<PersonAddAltRoundedIcon sx={{ fontSize: 20 }} />}
                       iconPosition="start"
                       sx={{ gap: 1 }}
                     />
                     <Tab
-                      label="Mon Dashboard"
+                      label="Vue d'ensemble"
                       icon={<DashboardCustomizeOutlinedIcon sx={{ fontSize: 20 }} />}
                       iconPosition="start"
                       sx={{ gap: 1 }}
